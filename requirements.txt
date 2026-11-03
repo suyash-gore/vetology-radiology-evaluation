@@ -1,0 +1,15 @@
+
+# Excel workbook processing
+openpyxl==3.1.5
+
+# OpenAI integration through LangChain
+langchain-openai==1.7.2
+
+# Google Gemini integration through LangChain
+langchain-google-genai==4.4.2
+
+# Hugging Face integration through LangChain
+langchain-huggingface==1.2.3
+
+# Python code quality and linting
+flake8==7.4.1

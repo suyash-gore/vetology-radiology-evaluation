@@ -218,3 +218,18 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Vetology project-specific exclusions
+
+# Local environment and secrets
+.venv/
+.env.*
+!.env.example
+
+# Local datasets and generated data
+data/
+datasets/
+
+# Operating system files
+.DS_Store
+Thumbs.db
