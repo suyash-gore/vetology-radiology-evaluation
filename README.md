@@ -1,184 +1,175 @@
 # Vetology Radiology Evaluation
 
-Repository for Vetology training assignments involving radiology-report data processing, language-model integrations, and evaluation workflows.
+Python project for the Vetology training assignments. The project processes veterinary radiology reports, uses large language models (LLMs) to classify diagnostic conditions, and evaluates predictions against an independently maintained Gold Standard.
 
-## Project overview
+> **Confidentiality:** Do not commit or publish Vetology datasets, manually scored files, prediction outputs containing restricted data, patient/clinic identifiers, API credentials, or populated `.env` files. Use only approved data-handling and sharing workflows.
 
-This repository contains the code and documentation developed across the weekly Vetology training assignments. The project is organized by assignment week, with a separate location for reusable utilities and project documentation.
+## Current status
 
-## Current project status
+### Week 4 — First application
 
-### Week 2
+The first canine thorax application has been implemented and run against 100 cases (CaseID 1–100).
 
-- A command-line Excel-processing scaffold is implemented in `src/week_02/main.py`.
-- The program accepts an input Excel workbook path and can optionally accept an output path.
-- It reads the active worksheet's header row and identifies condition columns dynamically after the first eight metadata columns.
-- It generates an output workbook following the supplied confusion-matrix example structure.
-- The output currently provides the confusion-matrix layout and formulas; it does **not** calculate or populate TP, FN, TN, or FP counts.
-- Separate LangChain demonstration scripts are present for OpenAI GPT, Google Gemini, and Hugging Face Mistral.
-- Explanatory comments have been added, and Flake8 checks have been reported as passing.
-- Live API calls have not yet been verified; they are pending organizational credentials, billing/access guidance, and model/provider availability.
+Completed and user-verified:
+- Excel data loading and validation for 100 cases, 20 conditions, and 2,000 Gold Standard labels.
+- LLM input restricted to the original radiologist `Findings`, `Conclusions`, and `Recommendations`; CaseID is retained for tracking and is not sent to the model.
+- AI-generated report fields and Gold Standard labels are excluded from LLM input.
+- V1.3 master classification prompt integrated.
+- LangChain/OpenAI client configured using environment variables.
+- Strict JSON response validation for the exact 20 condition keys and `Positive`/`Negative` labels.
+- Sequential batch processing, retries, checkpointing, restart support, and error logging.
+- Live batch completed: 100 successful predictions and zero failed cases.
+- Matrix 2 evaluation against the approved Gold Standard generated for 2,000 labels.
+- All 70 prediction/Gold Standard mismatches reviewed provisionally and consolidated in a separate adjudication register.
 
-### Week 3
+Matrix 2 aggregate results:
+- Accuracy: 96.50%
+- Sensitivity: 80.38%
+- Specificity: 97.88%
+- TP: 127; FN: 31; TN: 1,803; FP: 39
 
-The `src/week_03/` directory is reserved for condition-specific prompts, prompt testing, and evaluation work. Work should be documented as it is implemented.
+**Still outstanding for Week 4:**
+- Matrix 1: original radiologist report versus the second AI report.
+- Authorized adjudication of the 70 mismatches. The existing Gold Standard and original predictions must remain unchanged until approved.
+- Optional task: move prompt configuration into JSON and test loading/execution from that configuration.
 
-### Shared utilities
+These results are a pilot evaluation against the approved project Gold Standard, not evidence of clinical readiness. Conditions with no positive reference cases do not have a meaningful sensitivity estimate.
 
-The `src/common/` directory is reserved for utilities that are genuinely reusable across assignment weeks. Code should only be moved here when there is a clear reuse case.
+## Repository layout
 
-## Repository structure
+The project is organized by assignment week, with shared utilities and documentation kept separately.
 
 ```text
-vetology-radiology-evaluation/
+VETOLOGY-RADIOLOGY/
 ├── src/
+│   ├── common/
+│   ├── week_01/
 │   ├── week_02/
-│   │   ├── main.py
-│   │   ├── test_openai_api.py
-│   │   ├── test_gemini_api.py
-│   │   └── test_huggingface_mistral.py
 │   ├── week_03/
-│   │   └── .gitkeep
-│   └── common/
-│       └── .gitkeep
+│   └── week_04/
+│       ├── prompts/
+│       ├── week4_block1_data_loader.py
+│       ├── llm_client.py
+│       ├── single_case_test.py
+│       ├── response_validator.py
+│       ├── test_response_validator.py
+│       ├── batch_processor.py
+│       └── run_batch.py
 ├── docs/
-│   ├── project_documentation.md
 │   ├── CHANGELOG.md
 │   ├── DECISION_LOG.md
+│   ├── project_documentation.md
 │   ├── testing_log.md
 │   └── weekly_progress.md
-├── README.md
-├── requirements.txt
+├── .env.example
 ├── .gitignore
-└── .env.example
+├── README.md
+└── requirements.txt
 ```
 
-The `.gitkeep` files keep the currently empty `week_03` and `common` directories visible in Git. They can be removed once those directories contain tracked project files.
+The structure above records the known project modules. Keep it synchronized with the actual repository as files are added or renamed.
 
 ## Prerequisites
 
-- Python installed on your machine.
-- Git for version control.
-- Visual Studio Code or another Python-compatible editor is recommended.
+- Windows 11 (the reported development environment)
+- Python (Python 3.14.6 was reported during setup; verify compatibility if recreating the environment)
+- Visual Studio Code or another Python IDE
+- An OpenAI API key and permission/billing access for API execution
 
-The project has been developed and tested in a Windows PowerShell environment using a Python virtual environment.
+## Setup (Windows PowerShell)
 
-## Setup
-
-Run the following commands from the repository root.
-
-### 1. Create a virtual environment
+Run from the repository root:
 
 ```powershell
 python -m venv .venv
-```
-
-### 2. Activate the virtual environment
-
-```powershell
 .venv\Scripts\Activate.ps1
-```
-
-If PowerShell blocks script activation, use an approved local execution-policy approach or activate the environment through the VS Code Python interpreter selector.
-
-### 3. Install dependencies
-
-```powershell
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-`requirements.txt` records the direct dependencies and versions currently identified for the project. Update it when new direct dependencies are introduced.
+If PowerShell blocks activation, select `.venv` through the VS Code Python interpreter selector or follow your organization's approved execution-policy process.
 
-## Environment configuration and API credentials
+## Environment configuration
 
-The `.env.example` file documents the environment variable names used by the API demonstration scripts:
+1. Copy `.env.example` to a local file named `.env` in the repository root.
+2. Add your own OpenAI API key to `.env`.
+3. Do not share or commit `.env`.
 
-```text
-OPENAI_API_KEY=
-GOOGLE_API_KEY=
-HUGGINGFACEHUB_API_TOKEN=
-```
+The Week 4 client uses `python-dotenv` to load the root `.env` file and reads these settings:
 
-To configure credentials:
+| Variable | Purpose | Default |
+|---|---|---|
+| `OPENAI_API_KEY` | OpenAI credential | Required |
+| `OPENAI_MODEL` | OpenAI model name | `gpt-4.1-mini` |
+| `OPENAI_TEMPERATURE` | Sampling temperature | `0` |
+| `OPENAI_TIMEOUT_SECONDS` | Request timeout | `90` |
+| `OPENAI_MAX_RETRIES` | Client retry limit | `2` |
 
-1. Make a private local copy named `.env` if you use a local environment-file workflow.
-2. Add the appropriate credentials to your local configuration.
-3. Ensure `.env` is never committed to Git.
+Never put real keys in `.env.example`, source files, logs, screenshots, or documentation.
 
-**Important:** The current API scripts read credentials from environment variables. A plain `.env` file is not automatically loaded by Python unless a dotenv-loading mechanism is added. You can instead set the variables in your terminal/session or configure them through your development environment. Never put real credentials in `.env.example` or in source code.
+## Week 4 — first application
 
-Live API testing remains pending until the required organizational access and provider availability are confirmed.
+### Data and prompt safeguards
 
-## Week 2: Excel scaffold
+The approved Gold Standard is maintained separately from model inputs and predictions. The LLM receives only the three original radiologist report fields:
+- `Findings (original radiologist report)`
+- `Conclusions (original radiologist report)`
+- `Recommendations (original radiologist report)`
 
-Run the command-line program from the repository root:
+CaseID is used locally for tracking. It is not sent to the LLM. AI-generated report fields and Gold Standard labels must not be sent to the LLM.
+
+The V1.3 prompt classifies 20 condition keys independently and requires exact `Positive` or `Negative` labels in JSON. See the prompt file under `src/week_04/prompts/`.
+
+### Run the batch
+
+The batch runner accepts the project’s configured dataset and output paths. Check the current command-line help or function signature in `src/week_04/run_batch.py` before execution; paths and arguments may be adjusted as the project evolves.
+
+The batch processor:
+- processes cases sequentially;
+- validates model responses;
+- writes successful validated predictions to JSONL;
+- logs failed attempts separately;
+- supports retries and restart/checkpoint behavior.
+
+Do not place confidential input workbooks or generated prediction files in the repository.
+
+### Evaluation
+
+The completed Matrix 2 evaluation compares model predictions against the approved Gold Standard for 100 cases and 20 conditions (2,000 labels). The generated evaluation workbook contains:
+1. `Case Predictions`
+2. `Confusion Matrix`
+3. `Execution Log`
+
+The separately prepared adjudication register documents the 70 mismatches for authorized review. It is a review aid, not an automatically approved replacement Gold Standard.
+
+### Week 4 remaining work
+
+1. Generate Matrix 1 (original radiologist report versus the second AI report).
+2. Obtain authorized decisions on the mismatch register; preserve the baseline evaluation until decisions are approved.
+3. Optional: implement JSON-based prompt configuration and test it.
+
+## Tests
+
+The Week 4 response-validator tests cover valid responses and rejection of malformed JSON, duplicate keys, missing/unexpected keys, invalid labels, and markdown-fenced output. Offline batch-processor tests cover checkpointing, restart behavior, retries, and error logging. The 100-case live batch and Matrix 2 evaluation were also completed.
+
+See `docs/testing_log.md` for the recorded evidence and limitations. Run tests from the repository root using the project virtual environment. Example:
 
 ```powershell
-python src/week_02/main.py "path\to\input.xlsx"
+python -m unittest discover -s src/week_04 -p "test_*.py"
 ```
 
-To specify an output workbook path:
+If test discovery or import paths differ in your local checkout, use the test module's documented invocation and record the actual command and result.
 
-```powershell
-python src/week_02/main.py "path\to\input.xlsx" -o "path\to\output.xlsx"
-```
+## Documentation
 
-If `-o` is omitted, the program creates an output file using the input file's name with the `_confusion_matrix.xlsx` suffix.
+- `docs/weekly_progress.md` — assignment progress by week.
+- `docs/CHANGELOG.md` — implementation history.
+- `docs/DECISION_LOG.md` — technical and evaluation decisions.
+- `docs/testing_log.md` — tests, results, and limitations.
+- `docs/project_documentation.md` — consolidated technical record.
 
-The current scaffold identifies condition names dynamically from the input workbook. It assumes the first eight columns contain metadata and report fields, with condition columns following them.
+Update these files when implementation or assignment status changes. Do not describe planned or unverified functionality as complete.
 
-The generated workbook contains the confusion-matrix structure and formulas. Actual confusion-matrix counts and derived evaluation results are not populated by the current scaffold.
+## Version control
 
-Use authorized test data when testing. Do not add raw or manually labelled datasets to the repository unless sharing has been explicitly approved.
-
-## API demonstration scripts
-
-The following scripts are located in `src/week_02/`:
-
-| Script | Purpose |
-|---|---|
-| `test_openai_api.py` | Demonstrates a LangChain connection to an OpenAI model. |
-| `test_gemini_api.py` | Demonstrates a LangChain connection to a Google Gemini model. |
-| `test_huggingface_mistral.py` | Demonstrates a LangChain connection to a hosted Hugging Face Mistral model. |
-
-These are separate API demonstration scripts. Their presence does not mean that live API execution has been successfully verified.
-
-## Code quality checks
-
-Run Flake8 against the Week 2 Python scripts from the repository root:
-
-```powershell
-python -m flake8 src/week_02/
-```
-
-Run the command-line help check:
-
-```powershell
-python src/week_02/main.py --help
-```
-
-Record test commands, outcomes, and any limitations in `docs/testing_log.md`.
-
-## Documentation and version control
-
-Project documentation is maintained in `docs/`:
-
-- `project_documentation.md` — consolidated technical project documentation.
-- `CHANGELOG.md` — chronological record of meaningful changes.
-- `DECISION_LOG.md` — technical decisions, rationale, alternatives, and consequences.
-- `testing_log.md` — test commands, results, and outstanding verification.
-- `weekly_progress.md` — progress against weekly assignment requirements.
-
-Use meaningful Git commits for changes and milestone tags for significant weekly baselines. Keep the documentation aligned with the actual implementation and distinguish completed, pending, and planned work.
-
-## Security and data handling
-
-Do not commit or publish:
-
-- API keys, tokens, passwords, or populated `.env` files.
-- Raw radiology datasets or manually labelled datasets.
-- Patient-identifiable, confidential, or otherwise restricted Vetology information.
-- Local virtual environments or generated files that are not intended to be version-controlled.
-
-Follow organizational authorization and data-handling requirements before sharing project files or data with collaborators.
+Git milestone commits/tags were deferred during the implementation work and should be completed during the project closeout. Before committing, inspect staged files and confirm no confidential data, `.env`, datasets, predictions, or restricted outputs are included.

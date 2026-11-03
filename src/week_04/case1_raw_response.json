@@ -1,0 +1,22 @@
+{
+  "perihilar_infiltrate": "Negative",
+  "pneumonia": "Negative",
+  "bronchitis": "Positive",
+  "interstitial": "Positive",
+  "diseased_lungs": "Positive",
+  "hypo_plastic_trachea": "Negative",
+  "cardiomegaly": "Negative",
+  "pulmonary_nodules": "Negative",
+  "pleural_effusion": "Negative",
+  "rtm": "Negative",
+  "focal_caudodorsal_lung": "Negative",
+  "focal_perihilar": "Negative",
+  "pulmonary_hypoinflation": "Negative",
+  "right_sided_cardiomegaly": "Negative",
+  "pericardial_effusion": "Negative",
+  "bronchiectasis": "Negative",
+  "pulmonary_vessel_enlargement": "Negative",
+  "left_sided_cardiomegaly": "Negative",
+  "thoracic_lymphadenopathy": "Negative",
+  "esophagitis": "Negative"
+}

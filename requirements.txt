@@ -1,15 +1,16 @@
-
-# Excel workbook processing
+# Excel workbook input/output
 openpyxl==3.1.5
 
-# OpenAI integration through LangChain
+# LangChain integration with OpenAI
 langchain-openai==1.7.2
 
-# Google Gemini integration through LangChain
-langchain-google-genai==4.4.2
+# Load local environment variables from the repository-root .env file
+python-dotenv>=1.0,<2.0
 
-# Hugging Face integration through LangChain
-langchain-huggingface==1.2.3
-
-# Python code quality and linting
+# Code quality / linting
 flake8==7.4.1
+
+# Week 2 demonstration integrations retained in the project.
+# Keep these only while the corresponding demo scripts are part of the repository.
+langchain-google-genai==4.4.2
+langchain-huggingface==1.2.3
