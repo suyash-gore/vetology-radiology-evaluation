@@ -20,7 +20,10 @@ Completed and user-verified:
 - Sequential batch processing, retries, checkpointing, restart support, and error logging.
 - Live batch completed: 100 successful predictions and zero failed cases.
 - Matrix 2 evaluation against the approved Gold Standard generated for 2,000 labels.
-- All 70 prediction/Gold Standard mismatches reviewed provisionally and consolidated in a separate adjudication register.
+- All 70 Matrix 2 prediction/Gold Standard mismatches reviewed provisionally and consolidated in a separate adjudication register.
+- Matrix 1 evaluation completed for 100 cases × 20 conditions (2,000 pairs): TP 128, FN 921, TN 913, FP 38; accuracy 52.05%, sensitivity 12.20%, specificity 96.00%, precision 77.11%, F1 21.07%.
+- Matrix 1 mismatch/error analysis completed at the text-screening level for all 959 mismatches across all 20 conditions; veterinary adjudication remains pending.
+- Week 4 optional JSON prompt-configuration task implemented and locally tested: 5 tests passed.
 
 Matrix 2 aggregate results:
 - Accuracy: 96.50%
@@ -28,10 +31,7 @@ Matrix 2 aggregate results:
 - Specificity: 97.88%
 - TP: 127; FN: 31; TN: 1,803; FP: 39
 
-**Still outstanding for Week 4:**
-- Matrix 1: original radiologist report versus the second AI report.
-- Authorized adjudication of the 70 mismatches. The existing Gold Standard and original predictions must remain unchanged until approved.
-- Optional task: move prompt configuration into JSON and test loading/execution from that configuration.
+**Week 4 closeout:** The application, evaluation deliverables, and optional JSON prompt-configuration task are implemented and tested. Authorized veterinary adjudication of mismatch registers remains pending. Text screening does not authorize changes to the Gold Standard or baseline predictions.
 
 These results are a pilot evaluation against the approved project Gold Standard, not evidence of clinical readiness. Conditions with no positive reference cases do not have a meaningful sensitivity estimate.
 
@@ -48,6 +48,12 @@ VETOLOGY-RADIOLOGY/
 │   ├── week_03/
 │   └── week_04/
 │       ├── prompts/
+│       ├── optional_json_config/
+│       │   ├── config/
+│       │   │   └── canine_thorax_v1_3.json
+│       │   ├── prompt_config_loader.py
+│       │   ├── test_prompt_config_loader.py
+│       │   └── README.md
 │       ├── week4_block1_data_loader.py
 │       ├── llm_client.py
 │       ├── single_case_test.py
@@ -142,11 +148,26 @@ The completed Matrix 2 evaluation compares model predictions against the approve
 
 The separately prepared adjudication register documents the 70 mismatches for authorized review. It is a review aid, not an automatically approved replacement Gold Standard.
 
-### Week 4 remaining work
+### Week 4 closeout
 
-1. Generate Matrix 1 (original radiologist report versus the second AI report).
-2. Obtain authorized decisions on the mismatch register; preserve the baseline evaluation until decisions are approved.
-3. Optional: implement JSON-based prompt configuration and test it.
+The Week 4 application and optional JSON prompt-configuration task are implemented. The optional module stores the existing V1.3 prompt in JSON and reads it through a dedicated loader. It performs local configuration reading/validation only; it does not call an API or execute an LLM.
+
+Run the optional task's tests from its directory:
+
+```powershell
+cd src/week_04/optional_json_config
+python -m unittest -v test_prompt_config_loader.py
+```
+
+The five tests passed in the user's local environment.
+
+Authorized veterinary adjudication of mismatch registers remains pending. Text-screening notes are provisional and must not be treated as clinical adjudication or as approval to change reference labels.
+
+## Matrix 1 evaluation snapshot
+
+The Matrix 1 evaluation covered 100 cases and 20 conditions (2,000 pairs): TP 128, FN 921, TN 913, FP 38; accuracy 52.05%, sensitivity 12.20%, specificity 96.00%, precision 77.11%, and F1 21.07%. All 959 mismatches received text-based screening across the 20 conditions. Veterinary adjudication remains pending.
+
+These pilot results do not establish clinical readiness. See `docs/project_documentation.md` and `docs/testing_log.md` for details and limitations.
 
 ## Tests
 

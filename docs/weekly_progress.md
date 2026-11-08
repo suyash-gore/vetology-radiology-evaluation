@@ -64,14 +64,24 @@
 - Sensitivity: 80.38%.
 - Specificity: 97.88%.
 
-### Remaining required work
-- Generate Matrix 1: original radiologist report versus the second AI report.
-- Obtain authorized adjudication decisions for the 70 mismatches. Preserve the original Gold Standard and baseline predictions until approved.
+### Matrix 1 evaluation and error analysis
+- Completed the 100-case, 20-condition evaluation: 2,000 prediction/reference pairs.
+- Confusion counts: TP 128, FN 921, TN 913, FP 38.
+- Aggregate metrics: accuracy 52.05%, sensitivity 12.20%, specificity 96.00%, precision 77.11%, F1 21.07%.
+- Consolidated 959 mismatches (921 FN and 38 FP) into the error-analysis workflow.
+- Completed text-based screening across all 20 conditions. Screening findings remain provisional and are not veterinary adjudications.
 
-### Optional work
-- Implement JSON-based prompt configuration.
-- Update the application to load prompt settings from JSON.
-- Test JSON configuration loading and prompt execution.
+### Optional task — JSON prompt configuration (completed)
+- Created a separate module at `src/week_04/optional_json_config/`.
+- Stored the exact operational Canine Thorax Master Prompt V1.3 in `config/canine_thorax_v1_3.json`.
+- Implemented a JSON configuration loader with basic structure and version validation.
+- Added five offline unit tests covering successful loading and expected error handling.
+- User ran the tests locally: 5 passed, 0 failed.
+- No API calls, dataset loading, or LLM execution were performed for this optional task.
+
+### Remaining / limitations
+- Authorized veterinary adjudication of mismatch registers remains pending. Preserve original reference labels and baseline predictions until approved.
+- Matrix 1 and Matrix 2 results are pilot evaluations and do not establish clinical readiness.
 
 ### Limitations
 - Mismatch assessments are provisional, not veterinary adjudications.
@@ -81,3 +91,8 @@
 ## Weeks 5–10
 
 Not yet documented as completed in this project record. Add implementation, tests, advisor feedback, decisions, and deliverables as each week's work is performed.
+
+
+## Week 4 closeout status — 2026-11-08
+
+The Week 4 application and optional JSON prompt-configuration task are implemented and tested. Documentation has been updated to reflect completed work. The remaining adjudication is a separate review dependency, not an unfinished coding task. Git commit/tag closeout is still to be performed.

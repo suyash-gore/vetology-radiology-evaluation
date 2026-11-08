@@ -168,7 +168,63 @@ Refer to `DECISION_LOG.md`. Key decisions include:
 - sequential checkpointed batch execution;
 - preservation of baseline results pending authorized adjudication.
 
-## 9. Testing and validation
+### 7.4 Matrix 1 evaluation and mismatch screening
+
+The Matrix 1 evaluation covered 100 cases × 20 conditions (2,000 prediction/reference pairs).
+
+| Metric | Value |
+|---|---:|
+| TP | 128 |
+| FN | 921 |
+| TN | 913 |
+| FP | 38 |
+| Accuracy | 52.05% |
+| Sensitivity | 12.20% |
+| Specificity | 96.00% |
+| Precision | 77.11% |
+| F1 | 21.07% |
+
+The 959 mismatches (921 FN and 38 FP) were consolidated into the Matrix 1 error-analysis workflow. Text-based screening was completed across all 20 conditions. The screening register preserves original labels and predictions and records provisional evidence/root-cause notes.
+
+**Important:** text screening is not veterinary adjudication. A mismatch between report text and a reference label does not, by itself, establish that the reference label is wrong; the reference may reflect image-based assessment not expressed in the report text. Authorized veterinary adjudication remains pending.
+
+## 9. Week 4 optional task — JSON prompt configuration
+
+### 8.1 Purpose and scope
+
+The optional assignment asks the application to read prompts from a JSON configuration file. This was implemented as an isolated module under:
+
+`src/week_04/optional_json_config/`
+
+The module uses the existing operational Canine Thorax Master Prompt V1.3. Prompt wording was not revised, and no new prompt version was introduced.
+
+### 8.2 Files
+
+- `config/canine_thorax_v1_3.json` — stores prompt metadata, the 20 condition keys, valid labels, and the V1.3 system prompt text.
+- `prompt_config_loader.py` — reads the JSON file, checks required fields and expected configuration values, and returns the system prompt.
+- `test_prompt_config_loader.py` — offline unit tests.
+- `README.md` — module-specific instructions and scope.
+
+### 8.3 Execution boundary
+
+This optional module only reads and validates a local JSON configuration. It does not:
+- make OpenAI or other API calls;
+- instantiate or execute an LLM;
+- load the canine thorax dataset;
+- generate classifications or predictions;
+- modify the existing Matrix 1 prompt loader or batch workflow.
+
+### 8.4 Local test result
+
+The user ran the following command from `src/week_04/optional_json_config`:
+
+```powershell
+python -m unittest -v test_prompt_config_loader.py
+```
+
+Result: **5 tests passed, 0 failures**. Tests cover successful configuration loading, prompt retrieval, missing configuration file, invalid JSON, and missing required fields.
+
+## 10. Testing and validation
 
 Refer to `testing_log.md`. Recorded tests include:
 - data loader validation;
@@ -180,9 +236,9 @@ Refer to `testing_log.md`. Recorded tests include:
 - Matrix 2 evaluation;
 - mismatch reconciliation.
 
-Matrix 1 and optional JSON prompt configuration remain pending.
+Matrix 1 evaluation and optional JSON prompt configuration are implemented. Authorized veterinary adjudication remains pending.
 
-## 10. Problems, resolutions, and limitations
+## 11. Problems, resolutions, and limitations
 
 ### Recorded resolution
 The mismatch register was reconciled against the original Block 6 mismatch source after inconsistencies were identified in one condition-specific review workbook.
@@ -196,22 +252,22 @@ The mismatch register was reconciled against the original Block 6 mismatch sourc
 - Model outputs can vary across runs; the reported run is the baseline run.
 - The results do not establish clinical readiness.
 
-## 11. Advisor feedback
+## 12. Advisor feedback
 
 Record only feedback actually received. No new advisor feedback is asserted in this update.
 
-## 12. Week-by-week history and future work
+## 13. Week-by-week history and future work
 
 See `weekly_progress.md`.
 
-Immediate Week 4 outstanding work:
-1. Generate Matrix 1 (original radiologist report versus second AI report).
-2. Obtain authorized adjudication decisions for the 70 mismatches.
-3. Optional: implement and test JSON-based prompt configuration.
+Week 4 closeout:
+1. Matrix 1 and Matrix 2 evaluation workflows are documented as completed deliverables.
+2. The optional JSON prompt-configuration task is implemented and locally tested.
+3. Authorized veterinary adjudication of mismatch registers remains pending; preserve baseline labels and predictions until approved.
 
 Later program work includes the Claude Code rebuild, presentation, two remaining datasets, multi-dataset evaluation, research paper, final presentation, and closeout.
 
-## 13. Security and repository hygiene
+## 14. Security and repository hygiene
 
 Do not commit or publish:
 - API keys, tokens, populated `.env` files;

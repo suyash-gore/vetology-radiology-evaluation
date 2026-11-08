@@ -1,0 +1,31 @@
+{
+  "run_type": "matrix_1_single_case_test",
+  "prompt_version": "V1.3",
+  "case_id": 1,
+  "model": "gpt-4.1-mini",
+  "status": "success",
+  "completed_at_utc": "2026-11-07T05:10:39.561912+00:00",
+  "raw_response": "{\n  \"perihilar_infiltrate\": \"Negative\",\n  \"pneumonia\": \"Negative\",\n  \"bronchitis\": \"Positive\",\n  \"interstitial\": \"Positive\",\n  \"diseased_lungs\": \"Positive\",\n  \"hypo_plastic_trachea\": \"Negative\",\n  \"cardiomegaly\": \"Negative\",\n  \"pulmonary_nodules\": \"Negative\",\n  \"pleural_effusion\": \"Negative\",\n  \"rtm\": \"Negative\",\n  \"focal_caudodorsal_lung\": \"Negative\",\n  \"focal_perihilar\": \"Negative\",\n  \"pulmonary_hypoinflation\": \"Negative\",\n  \"right_sided_cardiomegaly\": \"Negative\",\n  \"pericardial_effusion\": \"Negative\",\n  \"bronchiectasis\": \"Negative\",\n  \"pulmonary_vessel_enlargement\": \"Negative\",\n  \"left_sided_cardiomegaly\": \"Negative\",\n  \"thoracic_lymphadenopathy\": \"Negative\",\n  \"esophagitis\": \"Negative\"\n}",
+  "predictions": {
+    "perihilar_infiltrate": "Negative",
+    "pneumonia": "Negative",
+    "bronchitis": "Positive",
+    "interstitial": "Positive",
+    "diseased_lungs": "Positive",
+    "hypo_plastic_trachea": "Negative",
+    "cardiomegaly": "Negative",
+    "pulmonary_nodules": "Negative",
+    "pleural_effusion": "Negative",
+    "rtm": "Negative",
+    "focal_caudodorsal_lung": "Negative",
+    "focal_perihilar": "Negative",
+    "pulmonary_hypoinflation": "Negative",
+    "right_sided_cardiomegaly": "Negative",
+    "pericardial_effusion": "Negative",
+    "bronchiectasis": "Negative",
+    "pulmonary_vessel_enlargement": "Negative",
+    "left_sided_cardiomegaly": "Negative",
+    "thoracic_lymphadenopathy": "Negative",
+    "esophagitis": "Negative"
+  }
+}

@@ -19,8 +19,10 @@ Decisions are recorded to preserve the reasoning behind data handling, implement
 | D-013 | Batch processing | Process cases sequentially and checkpoint validated successes; retry failed cases and log errors separately. | Supports recoverability and prevents completed cases from being unnecessarily reprocessed. | Implemented |
 | D-014 | Evaluation baseline | Preserve original predictions and approved Gold Standard while mismatches are reviewed. | Provisional review is not an authorized correction to the reference labels. | Active |
 | D-015 | Mismatch review | Use the original Block 6 Mismatch Review source as the authoritative source for Gold Standard, prediction, and mismatch type in the consolidated 70-row register. | A condition-specific review workbook contained inconsistent Gold Standard entries; the original evaluation mismatch source was cross-checked. | Implemented |
-| D-016 | Week 4 optional configuration | JSON-based prompt configuration is optional and remains pending. | The training page lists this as an “as time permits” task. | Pending |
-| D-017 | Week 4 Matrix 1 | Matrix 1 must compare the original radiologist report with the second AI report; it is distinct from Matrix 2. | Both comparisons are separately specified in the Week 4 assignment. | Pending |
+| D-016 | Week 4 optional configuration | Store the existing V1.3 prompt in a JSON configuration file and load it through a dedicated local loader; do not make API calls for this optional task. | Satisfies the optional “read prompts from a JSON configuration file” requirement while keeping the task isolated from the live LLM workflow. | Implemented and locally tested |
+| D-017 | Week 4 Matrix 1 | Preserve Matrix 1 as a separate evaluation artifact and keep its predictions, reference labels, and mismatch register traceable. | Maintains a distinct evaluation record and prevents confusion with Matrix 2. | Implemented; veterinary adjudication pending |
+| D-018 | JSON configuration scope | The optional JSON module performs local file reading and configuration validation only; it does not load data, call an API, or execute an LLM. | The requested optional task is specifically prompt configuration, not a second LLM integration. | Implemented |
+| D-019 | Prompt integrity | Reuse the exact operational Master Prompt V1.3 text in the JSON configuration; do not revise prompt wording or create a new prompt version. | Keeps the optional task focused on configuration format rather than prompt development. | Implemented |
 
 ## Decision template
 
@@ -32,3 +34,11 @@ Decisions are recorded to preserve the reasoning behind data handling, implement
 - Consequences/trade-offs:
 - Related files:
 - Related commit/tag:
+
+
+## Week 4 closeout decisions
+
+- The optional JSON prompt configuration is kept in its own `src/week_04/optional_json_config/` directory and does not alter the existing Matrix 1 implementation.
+- The JSON loader validates required configuration fields, V1.3 version, 20 condition keys, and the `Positive` / `Negative` label set.
+- Five offline unit tests are required for this module; no API credentials are needed to run them.
+- Error-screening notes and provisional root-cause categories must not be treated as veterinary adjudication or as authorization to change reference labels.
