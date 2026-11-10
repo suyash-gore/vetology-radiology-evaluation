@@ -1,9 +1,17 @@
-"""Matrix 1 evaluation workbook — replicates ``matrix1_evaluator.py`` (Week 4).
+"""Matrix 1 evaluation workbook — layout and wording of the DELIVERED baseline A5.
+
+Parity target (approved decision D1): the delivered Week 4 Matrix 1 workbook
+(``Evaluation_Workbook_v1.xlsx``, A5). A5 was produced by a variant of the Week 4
+evaluator that is not in the repository; it differs from the committed
+``matrix1_evaluator.py`` only in presentation — 10 wording changes, row-1 height
+28 (code: 30), Overall Summary column C width 55 (code: 58) and a dark font
+colour on the Overall Summary header row. All metric calculations are the Week 4
+calculations (``metrics.py``) and are identical to the committed code.
 
 Sheets, row text, column headers, number formats, fills, fonts, widths, freeze
-panes and filters are reproduced exactly, including the existing wording that
-calls the Matrix 1 reference labels "Gold Standard" / "GS" (terminology is
-preserved until a change is explicitly approved).
+panes and filters reproduce A5, including the existing wording that calls the
+Matrix 1 reference labels "Gold Standard" / "GS" (terminology is preserved until
+a change is explicitly approved).
 
 Sheets (in order):
 1. Overall Summary    — title, header, 17 metric rows (counts, micro, macro)
@@ -28,11 +36,13 @@ from week_05.evaluation.reconcile import ReconciledLabels, sorted_case_ids
 from week_05.jsonl_store import Clock, utc_now
 
 NAVY, PALE_BLUE, PALE_GREEN, PALE_RED = "1F4E78", "D9EAF7", "E2F0D9", "FCE4D6"
+DARK_TEXT = "1F1F1F"          # A5: Overall Summary header-row font colour
+HEADER_ROW_HEIGHT = 28        # A5 (committed Week 4 code: 30)
 PERCENT = "0.00%"
 SUMMARY_TITLE = "VETOLOGY MATRIX 1 - EVALUATION SUMMARY"
 
-# Recorded verbatim from the Week 4 Matrix 1 execution record.
-MODEL_RECORD = "gpt-4.1-mini (Matrix 1 batch execution record)"
+# Recorded verbatim from the delivered Week 4 Matrix 1 workbook (A5).
+MODEL_RECORD = "gpt-4.1-mini (from Matrix 1 batch execution record)"
 PROMPT_RECORD = "Canine Thorax Master Prompt V1.3"
 DEFAULT_GROUND_TRUTH_NAME = "Matrix 1 encoded ground-truth workbook"
 DEFAULT_PREDICTIONS_NAME = "Matrix 1 predictions.jsonl"
@@ -56,11 +66,11 @@ METRIC_DEFINITIONS = [
      "TP / (TP + FN). Undefined when there are no Gold Standard Positive labels."),
     ("Specificity", "TN / (TN + FP). Undefined when there are no Gold Standard Negative labels."),
     ("Precision", "TP / (TP + FP). Undefined when the model makes no Positive predictions."),
-    ("F1-score", "2 × Precision × Sensitivity / (Precision + Sensitivity). Undefined if either "
-                 "component is undefined or their sum is zero."),
+    ("F1-score", "2 × Precision × Sensitivity / (Precision + Sensitivity). Undefined when "
+                 "precision or sensitivity is undefined, or their sum is zero."),
     ("Micro average", "Metrics calculated after summing TP, FN, TN, and FP across all conditions."),
-    ("Macro average", "Unweighted mean of defined condition-level values. Undefined values are "
-                      "excluded, not treated as zero."),
+    ("Macro average", "Unweighted mean of the defined condition-level metric values. Undefined "
+                      "condition-level values are excluded and not treated as zero."),
     ("Separation rule", "Matrix 1 results are not combined with Matrix 2 results."),
 ]
 
@@ -72,7 +82,7 @@ def _summary_rows(cases: int, micro: ConfusionMetrics, macro: MacroMetrics) -> l
         ("Conditions evaluated", len(CONDITION_KEYS), "Condition columns",
          "All 20 Matrix 1 conditions evaluated independently."),
         ("Total paired labels", micro.total, "Cases × conditions",
-         "Each case-condition pair contributes one comparison."),
+         "Each case-condition pair contributes one label comparison."),
         ("True Positive (TP)", micro.tp, "GS Positive; model Positive",
          "Correctly identified positive labels."),
         ("False Negative (FN)", micro.fn, "GS Positive; model Negative",
@@ -90,17 +100,17 @@ def _summary_rows(cases: int, micro: ConfusionMetrics, macro: MacroMetrics) -> l
         ("Micro Precision", micro.precision, "TP / (TP + FP)",
          "Proportion of model-positive labels that are Gold Standard Positive."),
         ("Micro F1-score", micro.f1, "2 × Precision × Sensitivity / (Precision + Sensitivity)",
-         "Harmonic mean of micro precision and sensitivity."),
+         "Harmonic mean of micro precision and micro sensitivity."),
         ("Macro Accuracy", macro.accuracy, "Mean of condition-level accuracies",
          "Each condition receives equal weight."),
         ("Macro Sensitivity", macro.sensitivity, "Mean of defined condition-level sensitivities",
-         "Undefined conditions are excluded, not set to zero."),
+         "Conditions with no Gold Standard positives are excluded."),
         ("Macro Specificity", macro.specificity, "Mean of defined condition-level specificities",
-         "Undefined conditions are excluded, not set to zero."),
+         "Conditions with no Gold Standard negatives are excluded."),
         ("Macro Precision", macro.precision, "Mean of defined condition-level precisions",
-         "Undefined conditions are excluded, not set to zero."),
+         "Conditions with no predicted positives are excluded."),
         ("Macro F1-score", macro.f1, "Mean of defined condition-level F1-scores",
-         "Undefined conditions are excluded, not set to zero."),
+         "Conditions with undefined F1 are excluded."),
     ]
 
 
@@ -203,7 +213,7 @@ def build_matrix1_workbook(
         ("Model", MODEL_RECORD),
         ("Prompt version", PROMPT_RECORD),
         ("Evaluation generated (UTC)", clock().strftime("%Y-%m-%d %H:%M:%S UTC")),
-        ("Metric scope", "Matrix 1 encoded ground truth compared with Matrix 1 predictions only"),
+        ("Metric scope", "Model predictions compared against Matrix 1 encoded ground truth only"),
         ("Clinical interpretation",
          "Dataset-specific evaluation; not a statement of clinical readiness."),
     ]:
@@ -223,7 +233,7 @@ def build_matrix1_workbook(
 
 
 def _apply_week4_formatting(wb: Workbook) -> None:
-    """Formatting pass in the same order as Week 4 (later steps override earlier)."""
+    """Formatting pass in the same order as Week 4 (later steps override earlier); A5 values."""
     thin = Side(style="thin", color="D9E1F2")
     for sheet in wb.worksheets:
         sheet.freeze_panes = "B3" if sheet.title == "Overall Summary" else "B2"
@@ -233,16 +243,16 @@ def _apply_week4_formatting(wb: Workbook) -> None:
             cell.fill = PatternFill("solid", fgColor=NAVY)
             cell.font = Font(color="FFFFFF", bold=True)
             cell.alignment = Alignment(vertical="center", wrap_text=True)
-        sheet.row_dimensions[1].height = 30
+        sheet.row_dimensions[1].height = HEADER_ROW_HEIGHT
 
         if sheet.title == "Overall Summary":
             for cell in sheet[2]:
                 cell.fill = PatternFill("solid", fgColor=PALE_BLUE)
-                cell.font = Font(bold=True)
+                cell.font = Font(bold=True, color=DARK_TEXT)
             for row in range(3, sheet.max_row + 1):
                 if row in range(10, 20):  # Micro and Macro ratio rows
                     sheet.cell(row, 2).number_format = PERCENT
-            widths = [30, 18, 58, 65]
+            widths = [30, 18, 55, 65]
         elif sheet.title == "Condition Summary":
             for row in range(2, sheet.max_row + 1):
                 for col in range(9, 14):

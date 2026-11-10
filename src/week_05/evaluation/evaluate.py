@@ -6,13 +6,12 @@ not the Phase 3 batch loader), loads its own predictions file, reconciles them
 and computes the metrics. ``write_evaluation_workbook`` then writes the
 workflow's workbook.
 
-* Matrix 1 — Week 4 ``load_matrix1_inputs`` loading rules; workbook replicating
-  the Week 4 Matrix 1 evaluator.
-* Matrix 2 — PENDING. Its original reference-loading rules and workbook layout
-  are unknown until A2 and A6 are inspected, so evaluation raises
-  ``ReferenceLoadingPending`` and workbook writing raises
-  ``WorkbookLayoutPending``. The shared reconciliation and metric engine (with
-  exact CaseID-set matching and no case-count rule) is ready for Matrix 2.
+* Matrix 1 — Week 4 ``load_matrix1_inputs`` loading rules; exactly 100 cases;
+  workbook with the delivered A5 layout (``matrix1_workbook``).
+* Matrix 2 — Week 4 Matrix 2 batch-loader rules with an ambiguity guardrail
+  (``load_matrix2_reference``); exact CaseID-set matching, no case-count rule;
+  workbook with the delivered A6 structure minus the Balanced Accuracy row
+  (``matrix2_workbook``).
 """
 from __future__ import annotations
 
@@ -22,6 +21,7 @@ from pathlib import Path
 from week_05 import config
 from week_05.config import ConfigurationError, WorkflowSpec
 from week_05.evaluation.matrix1_workbook import build_matrix1_workbook
+from week_05.evaluation.matrix2_workbook import build_matrix2_workbook
 from week_05.evaluation.metrics import (
     ConfusionMetrics,
     MacroMetrics,
@@ -71,7 +71,7 @@ def evaluate_workflow(
     """Evaluate one workflow's predictions against that workflow's reference labels.
 
     Raises ``ReferenceLoadingPending`` (before reading any file) for a workflow
-    whose evaluation reference loader has not been established (Matrix 2).
+    without an established evaluation reference loader.
     """
     load_reference = reference_loader_for(spec)
     reference = load_reference(spec.default_input_path if input_path is None else input_path)
@@ -115,6 +115,8 @@ def write_evaluation_workbook(
     if spec.name == "matrix1":
         return build_matrix1_workbook(result.labels, result.per_condition, result.micro,
                                       result.macro, path, clock=clock)
+    if spec.name == "matrix2":
+        return build_matrix2_workbook(result.labels, result.per_condition, result.micro, path)
     raise WorkbookLayoutPending(
         f"The {spec.name} workbook layout will be reconstructed from "
         f"'{spec.evaluation_workbook_filename}' once that file is available for inspection."

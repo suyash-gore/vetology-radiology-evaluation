@@ -12,10 +12,12 @@ from week_05.conditions import CONDITION_KEYS
 from week_05.config import MATRIX1, MATRIX2
 from week_05.evaluation.reference_loader import (
     REFERENCE_LOADERS,
+    AmbiguousReferenceError,
     ReferenceLoadError,
     ReferenceLoadingPending,
     compare_reference_loaders,
     load_matrix1_reference,
+    load_matrix2_reference,
     load_reference_for_evaluation,
     reference_loader_for,
 )
@@ -190,31 +192,86 @@ class TestWeek4LoaderParity(RefTestCase):
 class TestPerWorkflowLoaders(RefTestCase):
     """Matrix 1 and Matrix 2 evaluation reference loading are independent."""
 
-    def test_only_matrix1_has_an_established_loader(self):
-        self.assertEqual(set(REFERENCE_LOADERS), {"matrix1"})
+    def test_each_workflow_has_its_own_loader(self):
+        self.assertEqual(set(REFERENCE_LOADERS), {"matrix1", "matrix2"})
         self.assertIs(reference_loader_for(MATRIX1), load_matrix1_reference)
+        self.assertIs(reference_loader_for(MATRIX2), load_matrix2_reference)
+        self.assertIsNot(load_matrix2_reference, load_matrix1_reference)
 
     def test_matrix1_dispatch_uses_the_week4_rules(self):
         path = self.book()
         self.assertEqual(load_reference_for_evaluation(MATRIX1, path),
                          load_matrix1_reference(path))
 
-    def test_matrix2_is_pending_and_never_falls_back_to_matrix1_rules(self):
-        path = self.book(headers=MATRIX2_HEADERS)
-        for call in (lambda: reference_loader_for(MATRIX2),
-                     lambda: load_reference_for_evaluation(MATRIX2, path),
-                     lambda: compare_reference_loaders(MATRIX2, path)):
+    def test_unknown_workflow_has_no_loader(self):
+        import dataclasses
+
+        other = dataclasses.replace(MATRIX1, name="matrix3")
+        for call in (lambda: reference_loader_for(other),
+                     lambda: load_reference_for_evaluation(other, self.book()),
+                     lambda: compare_reference_loaders(other, self.book())):
             with self.subTest(call=call):
-                with self.assertRaises(ReferenceLoadingPending) as ctx:
+                with self.assertRaises(ReferenceLoadingPending):
                     call()
-                message = str(ctx.exception)
-                self.assertIn("Matrix 1 rules are not assumed to apply", message)
-                self.assertIn("1_canine_thorax_gold_standard_score_draft.xlsx", message)
-                self.assertIn("Evaluation Workbook v2.xlsx", message)
 
     def test_pending_is_not_an_input_error(self):
         self.assertFalse(issubclass(ReferenceLoadingPending, ValueError))
         self.assertTrue(issubclass(ReferenceLoadingPending, NotImplementedError))
+
+
+class TestMatrix2Loader(RefTestCase):
+    """Decision D3: Week 4 Matrix 2 batch-loader rules plus an ambiguity guardrail."""
+
+    def test_unambiguous_workbook_uses_batch_loader_selection(self):
+        from week_05.dataset_loader import load_dataset
+
+        path = self.book(headers=MATRIX2_HEADERS)
+        ref = load_matrix2_reference(path)
+        batch = load_dataset(MATRIX2, path)
+        self.assertEqual(ref.case_ids, batch.case_ids)
+        self.assertEqual(ref.worksheet_name, "Sheet1")
+        self.assertEqual({k: dict(v) for k, v in ref.labels.items()},
+                         {k: dict(v) for k, v in batch.reference_labels.items()})
+        self.assertTrue(all(type(c) is int for c in ref.case_ids))
+
+    def test_blank_rows_after_the_cases_are_not_ambiguous(self):
+        rows = [*self.rows(), *[None] * 50]
+        self.assertEqual(len(load_matrix2_reference(self.book(rows)).case_ids), 100)
+
+    def test_fewer_than_100_cases_is_not_ambiguous(self):
+        self.assertEqual(len(load_matrix2_reference(self.book(self.rows(range(1, 61))))
+                             .case_ids), 60)
+
+    def test_ambiguous_workbooks_are_rejected(self):
+        padded = self.rows()
+        padded[0]["rtm"] = " Positive"
+        text_id = self.rows()
+        text_id[4]["CaseID"] = "5"
+        decimal_id = self.rows()
+        decimal_id[4]["CaseID"] = 5.7
+        cases = {
+            "more than 100 populated rows": (self.book(self.rows(range(1, 126))),
+                                             "Case count differs"),
+            "padded label": (self.book(padded), "Evaluation loader failed"),
+            "text CaseID": (self.book(text_id), "CaseID '5' is read as 5"),
+            "decimal CaseID": (self.book(decimal_id), "Evaluation loader failed|read as"),
+            "different first sheet": (self.book(first_sheet="Notes"),
+                                      "Evaluation loader failed"),
+        }
+        for name, (path, detail) in cases.items():
+            with self.subTest(case=name):
+                with self.assertRaises(AmbiguousReferenceError) as ctx:
+                    load_matrix2_reference(path)
+                self.assertIn("ambiguous", str(ctx.exception))
+                self.assertRegex(str(ctx.exception), detail)
+                self.assertEqual(compare_reference_loaders(MATRIX2, path) != [], True)
+
+    def test_ambiguity_is_an_input_error(self):
+        self.assertTrue(issubclass(AmbiguousReferenceError, ReferenceLoadError))
+
+    def test_missing_workbook(self):
+        with self.assertRaises(AmbiguousReferenceError):
+            load_matrix2_reference(self.dir / "absent.xlsx")
 
 
 class TestCompareLoaders(RefTestCase):

@@ -6,12 +6,11 @@ Each workflow has its own evaluation reference loader, registered in
 * Matrix 1 — ``load_matrix1_reference`` (below), a reproduction of Week 4's
   ``load_matrix1_inputs``. This is the only Week 4 evaluation loader that
   exists in the repository.
-* Matrix 2 — PENDING. The original Week 4 Matrix 2 evaluator is not in the
-  repository, so its reference-loading rules are unknown. They are not
-  assumed to match Matrix 1; ``ReferenceLoadingPending`` is raised until
-  ``1_canine_thorax_gold_standard_score_draft.xlsx`` (A2) and
-  ``Evaluation Workbook v2.xlsx`` (A6) have been inspected and a Matrix 2
-  loader is approved and registered.
+* Matrix 2 — ``load_matrix2_reference`` (approved decision D3, after
+  inspecting A2 and A6): the Week 4 Matrix 2 batch loader rules, guarded so
+  that any workbook on which the alternative (Matrix 1-style) rules would give
+  a different result is rejected as ambiguous. The original Matrix 2 evaluator
+  is not in the repository; the Matrix 1 rules are never applied silently.
 
 These loaders are deliberately separate from the Phase 3 ``dataset_loader``
 used for batch execution.
@@ -130,43 +129,23 @@ def load_matrix1_reference(path: str | Path) -> EvaluationReference:
 
 ReferenceLoader = Callable[[str | Path], EvaluationReference]
 
-# One evaluation reference loader per workflow. Matrix 2 is intentionally absent
-# until its original Week 4 behaviour has been established from A2 and A6.
-REFERENCE_LOADERS: Mapping[str, ReferenceLoader] = MappingProxyType({
-    "matrix1": load_matrix1_reference,
-})
+
+class AmbiguousReferenceError(ReferenceLoadError):
+    """The two candidate loading approaches disagree on a workbook (Matrix 2 guardrail)."""
 
 
-def reference_loader_for(spec: WorkflowSpec) -> ReferenceLoader:
-    """Return the workflow's own evaluation reference loader, or raise if pending."""
-    try:
-        return REFERENCE_LOADERS[spec.name]
-    except KeyError:
-        raise ReferenceLoadingPending(
-            f"The {spec.name} evaluation reference-loading rules have not been established. "
-            f"The original Week 4 {spec.name} evaluator is not in the repository, and the "
-            "Matrix 1 rules are not assumed to apply. A loader will be defined after "
-            f"'{spec.input_filename}' and '{spec.evaluation_workbook_filename}' have been "
-            "inspected."
-        ) from None
+def _loader_differences(spec: WorkflowSpec, path: str | Path) -> tuple[list[str], Any]:
+    """Compare the Phase 3 batch loader with the Week 4 evaluator-style rules.
 
-
-def load_reference_for_evaluation(spec: WorkflowSpec, path: str | Path) -> EvaluationReference:
-    """Load reference labels for evaluation with the workflow's own rules."""
-    return reference_loader_for(spec)(path)
-
-
-def compare_reference_loaders(spec: WorkflowSpec, path: str | Path) -> list[str]:
-    """Differences between the Phase 3 batch loader and the workflow's evaluation loader.
-
-    An empty list means both loaders select the same cases (in the same order,
-    after the evaluation loader's CaseID conversion) with the same labels. A
-    loader that fails on the workbook is reported as a difference. A workflow
-    whose evaluation loader is pending raises ``ReferenceLoadingPending``.
+    Batch loader: ``Sheet1``, first ``case_limit`` populated rows, trimmed labels.
+    Week 4 evaluator-style rules (``load_matrix1_reference``): first worksheet,
+    all rows, ``int()`` CaseIDs, no trimming. Returns the differences (empty when
+    both select the same cases, in the same order, with the same labels) and the
+    batch loader's dataset (``None`` if it failed). Failures are reported as
+    differences, not raised.
     """
     from week_05.dataset_loader import load_dataset
 
-    evaluation_loader = reference_loader_for(spec)  # raises if pending
     differences: list[str] = []
     try:
         batch = load_dataset(spec, path)
@@ -174,12 +153,12 @@ def compare_reference_loaders(spec: WorkflowSpec, path: str | Path) -> list[str]
         batch = None
         differences.append(f"Phase 3 batch loader failed: {type(exc).__name__}: {exc}")
     try:
-        evaluation = evaluation_loader(path)
+        evaluation = load_matrix1_reference(path)
     except Exception as exc:  # noqa: BLE001 — reported, not raised
         evaluation = None
         differences.append(f"Evaluation loader failed: {type(exc).__name__}: {exc}")
     if batch is None or evaluation is None:
-        return differences
+        return differences, batch
 
     if batch.worksheet_name != evaluation.worksheet_name:
         differences.append(f"Worksheet differs: batch={batch.worksheet_name!r}, "
@@ -218,4 +197,71 @@ def compare_reference_loaders(spec: WorkflowSpec, path: str | Path) -> list[str]
             if a != b:
                 differences.append(f"Label differs for CaseID {case_id}, {condition}: "
                                    f"batch={a!r}, evaluation={b!r}")
+    return differences, batch
+
+
+def load_matrix2_reference(path: str | Path) -> EvaluationReference:
+    """Matrix 2 evaluation reference labels (approved decision D3).
+
+    Uses the Week 4 Matrix 2 batch loader behaviour — the only Week 4 code known
+    to have read the Gold Standard workbook: worksheet ``Sheet1``, the first 100
+    populated rows, labels trimmed (Phase 3 ``dataset_loader`` with MATRIX2).
+
+    Guardrail: the inspected baseline (A2/A6) could not distinguish this from the
+    Week 4 evaluator-style rules (first sheet, all rows, ``int()`` CaseIDs, no
+    trimming), because on A2 both select CaseIDs 1-100 with identical labels. If
+    the two approaches produce ANY difference on a workbook — extra populated
+    rows, padded labels, non-integer CaseIDs, a different first sheet, either
+    approach failing — the workbook is rejected as ambiguous rather than one
+    result being chosen silently.
+    """
+    from week_05.config import MATRIX2
+
+    differences, batch = _loader_differences(MATRIX2, path)
+    if differences:
+        listed = "\n  - ".join(differences[:20])
+        raise AmbiguousReferenceError(
+            "Matrix 2 reference workbook is ambiguous: the Week 4 Matrix 2 batch loader rules "
+            "and the alternative Week 4 evaluator-style rules give different results, and the "
+            f"baseline does not establish which applies. Differences:\n  - {listed}"
+        )
+    return EvaluationReference(
+        source_path=batch.source_path,
+        worksheet_name=batch.worksheet_name,
+        case_ids=tuple(batch.case_ids),
+        labels=batch.reference_labels,
+    )
+
+
+# One evaluation reference loader per workflow (independent rules).
+REFERENCE_LOADERS: Mapping[str, ReferenceLoader] = MappingProxyType({
+    "matrix1": load_matrix1_reference,
+    "matrix2": load_matrix2_reference,
+})
+
+
+def reference_loader_for(spec: WorkflowSpec) -> ReferenceLoader:
+    """Return the workflow's own evaluation reference loader, or raise if none exists."""
+    try:
+        return REFERENCE_LOADERS[spec.name]
+    except KeyError:
+        raise ReferenceLoadingPending(
+            f"No evaluation reference loader has been established for {spec.name!r}."
+        ) from None
+
+
+def load_reference_for_evaluation(spec: WorkflowSpec, path: str | Path) -> EvaluationReference:
+    """Load reference labels for evaluation with the workflow's own rules."""
+    return reference_loader_for(spec)(path)
+
+
+def compare_reference_loaders(spec: WorkflowSpec, path: str | Path) -> list[str]:
+    """Differences between the batch loader and the Week 4 evaluator-style rules.
+
+    For Matrix 1 the evaluator-style rules ARE its evaluation loader; for Matrix 2
+    they are the alternative checked by the ambiguity guardrail, so an empty list
+    means the Matrix 2 loader will accept the workbook.
+    """
+    reference_loader_for(spec)  # raises for a workflow without a loader
+    differences, _ = _loader_differences(spec, path)
     return differences

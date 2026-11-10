@@ -19,7 +19,6 @@ from week_05.batch_runner import run_workflow_batch
 from week_05.conditions import CONDITION_KEYS
 from week_05.config import MATRIX1, MATRIX2, ConfigurationError
 from week_05.evaluation.evaluate import (
-    WorkbookLayoutPending,
     compute_evaluation,
     evaluate_workflow,
     resolve_workbook_path,
@@ -32,7 +31,11 @@ from week_05.evaluation.reconcile import (
     reconcile,
     sorted_case_ids,
 )
-from week_05.evaluation.reference_loader import EvaluationReference, ReferenceLoadingPending
+from week_05.evaluation.reference_loader import (
+    EvaluationReference,
+    ReferenceLoadError,
+    ReferenceLoadingPending,
+)
 from week_05.evaluation.workbook_compare import compare_workbooks
 from week_05.tests.support import FrozenDatetime, ScriptedClassifier, StepClock, quiet
 from week_05.tests.workbook_factory import (
@@ -435,8 +438,47 @@ class TestMatrix1Workbook(EvalTestCase):
                                    self.dir / "x.xlsx")
 
 
+# Approved decision D1: the Matrix 1 layout follows the delivered A5 workbook, which
+# differs from the committed Week 4 evaluator only in these presentation details.
+A5_TEXT_CELLS = {
+    ("Overall Summary", "D5"), ("Overall Summary", "D14"), ("Overall Summary", "D16"),
+    ("Overall Summary", "D17"), ("Overall Summary", "D18"), ("Overall Summary", "D19"),
+    ("Execution Log", "B12"), ("Execution Log", "B15"),
+    ("Metric Definitions", "B10"), ("Metric Definitions", "B12"),
+}
+A5_STYLE_CELLS = {("Overall Summary", f"{col}2") for col in "ABCD"}
+SHEETS = ("Overall Summary", "Condition Summary", "Case Predictions", "Confusion Matrix",
+          "Execution Log", "Metric Definitions")
+
+
 class TestMatrix1Week4Parity(EvalTestCase):
-    """End to end (reference workbook + JSONL -> xlsx), Week 5 must equal Week 4 cell by cell."""
+    """Week 5 vs the committed Week 4 evaluator, end to end (workbook + JSONL -> xlsx).
+
+    Metrics must be identical. The workbooks may differ only by the documented
+    A5 presentation differences (decision D1), and nowhere else.
+    """
+
+    def assert_only_a5_layout_differences(self, week4_path, week5_path):
+        import re
+
+        diffs = compare_workbooks(week4_path, week5_path, max_differences=200)
+        values, styles, heights, widths, other = set(), set(), set(), set(), []
+        for diff in diffs:
+            if m := re.match(r"\[(.+?)!([A-Z]+\d+)\] value", diff):
+                values.add((m[1], m[2]))
+            elif m := re.match(r"\[(.+?)!([A-Z]+\d+)\] style", diff):
+                styles.add((m[1], m[2]))
+            elif m := re.match(r"\[(.+?)\] row (\d+) height 30.0 != 28", diff):
+                heights.add((m[1], int(m[2])))
+            elif m := re.match(r"\[(.+?)\] column ([A-Z]+) width 58.0 != 55", diff):
+                widths.add((m[1], m[2]))
+            else:
+                other.append(diff)
+        self.assertEqual(other, [])
+        self.assertTrue(values <= A5_TEXT_CELLS, values - A5_TEXT_CELLS)
+        self.assertEqual(styles, A5_STYLE_CELLS)
+        self.assertEqual(heights, {(sheet, 1) for sheet in SHEETS})
+        self.assertEqual(widths, {("Overall Summary", "C")})
 
     def compare_with_week4(self, predictions_by_id, gt_kwargs=None):
         from week_04.matrix_1 import matrix1_evaluator as week4
@@ -452,7 +494,7 @@ class TestMatrix1Week4Parity(EvalTestCase):
         write_evaluation_workbook(MATRIX1, result, week5_path, clock=StepClock())
         self.assertEqual({c: result.per_condition[c].as_dict() for c in CONDITION_KEYS},
                          week4_metrics)
-        self.assertEqual(compare_workbooks(week4_path, week5_path), [])
+        self.assert_only_a5_layout_differences(week4_path, week5_path)
         return result
 
     def test_random_predictions(self):
@@ -515,28 +557,38 @@ class TestPipeline(EvalTestCase):
         with self.assertRaisesRegex(EvaluationInputError, r"reference-only=\[101, 102"):
             evaluate_workflow(MATRIX1, gt, pred)
 
-    def test_matrix2_evaluation_is_pending_and_reads_no_files(self):
+    def test_matrix2_end_to_end_with_synthetic_data(self):
         gt = make_workbook(self.dir / "m2.xlsx", MATRIX2_HEADERS)
-        pred = write_predictions(self.dir / "p.jsonl", reference_for(range(1, 101)))
-        with self.assertRaisesRegex(ReferenceLoadingPending,
-                                    "matrix2 evaluation reference-loading rules"):
-            evaluate_workflow(MATRIX2, gt, pred)
-        with patch("week_05.evaluation.reconcile.load_prediction_records") as reader:
-            with self.assertRaises(ReferenceLoadingPending):
-                evaluate_workflow(MATRIX2, self.dir / "absent.xlsx", self.dir / "absent.jsonl")
-        reader.assert_not_called()
+        pred = write_predictions(self.dir / "p.jsonl", random_predictions(range(1, 101), seed=8))
+        result = evaluate_workflow(MATRIX2, gt, pred)
+        self.assertEqual(result.workflow, "matrix2")
+        self.assertEqual(result.micro.total, 2000)
+        target = self.dir / "matrix_2" / "Evaluation Workbook v2.xlsx"
+        self.assertEqual(write_evaluation_workbook(MATRIX2, result, target), target.resolve())
+        self.assertEqual(load_workbook(target).sheetnames,
+                         ["Overall Summary", "Condition Summary", "Case Predictions",
+                          "Confusion Matrix", "Execution Log"])
 
-    def test_matrix2_shared_engine_uses_exact_set_matching_only(self):
-        """Approved rule, exercised with synthetic references (loader still pending)."""
+    def test_matrix2_uses_exact_set_matching_without_a_case_count(self):
         ids = range(1001, 1061)
-        pred = write_predictions(self.dir / "matrix_2" / "predictions.jsonl", reference_for(ids))
-        result = compute_evaluation(reconcile(MATRIX2, as_reference(reference_for(ids)), pred))
+        gt = make_workbook(self.dir / "m2.xlsx", MATRIX2_HEADERS, case_ids=ids)
+        pred = write_predictions(self.dir / "p.jsonl", reference_for(ids))
+        result = evaluate_workflow(MATRIX2, gt, pred)
         self.assertEqual(len(result.labels.case_ids), 60)        # no 100-case restriction
         self.assertEqual(result.micro.accuracy, 1.0)
-        target = self.dir / "matrix_2" / "Evaluation Workbook v2.xlsx"
-        with self.assertRaisesRegex(WorkbookLayoutPending, "Evaluation Workbook v2.xlsx"):
-            write_evaluation_workbook(MATRIX2, result, target)
-        self.assertFalse(target.exists())
+
+    def test_matrix2_ambiguous_workbook_is_rejected_before_evaluation(self):
+        gt = make_workbook(self.dir / "m2.xlsx", MATRIX2_HEADERS, case_ids=range(1, 126))
+        pred = write_predictions(self.dir / "p.jsonl", reference_for(range(1, 101)))
+        with self.assertRaisesRegex(ReferenceLoadError, "ambiguous"):
+            evaluate_workflow(MATRIX2, gt, pred)
+
+    def test_unknown_workflow_has_no_loader_or_layout(self):
+        import dataclasses
+
+        other = dataclasses.replace(MATRIX1, name="matrix3")
+        with self.assertRaises(ReferenceLoadingPending):
+            evaluate_workflow(other, self.dir / "x.xlsx", self.dir / "x.jsonl")
 
     def test_matrix2_set_mismatch_rejected(self):
         pred = write_predictions(self.dir / "p.jsonl", reference_for(range(1, 101)))
@@ -590,16 +642,25 @@ class TestCli(EvalTestCase):
         self.assertEqual(code, 0)
         self.assertIn("WARNING: skipped prediction line 1: not valid JSON", out)
 
-    def test_matrix2_evaluate_is_reported_as_pending(self):
+    def test_matrix2_evaluate_writes_workbook(self):
         gt = make_workbook(self.dir / "m2.xlsx", MATRIX2_HEADERS)
         pred = write_predictions(self.dir / "p.jsonl", reference_for(range(1, 101)))
         output = self.dir / "eval.xlsx"
         code, out = self.run_cli(["evaluate", "--workflow", "matrix2", "--input", str(gt),
                                   "--predictions", str(pred), "--output", str(output)])
-        self.assertEqual(code, 5)
-        self.assertIn("Not available yet", out)
-        self.assertNotIn("TP=", out)
-        self.assertFalse(output.exists())
+        self.assertEqual(code, 0)
+        self.assertIn("Micro accuracy=100.00%", out)
+        self.assertIn("Evaluation workbook created", out)
+        self.assertTrue(output.is_file())
+
+    def test_matrix2_ambiguous_workbook_is_an_input_error(self):
+        gt = make_workbook(self.dir / "m2.xlsx", MATRIX2_HEADERS, case_ids=range(1, 126))
+        pred = write_predictions(self.dir / "p.jsonl", reference_for(range(1, 101)))
+        code, out = self.run_cli(["evaluate", "--workflow", "matrix2", "--input", str(gt),
+                                  "--predictions", str(pred), "--output",
+                                  str(self.dir / "e.xlsx")])
+        self.assertEqual(code, 3)
+        self.assertIn("ambiguous", out)
 
     def test_evaluate_input_errors(self):
         gt = make_workbook(self.dir / "m1.xlsx", MATRIX1_HEADERS)
@@ -622,8 +683,8 @@ class TestCli(EvalTestCase):
         self.assertIn("Case count differs: batch=100, evaluation=125", out)
         code, out = self.run_cli(["compare-references", "--workflow", "matrix2",
                                   "--input", str(clean)])
-        self.assertEqual(code, 5)
-        self.assertIn("Not available yet", out)
+        self.assertEqual(code, 0)
+        self.assertIn("No differences", out)
 
 
 class TestWorkbookCompare(EvalTestCase):
@@ -659,6 +720,34 @@ class TestWorkbookCompare(EvalTestCase):
         wb["Metric Definitions"].title = "Definitions"
         wb.save(b)
         self.assertIn("Sheet names differ", compare_workbooks(a, b)[0])
+
+    def test_numbers_compare_like_excel_but_other_types_stay_strict(self):
+        from week_05.evaluation.workbook_compare import _values_equal
+
+        self.assertTrue(_values_equal(1, 1.0, 0.0))
+        self.assertTrue(_values_equal(0, 0.0, 0.0))
+        self.assertFalse(_values_equal(True, 1, 0.0))
+        self.assertFalse(_values_equal("1", 1, 0.0))
+        self.assertFalse(_values_equal(None, 0, 0.0))
+        self.assertFalse(_values_equal(0.5, 0.5000001, 0.0))
+
+    def test_in_memory_workbooks_merges_heights_and_full_styles(self):
+        from openpyxl.styles import Alignment, Border, Font, Side
+
+        a, b = self.make_pair()
+        expected, actual = load_workbook(a), load_workbook(b)
+        self.assertEqual(compare_workbooks(expected, actual), [])
+        sheet = actual["Overall Summary"]
+        sheet.merge_cells("A1:D1")
+        sheet.row_dimensions[5].height = 40
+        sheet["A6"].alignment = Alignment(horizontal="right", vertical="top", wrap_text=True)
+        sheet["A7"].font = Font(name="Arial")
+        sheet["A8"].border = Border(left=Side(style="thin"))
+        joined = "\n".join(compare_workbooks(expected, actual))
+        self.assertIn("merged cells", joined)
+        self.assertIn("row 5 height", joined)
+        for cell in ("A6", "A7", "A8"):
+            self.assertIn(f"[Overall Summary!{cell}] style", joined)
 
     def test_ignore_cells_and_float_tolerance(self):
         a, b = self.make_pair()

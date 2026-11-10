@@ -47,9 +47,19 @@ class SkippedLine:
 
 
 @dataclass(frozen=True)
+class RecordMetadata:
+    """Batch execution details of one prediction record (never labels)."""
+
+    status: str
+    attempts: Any
+    completed_at_utc: Any
+
+
+@dataclass(frozen=True)
 class PredictionRecords:
     labels: Mapping[int, Mapping[str, str]]            # file order
     skipped: tuple[SkippedLine, ...] = field(default=())
+    metadata: Mapping[int, RecordMetadata] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -63,6 +73,7 @@ class ReconciledLabels:
     reference_source: Path | None = None
     predictions_source: Path | None = None
     skipped_lines: tuple[SkippedLine, ...] = ()
+    prediction_metadata: Mapping[int, RecordMetadata] = field(default_factory=dict)
 
     def __repr__(self) -> str:
         return (f"ReconciledLabels(workflow={self.workflow!r}, cases={len(self.case_ids)}, "
@@ -99,6 +110,7 @@ def load_prediction_records(path: Path) -> PredictionRecords:
         raise FileNotFoundError(f"Predictions file not found: {path}")
 
     labels_by_case: dict[int, Mapping[str, str]] = {}
+    metadata: dict[int, RecordMetadata] = {}
     skipped: list[SkippedLine] = []
     with path.open("r", encoding="utf-8") as handle:
         for line_number, line in enumerate(handle, start=1):
@@ -129,9 +141,15 @@ def load_prediction_records(path: Path) -> PredictionRecords:
             labels_by_case[case_id] = MappingProxyType(
                 {condition: labels[condition] for condition in CONDITION_KEYS}
             )
+            metadata[case_id] = RecordMetadata(
+                status=record["status"],
+                attempts=record.get("attempts"),
+                completed_at_utc=record.get("completed_at_utc"),
+            )
     if not labels_by_case:
         raise EvaluationInputError(f"No valid prediction records found in {path}")
-    return PredictionRecords(MappingProxyType(labels_by_case), tuple(skipped))
+    return PredictionRecords(MappingProxyType(labels_by_case), tuple(skipped),
+                             MappingProxyType(metadata))
 
 
 def reconcile(
@@ -174,6 +192,9 @@ def reconcile(
         reference_source=reference.source_path,
         predictions_source=path.resolve(),
         skipped_lines=records.skipped,
+        prediction_metadata=MappingProxyType(
+            {cid: records.metadata[cid] for cid in reference.case_ids}
+        ),
     )
 
 
