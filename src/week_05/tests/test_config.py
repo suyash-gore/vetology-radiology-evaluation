@@ -156,6 +156,8 @@ class TestWorkflowSpecs(unittest.TestCase):
                 self.assertEqual(spec.worksheet_name, "Sheet1")
         self.assertTrue(MATRIX1.require_exact_case_count)   # Week 4 M1 loader raises
         self.assertFalse(MATRIX2.require_exact_case_count)  # Week 4 M2 loader warns
+        self.assertFalse(MATRIX1.configurable_limit)        # Week 4 M1 batch: fixed 100
+        self.assertTrue(MATRIX2.configurable_limit)         # Week 4 M2 batch: --limit
 
     def test_paths_are_anchored_to_repository_and_isolated_from_week4(self):
         week5_outputs = config.REPO_ROOT / "outputs" / "week_05"

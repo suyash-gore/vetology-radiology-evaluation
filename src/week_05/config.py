@@ -188,6 +188,9 @@ class WorkflowSpec:
     require_exact_case_count: bool = False
     # Week 4 Matrix 1 loader rejects a limit above 100; Matrix 2 has no cap.
     max_case_limit: int | None = None
+    # Week 4's Matrix 1 batch always ran exactly 100 cases (no --limit option);
+    # Matrix 2's batch accepted --limit. Applies to batch runs and the CLI.
+    configurable_limit: bool = True
     input_dir: Path = DEFAULT_INPUT_DIR
 
     @property
@@ -220,6 +223,7 @@ MATRIX1: Final[WorkflowSpec] = WorkflowSpec(
     output_dir=OUTPUT_ROOT / "matrix_1",
     require_exact_case_count=True,
     max_case_limit=CASE_LIMIT,
+    configurable_limit=False,
 )
 
 MATRIX2: Final[WorkflowSpec] = WorkflowSpec(
