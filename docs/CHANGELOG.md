@@ -1,6 +1,6 @@
 # Changelog
 
-This file records meaningful implementation and documentation changes. Week 4 closeout updates reflect the verified project state as of 2026-11-08.
+This file records meaningful implementation and documentation changes. Week 4 entries reflect the verified project state as of 2026-11-08; the Week 5 entries reflect the closeout on 2026-11-10.
 
 ## Week 2 — Scaffolding
 
@@ -83,3 +83,51 @@ This file records meaningful implementation and documentation changes. Week 4 cl
 
 - Completed the Week 4 implementation, evaluation, quality checks, error-screening work, and optional JSON prompt-configuration task.
 - Git commits and tags remain to be performed by the user after reviewing staged files and excluding confidential data.
+
+
+## Week 5 — Claude Code rebuild (2026-11-10)
+
+Independent rebuild of the Week 4 application under `src/week_05/`, developed with Claude Code on branch `week-05/claude-code-rebuild`. `src/week_04/` was not modified. No live OpenAI API request was made.
+
+### Added (by phase)
+- **Phase 1 — Foundation and configuration** (`config.py`, `conditions.py`, `cli.py`): single source for the 20 condition keys and `Positive`/`Negative`; Week 4 model settings and `.env` handling; separate Matrix 1 and Matrix 2 workflow configurations with isolated outputs under `outputs/week_05/`.
+- **Phase 2 — Prompt and LLM client** (`prompts/`, `llm_client.py`): byte-identical copy of Canine Thorax Master Prompt V1.3 guarded by SHA-256 checks; system and human messages reproduced byte-for-byte from Week 4, including `[Not provided]` for empty fields; payload restricted to the three original report fields.
+- **Phase 3 — Dataset loading** (`dataset_loader.py`): one loader for both workflows reproducing Week 4 cleaning and validation; reference labels stored separately and read-only.
+- **Phase 4 — Response validation** (`response_validator.py`): Week 4 output contract with identical error messages.
+- **Phase 5 — Batch execution** (`batch_runner.py`, `jsonl_store.py`): Week 4 retry and checkpoint semantics and byte-identical JSONL records.
+- **Phase 6 — Evaluation and workbooks** (`evaluation/`): shared Week 4 metric engine; separate Matrix 1 and Matrix 2 reference loaders and workbook generators; workbook comparison tool; verification against the delivered Week 4 baseline artifacts.
+- CLI commands `config`, `validate-data`, `batch`, `evaluate`, `compare-references` (`python -m week_05`).
+- 338 offline tests, including real-artifact tests that run only when the gitignored baseline files are present.
+
+### Changed relative to Week 4 (all approved)
+- Missing API key or invalid settings are detected before any classification instead of producing a failure record per case; a configuration error during a run stops the run.
+- One OpenAI client is reused for the whole batch instead of one per case (identical request configuration).
+- Crash recovery: if a JSONL file ends without a newline (interrupted write), a newline is written before appending, so the new record stays readable. Week 4 appended onto the partial line, which made that case be reclassified on every later run.
+- Matrix 1 batch processes exactly 100 cases with no configurable limit; Matrix 2 keeps `--limit`.
+- Evaluation skips only prediction lines that are not valid JSON (interrupted writes), listing each in the Execution Log; all other invalid content is still rejected.
+- Matrix 1 workbook follows the delivered Matrix 1 baseline layout and wording; Matrix 2 workbook follows the delivered Matrix 2 baseline structure except the two approved differences below.
+- Matrix 2 reference loading uses the Week 4 Matrix 2 batch-loader rules with an ambiguity guard.
+
+### Verified
+- Matrix 1 reproduced from the baseline artifacts: TP 128, FN 921, TN 913, FP 38; workbook identical to the delivered Matrix 1 workbook (input file names and generation timestamp excluded).
+- Matrix 2 reproduced: TP 127, FN 31, TN 1,803, FP 39; workbook identical to the delivered Matrix 2 workbook except: (1) the Overall Summary "Balanced Accuracy" row is not produced; (2) Execution Log cell C8 states the failure-count source (input file names excluded).
+- 338 tests passed with network access blocked: 0 failures, 0 skipped, 0 connection attempts; flake8 clean. Week 4 regression tests pass unchanged.
+
+### Dependencies
+- `requirements.txt` now pins every directly imported package: added `langchain-core==1.7.7` (imported by `llm_client.py`), `openai==3.49.0` and `httpx==0.28.1` (imported by the offline tests). These are the versions already installed and tested; no other version changed.
+
+### Checkpoint commits
+`d62470f` (Phases 1–3), `f670f26` (Phase 4), `dfdd3ec` (Phase 5), `ecc8153` (Phase 6 interim), `874aaea` (Phase 6 final), followed by this documentation and dependency update.
+
+## Documentation corrections — Week 5 closeout (2026-11-10)
+
+Corrected statements found during the Week 5 documentation audit. Historical Week 4 facts were kept; only inaccurate descriptions were fixed.
+1. Matrix 1 was described in `project_documentation.md` as "original report vs second AI report… pending"; it is original Vetology scores vs LLM and was completed in Week 4.
+2. Section numbering in `project_documentation.md` was inconsistent.
+3. The delivered Matrix 2 workbook has five sheets (not three) and includes precision, F1 and a Balanced Accuracy row.
+4. The README test command `unittest discover -s src/week_04` runs no tests; working commands are now documented.
+5. The README repository layout listed a non-existent `optional_json_config/README.md` and omitted `matrix_1/` and `week_05/`.
+6. The Week 4 batch was described as logging "failed attempts" separately; it writes one record per case that fails all attempts, and logs individual attempt failures to the console only.
+7. Workbook naming: the delivered Matrix 1 workbook is `Evaluation_Workbook_v1.xlsx` (code default `matrix1_evaluation_workbook.xlsx`) and was produced by an evaluator variant not in the repository; no Matrix 2 evaluator source exists.
+8. The Python environment now records both Week 4 (3.14.6, Windows) and Week 5 (3.13.18, Linux) versions.
+9. `requirements.txt` did not declare `langchain-core`, `openai` or `httpx`, which are imported directly.

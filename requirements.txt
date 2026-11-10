@@ -4,6 +4,18 @@ openpyxl==3.1.5
 # LangChain integration with OpenAI
 langchain-openai==1.7.2
 
+# Imported directly by Week 5 (src/week_05/llm_client.py: chat message types).
+# Previously installed only as a dependency of langchain-openai (requires >=1.6.10,<2).
+langchain-core==1.7.7
+
+# Imported directly by the Week 5 offline tests (src/week_05/tests/test_batch_runner.py)
+# to build realistic OpenAI API exceptions without any network request.
+# openai: within langchain-openai's range (>=2.45.0,<4). openai 3.x itself uses the
+# separate "httpx2" package internally; "httpx" is required by langchain-core (>=0.23.0)
+# and the Week 2 Google integration (>=0.28.1,<1).
+openai==3.49.0
+httpx==0.28.1
+
 # Load local environment variables from the repository-root .env file
 python-dotenv>=1.0,<2.0
 
