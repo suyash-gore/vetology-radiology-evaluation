@@ -17,7 +17,7 @@ openai==3.49.0
 httpx==0.28.1
 
 # Load local environment variables from the repository-root .env file
-python-dotenv>=1.0,<2.0
+python-dotenv==1.2.4
 
 # Code quality / linting
 flake8==7.4.1

@@ -1,6 +1,7 @@
 """Offline tests for the Week 4-style evaluation reference loader (synthetic workbooks)."""
 from __future__ import annotations
 
+import gc
 import json
 import tempfile
 import unittest
@@ -35,6 +36,7 @@ class RefTestCase(unittest.TestCase):
     def setUp(self):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
+        self.addCleanup(gc.collect)  # Release Week 4 read-only workbook handles before temp cleanup.
         self.dir = Path(tmp.name)
         self.n = 0
         quiet(self, "week_05.dataset_loader")
@@ -51,7 +53,10 @@ class RefTestCase(unittest.TestCase):
         if first_sheet:
             wb = load_workbook(path)
             wb.create_sheet(first_sheet, 0).append(["notes"])
-            wb.save(path)
+            try:
+                wb.save(path)
+            finally:
+                wb.close()
         return path
 
 

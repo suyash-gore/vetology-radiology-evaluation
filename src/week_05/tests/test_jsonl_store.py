@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import tempfile
 import unittest
@@ -89,15 +90,15 @@ class TestAppend(StoreTestCase):
 
     def test_recovery_inserts_newline_only_after_a_partial_line(self):
         record = {"case_id": 2}
-        line = json.dumps(record) + "\n"
+        line = json.dumps(record) + os.linesep
         cases = {
             "missing file": (None, line),
             "empty file": ("", line),
             "ends with newline": ('{"case_id": 1}\n', '{"case_id": 1}\n' + line),
             "ends with CRLF": ('{"case_id": 1}\r\n', '{"case_id": 1}\r\n' + line),
             "partial line": ('{"case_id": 1}\n{"case_id": 9, "sta',
-                             '{"case_id": 1}\n{"case_id": 9, "sta\n' + line),
-            "partial only": ('{"cas', '{"cas\n' + line),
+                             '{"case_id": 1}\n{"case_id": 9, "sta' + os.linesep + line),
+            "partial only": ('{"cas', '{"cas' + os.linesep + line),
         }
         for name, (existing, expected) in cases.items():
             with self.subTest(case=name):
@@ -121,7 +122,7 @@ class TestAppend(StoreTestCase):
         path = self.dir / "p.jsonl"
         append_jsonl(path, record)
         self.assertEqual(path.read_bytes(),
-                         (json.dumps(record, ensure_ascii=False) + "\n").encode("utf-8"))
+                         (json.dumps(record, ensure_ascii=False) + os.linesep).encode("utf-8"))
 
 
 class TestLoadSuccessfulCaseIds(StoreTestCase):

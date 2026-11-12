@@ -75,7 +75,7 @@ python -m unittest -v test_prompt_config_loader.py
 
 ## Week 5 — Claude Code rebuild: verification record (2026-11-10)
 
-All Week 5 tests are offline. No live OpenAI API request was made during Week 5 development or verification (live testing was not approved). Results below were run by the assistant in the cloud environment (Python 3.13.18, Linux).
+The Week 5 development and regression test suites recorded below are offline and make no API requests. At the 2026-11-10 development closeout, live testing had not been approved and no live OpenAI API request had been made. The cloud-environment results below were run on Python 3.13.18 (Linux). Separate live batch executions were later approved and completed on 2026-11-12; see the local Windows execution record.
 
 ### Final test suite (authoritative)
 
@@ -84,7 +84,7 @@ All Week 5 tests are offline. No live OpenAI API request was made during Week 5 
 | Week 5 unit and integration tests | `PYTHONPATH=src python -m unittest discover -s src/week_05/tests -t src` | **338 tests passed**: 0 failures, 0 errors, 0 skipped |
 | Network isolation | Same suite with socket connections blocked | 338 passed; **0 network connection attempts** |
 | Code style | `python -m flake8 --max-line-length=100 src/week_05` | Clean |
-| Real-data tests without data | `test_baseline_artifacts.py` with the baseline files absent | All 9 skipped with an explanatory message (no failure) |
+| Real-data tests without data | `test_baseline_artifacts.py` with the baseline files absent | All 9 skipped with an explanatory message (no failure); the 338-pass result above was run with the baseline files present |
 
 The suite covers configuration and fail-fast checks; prompt integrity and byte-identical message construction (compared with Week 4 and with the request body LangChain would send); dataset loading and reference-label separation; response validation (outcomes and error messages identical to Week 4 on curated and randomised inputs); batch retries, checkpoints, interrupted runs and byte-identical JSONL output (compared with the Week 4 batch processor); metric calculations (identical to Week 4, including undefined values); both workbook layouts; and real-data verification.
 
@@ -120,7 +120,53 @@ Further checks:
 - The Matrix 1 and Matrix 2 prediction files differ on 8 of 2,000 case-condition pairs (6 cases; 4 Positive→Negative and 4 Negative→Positive; both files contain 166 positive predictions). This is recorded as observed run-to-run variation; neither file was altered.
 
 ### Limitations of the Week 5 verification
-- No live API run: classification behaviour of the rebuilt client was verified only by comparing the exact request content with Week 4.
+- At the 2026-11-10 development verification stage, no live API run had been performed; classification behavior was verified by comparing the exact request content with Week 4. Live Matrix 1 and Matrix 2 executions were subsequently completed on 2026-11-12, as recorded below.
 - No `errors.jsonl` was supplied for either Week 4 run; failure counts are derived from prediction records only.
-- Byte-level JSONL parity was tested with LF line endings; the Week 4 prediction files use Windows CRLF line endings (read correctly by Week 5).
+- JSONL writes use platform-native text newline translation, matching Week 4 on the same operating system (LF on Linux; CRLF on Windows). The Windows-specific compatibility correction was verified by the completed local Windows suite dated 2026-11-12.
 - Real-data tests require the gitignored baseline files and are skipped elsewhere.
+
+## Week 5 — Local Windows execution record (2026-11-12)
+
+**Environment:** Windows 11, Python 3.14.6, project virtual environment (`.venv`).
+
+### Automated tests
+
+| Check | Result | Notes |
+|---|---|---|
+| Week 5 unit and integration tests | 338 tests run; 329 passed, 9 skipped; 0 failures and 0 errors | Full local Windows test suite completed successfully. |
+| Skipped tests | 9 | Real-artifact tests requiring baseline files not available in the local test location. |
+| JSONL compatibility tests | Passed | Platform-native newline handling verified through the test suite. |
+| Flake8 on local Windows | Not rerun | The previously recorded clean flake8 result is from the Linux development environment. |
+
+### Live batch execution and evaluation
+
+| Workflow | Batch result | TP | FN | TN | FP | Accuracy | Sensitivity | Specificity | Precision | F1 |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Matrix 1 — Original Vetology | 100 succeeded, 0 failed | 126 | 923 | 916 | 35 | 52.10% | 12.01% | 96.32% | 78.26% | 20.83% |
+| Matrix 2 — Gold Standard | 100 succeeded, 0 failed | 126 | 32 | 1,806 | 36 | 96.60% | 79.75% | 98.05% | 77.78% | 78.75% |
+
+Each workflow evaluated 100 cases across 20 conditions (2,000 paired labels).
+
+Both live batch runs completed successfully using the OpenAI API. Reference labels were not sent to the model; model input was restricted to original Findings, Conclusions and Recommendations.
+
+### Reference-loading comparison
+
+| Workflow | Result |
+|---|---|
+| Matrix 1 | Passed — batch and evaluation loaders selected identical cases, order and labels. |
+| Matrix 2 | Passed — batch and evaluation loaders selected identical cases, order and labels. |
+
+No API requests were made during either reference comparison.
+
+### Evaluation workbook review
+
+Both generated evaluation workbooks were opened and visually reviewed. The generated Matrix 1 and Matrix 2 workbooks were confirmed as available in their respective Week 5 output directories.
+
+### Generated artifacts
+
+- Matrix 1 predictions: `outputs/week_05/matrix_1/predictions.jsonl` — 100 records.
+- Matrix 1 evaluation workbook: `outputs/week_05/matrix_1/matrix1_evaluation_workbook.xlsx`.
+- Matrix 2 predictions: `outputs/week_05/matrix_2/predictions.jsonl` — 100 records.
+- Matrix 2 evaluation workbook: `outputs/week_05/matrix_2/Evaluation Workbook v2.xlsx`.
+
+**Scope note:** This execution record documents batch completion, aggregate evaluation, reference-loader consistency and workbook review. Detailed prediction error analysis and veterinary adjudication were outside the scope of this Week 5 closeout.

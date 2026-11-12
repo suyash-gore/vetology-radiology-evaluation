@@ -17,10 +17,14 @@ The Week 4 application was rebuilt independently under `src/week_05/` in six rev
 - Both Week 4 baselines reproduced exactly from the delivered artifacts:
   - Matrix 1: TP 128, FN 921, TN 913, FP 38 — workbook identical to the delivered Matrix 1 workbook (run-dependent cells excluded).
   - Matrix 2: TP 127, FN 31, TN 1,803, FP 39 — workbook identical to the delivered Matrix 2 workbook except two approved differences.
-- **338 offline tests pass** (0 skipped, 0 network connection attempts); flake8 clean; Week 4 regression tests pass unchanged.
-- No live OpenAI API request was made during Week 5 development or verification.
+- **Development-environment verification:** 338 offline tests passed (0 skipped, 0 network connection attempts) when the gitignored baseline artifacts were available; flake8 was clean and Week 4 regression tests passed unchanged.
+- **Local Windows verification (2026-11-12):** 338 tests run; 329 passed, 9 skipped, 0 failures and 0 errors. The 9 skipped tests require baseline artifacts that were not present in the local test location. The Windows JSONL compatibility tests passed.
+- **Live execution (2026-11-12):** Matrix 1 and Matrix 2 each completed a 100-case OpenAI API batch with 100 successful cases and 0 final failures. Both evaluation workbooks were generated and visually reviewed; both reference-loader comparisons passed.
+- **Matrix 1 live evaluation:** TP 126, FN 923, TN 916, FP 35; accuracy 52.10%, sensitivity 12.01%, specificity 96.32%, precision 78.26%, F1 20.83%.
+- **Matrix 2 live evaluation:** TP 126, FN 32, TN 1,806, FP 36; accuracy 96.60%, sensitivity 79.75%, specificity 98.05%, precision 77.78%, F1 78.75%.
+- The live batch commands made billable OpenAI API requests. Tests, evaluation and reference-loader comparisons did not make API requests. Flake8 was not rerun on the local Windows machine.
 
-Details: `docs/project_documentation.md` §10–§13 and `docs/testing_log.md`.
+Details: `docs/project_documentation.md` §§10–13 and `docs/testing_log.md`.
 
 ### Week 4 — First application (historical record)
 
@@ -83,9 +87,11 @@ vetology-radiology-evaluation/
 
 Week 5 writes its outputs to `outputs/week_05/matrix_1/` and `outputs/week_05/matrix_2/`; workbooks and JSONL files are gitignored and must not be committed.
 
+The 2026-11-12 live execution produced 100 successful predictions for each workflow. Matrix 1 and Matrix 2 results use different reference-label sets and should be interpreted separately, not as a direct like-for-like comparison of model quality. These are pilot evaluations, not evidence of clinical readiness.
+
 ## Prerequisites
 
-- Python 3. The Week 4 work was reported on Python 3.14.6 (Windows 11). The Week 5 rebuild was developed and tested on Python 3.13.18 (Linux, cloud environment); the Week 4 regression tests also pass there.
+- Python 3. The Week 5 rebuild was developed and tested on Python 3.13.18 (Linux, cloud environment) and locally executed on Windows 11 with Python 3.14.6. The Week 4 work was also reported on Windows 11 with Python 3.14.6.
 - Visual Studio Code or another Python IDE.
 - An OpenAI API key and permission/billing access, only for live classification runs.
 
@@ -132,8 +138,19 @@ Week 5 validates these settings, and the presence of the key, before any classif
 
 ## Week 5 — using the rebuilt application
 
-All commands run from the repository root with `src` on `PYTHONPATH`
-(PowerShell: `$env:PYTHONPATH = "src"`; bash: `export PYTHONPATH=src`). Every command needs `--workflow matrix1` or `--workflow matrix2`.
+Run commands from the repository root with the project virtual environment active and `src` on `PYTHONPATH`.
+
+PowerShell:
+```powershell
+$env:PYTHONPATH = "src"
+```
+
+macOS/Linux:
+```bash
+export PYTHONPATH=src
+```
+
+Every workflow command needs `--workflow matrix1` or `--workflow matrix2`.
 
 ```bash
 python -m week_05 config --workflow matrix1                 # show settings (no API request)
@@ -187,14 +204,24 @@ The optional module under `src/week_04/optional_json_config/` stores the existin
 
 Run from the repository root with the project environment active. With bash, prefix commands with `PYTHONPATH=src` or export it; with PowerShell set `$env:PYTHONPATH = "src"` first.
 
-Week 5 (338 offline tests; no API key or network needed):
+Week 5 automated tests are offline; they do not require an API key or network access.
 
+Windows PowerShell:
+```powershell
+python -m unittest discover -s src/week_05/tests -v
+```
+
+macOS/Linux:
 ```bash
 PYTHONPATH=src python -m unittest discover -s src/week_05/tests -t src -v
+```
+
+Optional lint check:
+```bash
 python -m flake8 --max-line-length=100 src/week_05
 ```
 
-The real-data tests in `test_baseline_artifacts.py` run only when the baseline files are present in `data/`; otherwise they are skipped with an explanatory message.
+The real-artifact tests in `test_baseline_artifacts.py` run only when the baseline files are present in `data/`; otherwise they are skipped with an explanatory message. In the 2026-11-12 local Windows run, 329 tests passed and 9 were skipped because the baseline artifacts were not present in the local test location (338 tests total). The development-environment run passed all 338 tests when those artifacts were available. Flake8 was clean in the development environment; it was not rerun locally on Windows.
 
 Week 4 (unchanged; the top-level Week 4 tests are standalone scripts, so `unittest discover` on `src/week_04` finds no tests):
 

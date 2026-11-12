@@ -87,7 +87,10 @@ def write_workbook(
             sheet.append([row.get(header) for header in headers])
         else:
             sheet.append(list(row))
-    workbook.save(path)
+    try:
+        workbook.save(path)
+    finally:
+        workbook.close()
     return path
 
 

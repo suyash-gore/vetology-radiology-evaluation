@@ -57,12 +57,12 @@ The exact prompt is maintained under `src/week_04/prompts/` and copied byte-for-
 
 ## 3. Development environment
 
-| | Week 4 | Week 5 rebuild |
-|---|---|---|
-| OS | Windows 11 | Linux (Claude Code cloud environment) |
-| Python | 3.14.6 (reported during setup) | 3.13.18 |
-| IDE / tool | Visual Studio Code | Claude Code |
-| Virtual environment | `.venv` (also previously referred to as `venv1`) | Environment packages installed from `requirements.txt` |
+| | Week 4 | Week 5 development | Week 5 local execution |
+|---|---|---|---|
+| OS | Windows 11 | Linux (Claude Code cloud environment) | Windows 11 |
+| Python | 3.14.6 (reported during setup) | 3.13.18 | 3.14.6 |
+| IDE / tool | Visual Studio Code | Claude Code | Visual Studio Code / PowerShell |
+| Virtual environment | `.venv` (also previously referred to as `venv1`) | Environment packages installed from `requirements.txt` | Existing `.venv`, dependencies installed from `requirements.txt` |
 
 Both use `gpt-4.1-mini` through `langchain-openai`, with `python-dotenv` for configuration. `requirements.txt` pins every directly imported package (`openpyxl`, `langchain-openai`, `langchain-core`, `openai`, `httpx`, `python-dotenv`, `flake8`) and the retained Week 2 demonstration integrations. *(Corrected in Week 5 closeout: `langchain-core`, `openai` and `httpx` were previously used without being declared.)*
 
@@ -178,7 +178,7 @@ The Week 4 application was rebuilt independently under `src/week_05/` with Claud
 | 5 | Batch execution, retries, checkpoints | `dfdd3ec` |
 | 6 | Evaluation, workbooks, baseline verification | `ecc8153` (interim), `874aaea` (final) |
 
-`src/week_04/` was not modified. Week 5 does not import Week 4 at runtime; Week 4 is used only in parity tests. No live OpenAI API request was made during Week 5.
+`src/week_04/` was not modified. Week 5 does not import Week 4 at runtime; Week 4 is used only in parity tests. The development and regression tests were conducted offline. Separate live OpenAI API batch executions for Matrix 1 and Matrix 2 were completed successfully on 2026-11-12; see Section 11.6.
 
 ### 10.2 Architecture
 
@@ -213,7 +213,7 @@ The Week 4 application was rebuilt independently under `src/week_05/` with Claud
 Same contract and error messages as Week 4: a non-blank string containing exactly one JSON object; no duplicate keys at any depth; exactly the 20 keys; values exactly `Positive` or `Negative`. Any key order is accepted; output is in canonical order. Validation never sees CaseIDs or reference labels.
 
 ### 10.6 Batch execution, retries, checkpoints and JSONL
-- Success record: `case_id`, `status` ("success"), `attempts`, `completed_at_utc`, `predictions`. Failure record (`errors.jsonl`): `case_id`, `status` ("failed"), `attempts`, `failed_at_utc`, `error`. Field order, UTC ISO-8601 timestamps and serialisation are byte-identical to Week 4; no fields were added.
+- Success record: `case_id`, `status` ("success"), `attempts`, `completed_at_utc`, `predictions`. Failure record (`errors.jsonl`): `case_id`, `status` ("failed"), `attempts`, `failed_at_utc`, `error`. Record fields, field order, UTC ISO-8601 timestamp format and JSON serialisation contract are preserved from Week 4; no provenance fields were added. Line endings use platform-native newline translation, matching Week 4 when both run on the same operating system.
 - A case is skipped when `str(case_id)` already has a valid success record. Invalid checkpoint lines are ignored with a warning and the case is classified again.
 - Each case gets up to 2 attempts (classifier call plus validation), with no wait between attempts. If all fail, one failure record is written and the batch continues. Failed cases are retried on a later run; stale failure lines are kept (Week 4 behaviour).
 - Approved improvements: configuration errors stop the run before or during classification instead of producing a failure per case; after an interrupted write (file not ending with a newline), a newline is written before appending, so the next record stays readable.
@@ -257,10 +257,38 @@ The Matrix 2 workbook reproduces the delivered structure: five sheets, micro met
 | Accuracy / Sensitivity / Specificity / Precision / F1 | 52.05 / 12.20 / 96.00 / 77.11 / 21.07 % | 96.50 / 80.38 / 97.88 / 76.51 / 78.40 % |
 | Workbook vs delivered baseline | Identical (excluding input file names and generation time) | Identical except the two approved differences (excluding input file names) |
 
+### 11.6 Week 5 live execution results — 2026-11-12
+
+Both workflows were executed locally on Windows using the configured OpenAI API client (`gpt-4.1-mini`). Each workflow processed 100 cases and evaluated 2,000 paired condition labels.
+
+**Matrix 1 — Original Vetology scores vs LLM**
+- Cases processed: 100; succeeded: 100; failed: 0.
+- TP / FN / TN / FP: 126 / 923 / 916 / 35.
+- Accuracy: 52.10%; Sensitivity: 12.01%; Specificity: 96.32%; Precision: 78.26%; F1: 20.83%.
+- Workbook: `outputs/week_05/matrix_1/matrix1_evaluation_workbook.xlsx`.
+- Predictions: `outputs/week_05/matrix_1/predictions.jsonl`.
+
+**Matrix 2 — Gold Standard vs LLM**
+- Cases processed: 100; succeeded: 100; failed: 0.
+- TP / FN / TN / FP: 126 / 32 / 1,806 / 36.
+- Accuracy: 96.60%; Sensitivity: 79.75%; Specificity: 98.05%; Precision: 77.78%; F1: 78.75%.
+- Workbook: `outputs/week_05/matrix_2/Evaluation Workbook v2.xlsx`.
+- Predictions: `outputs/week_05/matrix_2/predictions.jsonl`.
+
+**Reference-loader verification**
+- Both Matrix 1 and Matrix 2 `compare-references` checks completed without differences between the batch and evaluation loaders in case selection, case ordering or reference labels.
+- These comparison commands did not make API requests.
+
+Both generated evaluation workbooks were visually reviewed. The batch executions made live OpenAI API requests; evaluation and reference-loader comparison were local operations and did not make API requests. Reference labels were not sent to the model. Only the three original radiologist report fields were used as LLM input.
+
+The Matrix 1 and Matrix 2 results use different reference-label sets and should be interpreted separately; the difference in aggregate metrics is not, by itself, a like-for-like comparison of model quality. This execution record documents aggregate results and loader verification only. Detailed prediction-level error analysis and veterinary adjudication were not undertaken as part of the Week 5 closeout.
+
 ## 12. Testing and validation
 
 - **Week 4:** see `testing_log.md` for the recorded data-loader, prompt, live single-case, validator, offline batch, live batch, evaluation and JSON-configuration results.
-- **Week 5:** 338 offline tests pass with 0 failures, 0 skipped and 0 network connection attempts; flake8 is clean (`--max-line-length=100`). The Week 4 regression tests pass unchanged. Deliberate-deviation checks confirmed that the tests detect regressions. Commands are listed in the README; results in `testing_log.md`.
+- **Week 5 development verification (Linux / Python 3.13.18):** 338 offline tests passed with 0 failures, 0 skipped and 0 network connection attempts in the development environment where the baseline artifacts were present. Flake8 was clean with `--max-line-length=100` in that development environment.
+- **Week 5 local Windows verification (Windows 11 / Python 3.14.6):** `python -m unittest discover -s src/week_05/tests -v` ran 338 tests: 329 passed, 9 skipped, 0 failures and 0 errors. The 9 skipped tests require gitignored baseline artifacts that were not present in the local test location. The Windows JSONL compatibility tests passed as part of the suite. Flake8 and `git diff --check` were not rerun locally.
+- **Week 5 live execution (2026-11-12):** Matrix 1 and Matrix 2 each completed a 100-case OpenAI API batch with 100 successes and 0 final failures. Both evaluations and both reference-loader comparisons completed locally; see Section 11.6. The batch commands made live API requests; the offline tests, evaluations and reference-loader comparisons did not.
 
 ## 13. Problems, resolutions, and limitations
 
@@ -275,8 +303,11 @@ The Matrix 2 workbook reproduces the delivered structure: five sheets, micro met
 - The delivered Matrix 1 workbook was produced by an evaluator variant not in the repository; the delivered Matrix 2 workbook was created by an external tool and modified four days later, so its history cannot be fully established.
 - No Week 4 `errors.jsonl` was available; failure counts are derived from prediction records only.
 - Model outputs vary between runs (8 of 2,000 pairs differ between the two Week 4 runs).
-- No live API run was made in Week 5; the rebuilt client's request content was verified identical to Week 4 instead.
-- Byte-level JSONL parity was tested with LF line endings only; the Week 4 files use CRLF.
+- Live Week 5 API execution was completed on 2026-11-12 for both workflows. Each 100-case batch reported 100 successes and 0 final failures. These are execution results on the selected sample, not evidence of clinical readiness.
+- The Week 5 local Windows test run skipped 9 real-artifact tests because the required baseline files were not present in the local test location; the cloud development run had those artifacts and passed all 338 tests.
+- Flake8 was clean in the Linux development environment; it was not rerun on the local Windows machine.
+- JSONL output uses platform-native newline translation, matching Week 4 when both run on the same operating system. The 2026-11-12 portability correction removed a forced LF override and made raw-byte tests platform-aware.
+- Detailed prediction-level error analysis and veterinary adjudication were outside the scope of the 2026-11-12 Week 5 execution closeout.
 - Preserved Week 4 behaviours: no backoff between retries; stale failure lines remain in `errors.jsonl`; in Matrix 1 evaluation a non-integral CaseID such as 5.7 would be truncated to 5 (not present in the data).
 
 ## 14. Advisor feedback

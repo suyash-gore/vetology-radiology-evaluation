@@ -100,9 +100,13 @@
   6. Evaluation and workbooks — Week 4 metrics; independent Matrix 1 and Matrix 2 reference loading and workbooks; verification against the delivered baselines.
 - Reproduced both Week 4 baselines from the delivered artifacts: Matrix 1 TP 128, FN 921, TN 913, FP 38; Matrix 2 TP 127, FN 31, TN 1,803, FP 39.
 - Matrix 1 workbook identical to the delivered workbook; Matrix 2 workbook identical except two approved differences (no Balanced Accuracy row; failure-count source disclosure in the Execution Log).
-- 338 offline tests pass (0 skipped, 0 network connection attempts); flake8 clean; Week 4 regression tests pass unchanged.
+- 338 offline tests passed in the Linux development environment with baseline artifacts present (0 skipped, 0 network connection attempts); flake8 was clean there; Week 4 regression tests passed unchanged. The 9 real-artifact tests skip when the gitignored baseline files are absent.
+- Completed the local Windows test suite on 2026-11-12 (Windows 11, Python 3.14.6): 338 tests run, 329 passed, 9 skipped, 0 failures and 0 errors. The skipped tests required baseline artifacts not present in the local test location. Windows JSONL compatibility tests passed. Flake8 was not rerun locally.
+- Completed live OpenAI API batch executions on 2026-11-12: Matrix 1, 100 succeeded and 0 failed; Matrix 2, 100 succeeded and 0 failed. Both evaluation workbooks were generated and visually reviewed, and both reference-loader comparisons passed.
+- Matrix 1 live evaluation: TP 126, FN 923, TN 916, FP 35; accuracy 52.10%, sensitivity 12.01%, specificity 96.32%, precision 78.26%, F1 20.83%.
+- Matrix 2 live evaluation: TP 126, FN 32, TN 1,806, FP 36; accuracy 96.60%, sensitivity 79.75%, specificity 98.05%, precision 77.78%, F1 78.75%.
 - Declared all directly imported dependencies in `requirements.txt`; corrected nine documentation inconsistencies.
-- No live OpenAI API request was made during Week 5.
+- Detailed prediction-level error analysis and veterinary adjudication were outside the scope of the Week 5 live-execution closeout.
 
 ### Limitations / open items
 - The Matrix 2 reference-loading rules are inferred from the delivered artifacts (the original Matrix 2 evaluator is not in the repository); ambiguous future workbooks are rejected rather than resolved silently.

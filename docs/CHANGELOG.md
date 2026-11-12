@@ -1,6 +1,6 @@
 # Changelog
 
-This file records meaningful implementation and documentation changes. Week 4 entries reflect the verified project state as of 2026-11-08; the Week 5 entries reflect the closeout on 2026-11-10.
+This file records meaningful implementation and documentation changes. Week 4 entries reflect the verified project state as of 2026-11-08; Week 5 development closeout was recorded on 2026-11-10, followed by Windows portability and live-execution updates on 2026-11-12.
 
 ## Week 2 — Scaffolding
 
@@ -87,7 +87,7 @@ This file records meaningful implementation and documentation changes. Week 4 en
 
 ## Week 5 — Claude Code rebuild (2026-11-10)
 
-Independent rebuild of the Week 4 application under `src/week_05/`, developed with Claude Code on branch `week-05/claude-code-rebuild`. `src/week_04/` was not modified. No live OpenAI API request was made.
+Independent rebuild of the Week 4 application under `src/week_05/`, developed with Claude Code on branch `week-05/claude-code-rebuild`. `src/week_04/` was not modified. At the 2026-11-10 development closeout, no live OpenAI API request had been made; separate live workflow executions were completed on 2026-11-12 and are recorded below.
 
 ### Added (by phase)
 - **Phase 1 — Foundation and configuration** (`config.py`, `conditions.py`, `cli.py`): single source for the 20 condition keys and `Positive`/`Negative`; Week 4 model settings and `.env` handling; separate Matrix 1 and Matrix 2 workflow configurations with isolated outputs under `outputs/week_05/`.
@@ -131,3 +131,27 @@ Corrected statements found during the Week 5 documentation audit. Historical Wee
 7. Workbook naming: the delivered Matrix 1 workbook is `Evaluation_Workbook_v1.xlsx` (code default `matrix1_evaluation_workbook.xlsx`) and was produced by an evaluator variant not in the repository; no Matrix 2 evaluator source exists.
 8. The Python environment now records both Week 4 (3.14.6, Windows) and Week 5 (3.13.18, Linux) versions.
 9. `requirements.txt` did not declare `langchain-core`, `openai` or `httpx`, which are imported directly.
+
+
+## Week 5 portability corrections — 2026-11-12
+
+- Removed the forced LF newline override from the JSONL writer. Appends now use the platform-native text newline translation, preserving byte-level compatibility with Week 4 on the same platform (including CRLF on Windows).
+- Made JSONL raw-byte expectations platform-aware while retaining checks that pre-existing file bytes are not rewritten during interrupted-write recovery.
+- Closed synthetic test workbooks explicitly and added garbage collection before temporary-directory cleanup in the Week 4 parity test fixture, avoiding Windows file-handle cleanup failures without modifying Week 4.
+- Corrected the evaluation package description and clarified that the 338-test development result used available baseline artifacts; nine artifact tests skip when those gitignored files are absent.
+- The complete local Windows suite subsequently ran on 2026-11-12: 338 tests, 329 passed, 9 skipped, 0 failures and 0 errors. The 9 skips were real-artifact tests requiring baseline files absent from the local test location. Flake8 was not rerun locally; the earlier clean flake8 result applies to the Linux development environment.
+
+
+## Week 5 local Windows verification and live execution — 2026-11-12
+
+### Verified
+- Completed the full local Windows Week 5 test suite on Windows 11 with Python 3.14.6: 338 tests run, 329 passed, 9 skipped, 0 failures and 0 errors. The 9 skipped tests require gitignored baseline artifacts that were not present in the local test location.
+- Windows JSONL compatibility tests passed as part of the full suite. The JSONL writer uses platform-native newline translation, and interrupted-write recovery preserves existing file bytes.
+- Matrix 1 live batch: 100 cases succeeded, 0 final failures. Evaluation counts: TP 126, FN 923, TN 916, FP 35; accuracy 52.10%, sensitivity 12.01%, specificity 96.32%, precision 78.26%, F1 20.83%.
+- Matrix 2 live batch: 100 cases succeeded, 0 final failures. Evaluation counts: TP 126, FN 32, TN 1,806, FP 36; accuracy 96.60%, sensitivity 79.75%, specificity 98.05%, precision 77.78%, F1 78.75%.
+- Both evaluation workbooks were generated and visually reviewed. Both `compare-references` checks passed: batch and evaluation loaders selected identical cases, order and labels for each workflow.
+- Live batch commands made OpenAI API requests. Evaluation and reference-loader comparison commands did not make API requests. Reference labels were not sent to the model; input remained restricted to the three original radiologist report fields.
+
+### Scope note
+- Detailed prediction-level error analysis and veterinary adjudication were not undertaken as part of this Week 5 closeout. The Matrix 1 and Matrix 2 evaluations use different reference-label sets and should be interpreted separately.
+- Flake8 was not rerun on the local Windows machine; the previously recorded clean result is from the Linux development environment.

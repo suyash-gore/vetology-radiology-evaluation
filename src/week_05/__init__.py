@@ -1,15 +1,10 @@
-"""Vetology Week 5 — independent rebuild of the canine thorax evaluation app.
+"""Evaluation of LLM predictions against a workflow's reference labels.
 
-The package classifies 20 canine thoracic conditions from original radiologist
-report text with OpenAI (via LangChain) using the unchanged Canine Thorax Master
-Prompt V1.3, and evaluates predictions in two strictly separate workflows:
+* ``metrics``         — pure confusion-matrix and metric calculations (shared).
+* ``reconcile``       — loads predictions JSONL and aligns it with reference labels.
+* ``matrix1_workbook``— Matrix 1 workbook (replicates the Week 4 Matrix 1 evaluator).
+* ``evaluate``        — workflow-level entry point.
 
-* Matrix 1 — Original Vetology scoring vs. LLM predictions.
-* Matrix 2 — Gold Standard scoring vs. LLM predictions.
-
-This package does not import or modify the Week 4 implementation.
+The Matrix 2 workbook layout is intentionally not implemented until
+``Evaluation Workbook v2.xlsx`` has been inspected.
 """
-
-__all__ = ["__version__"]
-
-__version__ = "5.0.0"
