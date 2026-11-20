@@ -22,8 +22,10 @@ attempt per application invocation (``TRANSPORT_MAX_RETRIES = 0`` is a fixed
 constant, not an environment setting); the application makes at most two
 attempts per case. Bounded exponential backoff is applied between application
 attempts only for the transient HTTP status codes 408, 429, 500, 502, 503 and
-504. HTTP 400, 401, 403 and 404 and configuration errors are fatal and never
-retried. Response validation failures keep Week 5's immediate retry.
+504, and for network timeouts and network errors without an HTTP status
+(handled like 408). HTTP 400, 401, 403 and 404 and configuration errors are
+fatal and never retried. Response validation failures keep Week 5's immediate
+retry.
 
 Workflows: Matrix 1 and Matrix 2 keep the Week 5 inputs, case-count rules and
 workbook names, but every Week 7 output lives under ``outputs/week_07/``. The
@@ -169,6 +171,11 @@ class RetryPolicy:
             "application_max_attempts": self.max_attempts,
             "transient_http_status_codes": sorted(self.transient_status_codes),
             "transient_handling": "bounded exponential backoff between application attempts",
+            "network_error_handling": "network timeouts and httpx/httpx2 NetworkError "
+                                      "(connect/read/write/close) without an HTTP status: "
+                                      "transient, same backoff as HTTP 408",
+            "rate_limit_handling": "HTTP 429 uses the same bounded backoff; Retry-After "
+                                   "is not used",
             "backoff_base_seconds": self.backoff_base_seconds,
             "backoff_factor": self.backoff_factor,
             "backoff_max_seconds": self.backoff_max_seconds,
