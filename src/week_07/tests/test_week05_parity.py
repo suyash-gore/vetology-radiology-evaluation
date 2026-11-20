@@ -331,12 +331,21 @@ class TestEvaluationParity(SyntheticParityCase):
             f"!= {r7.model_record!r}",
         ])
 
-    def test_matrix2_workbook_differs_only_in_title_and_model_note(self):
+    def test_matrix2_workbook_differs_only_in_approved_cells(self):
+        """Approved: A1 title (Week 7), C3 model disclosure, C8 failure-count wording."""
+        from week_05.evaluation.matrix2_workbook import FAILURE_COUNT_SOURCE as WEEK5_C8
+        from week_07.evaluation.matrix2_workbook import FAILURE_COUNT_SOURCE as WEEK7_C8
         from week_07.evaluation.workbook_compare import compare_workbooks
 
+        self.assertEqual(
+            WEEK7_C8,
+            "Source: prediction records only. The batch error log (errors.jsonl) is not read "
+            "by this evaluation; error records for cases that later succeeded are not final "
+            "failures.")
         book5, book7, r7 = self._workbooks("matrix2", 1)
         self.assertEqual(compare_workbooks(book5, book7), [
             "[Overall Summary!A1] value 'VETOLOGY WEEK 4 - OVERALL EVALUATION SUMMARY' != "
             "'VETOLOGY WEEK 7 - OVERALL EVALUATION SUMMARY'",
             f"[Execution Log!C3] value None != {'Model: ' + r7.model_record!r}",
+            f"[Execution Log!C8] value {WEEK5_C8!r} != {WEEK7_C8!r}",
         ])

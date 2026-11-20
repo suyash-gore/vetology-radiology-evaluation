@@ -112,9 +112,15 @@ class TestMetricsAndWorkbooks(EvaluationTestCase):
         log = book["Execution Log"]
         self.assertEqual((log["A3"].value, log["C3"].value),
                          ("Prediction file", f"Model: {M2_MODEL}"))
+        self.assertEqual((log["A8"].value, log["B8"].value), ("Failed records", 0))
+        self.assertEqual(log["C8"].value,
+                         "Source: prediction records only. The batch error log (errors.jsonl) "
+                         "is not read by this evaluation; error records for cases that later "
+                         "succeeded are not final failures.")
         texts = [c.value for ws in book for row in ws.iter_rows() for c in row
                  if isinstance(c.value, str)]
         self.assertFalse(any("WEEK 4" in t or "gpt" in t.lower() for t in texts))
+        self.assertFalse(any("was supplied" in t for t in texts))
 
     def test_matrix1_requires_all_100_predictions(self):
         self.batch("matrix1", 0)

@@ -1,7 +1,8 @@
 """Matrix 2 evaluation workbook — structure of the DELIVERED baseline A6.
 
 Week 7 copy of ``src/week_05/evaluation/matrix2_workbook.py``. The ONLY changes
-(approved decision O5 and the Phase 3 instruction to identify Gemini and Week 7):
+(approved decision O5, the Phase 3 instruction to identify Gemini and Week 7, and
+the approved Phase 3 review of the failure-count note):
 
 * Overall Summary A1 title: ``VETOLOGY WEEK 7 - OVERALL EVALUATION SUMMARY``
   (Week 5 kept A6's ``VETOLOGY WEEK 4 - ...``).
@@ -9,6 +10,11 @@ Week 7 copy of ``src/week_05/evaluation/matrix2_workbook.py``. The ONLY changes
   model that produced the predictions: ``Model: <model_record>``. A6/Week 5 have
   no model cell; using the empty column C follows decision D6 (C8 disclosure) and
   moves no row, so every other cell keeps the Week 5/A6 position and format.
+* Execution Log C8 (failure-count source, decision D6) is reworded for Week 7,
+  whose batch does write ``errors.jsonl``: the count still comes from prediction
+  records only, and the note now says the error log is not read by this
+  evaluation and that error records superseded by a later success are not final
+  failures (Week 5 said "No errors.jsonl was supplied").
 
 Everything else is unchanged and is checked against the Week 5 module by the
 parity tests.
@@ -31,7 +37,7 @@ Approved decisions applied:
   numbers.
 * D6 — batch details (status, attempts, timestamps, successes, failures) come
   from the prediction records. The Execution Log states the failure-count
-  source and that no errors.jsonl was supplied (column C of "Failed records";
+  source and that the batch error log is not read (column C of "Failed records";
   A6 has no text there).
 * D8 — Case Predictions and the per-case log are sorted by CaseID.
 
@@ -65,8 +71,8 @@ DATASET_NAME = "Canine thorax Gold Standard pilot"
 NOT_APPLICABLE = "N/A - no separate radiologist-agreement reference supplied"
 NOT_CALCULATED = "Not calculated - separate radiologist-agreement reference not supplied"
 FAILURE_COUNT_SOURCE = (
-    "Source: prediction records only. No errors.jsonl was supplied, so failures recorded "
-    "only in an errors file are not counted."
+    "Source: prediction records only. The batch error log (errors.jsonl) is not read by "
+    "this evaluation; error records for cases that later succeeded are not final failures."
 )
 DEFAULT_GOLD_STANDARD_NAME = "Matrix 2 Gold Standard workbook"
 DEFAULT_PREDICTIONS_NAME = "Matrix 2 predictions.jsonl"
