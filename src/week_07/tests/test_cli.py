@@ -116,4 +116,5 @@ class TestOfflineCommands(CliTestCase):
         parser = cli.build_parser()
         self.assertEqual(parser.prog, "python -m week_07")
         self.assertEqual(set(cli.COMMANDS),
-                         {"config", "validate-data", "batch", "evaluate", "compare-references"})
+                         {"config", "validate-data", "batch", "evaluate", "compare-references",
+                          "compare"})

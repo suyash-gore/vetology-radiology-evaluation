@@ -7,6 +7,7 @@ Run from the repository root (``src`` on ``PYTHONPATH``)::
     python -m week_07 batch              --workflow matrix2 [--input PATH] [--limit N]
     python -m week_07 evaluate           --workflow matrix1 [--input PATH] [--predictions PATH]
     python -m week_07 compare-references --workflow matrix1 [--input PATH]
+    python -m week_07 compare            --workflow matrix1 [--openai PATH] [--gemini PATH]
 
 Only ``batch`` contacts Google Gemini: it makes billable requests for every case
 without a valid saved prediction. All other commands are offline.
@@ -91,6 +92,25 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--model-record",
                           help="Model description for the workbook when the predictions have "
                                "no Week 7 run manifest (e.g. a Week 5 replay).")
+
+    models = subcommands.add_parser(
+        "compare",
+        help="Compare saved Week 5 OpenAI and Week 7 Gemini predictions for one workflow "
+             "and write the six-sheet comparison workbook (offline).",
+    )
+    _add_workflow_argument(models)
+    models.add_argument("--openai", help="Week 5 OpenAI predictions JSONL (default: "
+                                         "outputs/week_05/<matrix>/predictions.jsonl). Read-only.")
+    models.add_argument("--gemini", help="Week 7 Gemini predictions JSONL (default: "
+                                         "outputs/week_07/<matrix>/predictions.jsonl). Read-only.")
+    models.add_argument("--reference", help="Reference workbook (default: the workflow's input).")
+    models.add_argument("--openai-errors", help="Week 5 errors.jsonl (default: the one beside "
+                                                "the OpenAI predictions, if present).")
+    models.add_argument("--gemini-errors", help="Week 7 errors.jsonl (default: the one beside "
+                                                "the Gemini predictions, if present).")
+    models.add_argument("--output", help="Comparison workbook path inside "
+                                         "outputs/week_07/comparison/<matrix> (default: the "
+                                         "workflow's comparison workbook).")
 
     compare = subcommands.add_parser(
         "compare-references",
@@ -247,12 +267,35 @@ def _command_compare_references(args: argparse.Namespace) -> int:
     return 0 if not differences else 1
 
 
+def _command_compare(args: argparse.Namespace) -> int:
+    from week_07.comparison.compare import compare_workflow
+    from week_07.comparison.comparison_workbook import summary_lines, write_comparison_workbook
+
+    workflow = config.get_workflow(args.workflow)
+    result = compare_workflow(
+        workflow,
+        openai_path=args.openai,
+        gemini_path=args.gemini,
+        reference_path=args.reference,
+        openai_errors_path=args.openai_errors,
+        gemini_errors_path=args.gemini_errors,
+    )
+    print("\n".join(summary_lines(result)))
+    for path, digest in result.source_digests.items():
+        print(f"Read-only source unchanged: {path.name} (sha256 {digest})")
+    path = write_comparison_workbook(workflow, result, args.output)
+    print(f"Comparison workbook created: {path}")
+    print("No API request was made.")
+    return 0
+
+
 COMMANDS = {
     "config": _command_config,
     "validate-data": _command_validate_data,
     "batch": _command_batch,
     "evaluate": _command_evaluate,
     "compare-references": _command_compare_references,
+    "compare": _command_compare,
 }
 
 
