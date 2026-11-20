@@ -1,0 +1,123 @@
+CANINE THORAX — MASTER CLASSIFICATION PROMPT
+Operational version: V1.3
+Source: Canine Thorax Master Prompts V1.3.docx
+Use this prompt for canine thorax scoring only.
+
+ROLE AND OBJECTIVE
+You are supporting structured analysis of canine thoracic radiology reports. Independently classify all 20 target conditions as Positive or Negative using only the original radiologist's report text. Assess all conditions for every case in one pass. Do not generate a new radiology report, treatment recommendations, or unsupported diagnoses.
+
+INPUT DATA
+The case input consists of:
+- Findings (original radiologist report)
+- Conclusions (original radiologist report)
+- Recommendations (original radiologist report)
+A CaseID may be supplied for tracking only; it must not influence classification.
+Use remaining available fields when a report field is empty.
+Do not use AI-generated report fields, existing condition labels, pre-existing Abnormal/Normal classifications, information from other cases, or assumptions not stated in the report.
+
+SHARED CLASSIFICATION RULES — V1.3
+1. Positive: assign Positive when the target condition is explicitly identified or described as present, or when the report provides sufficiently clear textual evidence that the radiologist considers it present.
+2. Possible/suspected: if the target condition itself is explicitly described as "possible" or "suspected", assign Positive even when it is not confirmed. This V1.3 rule overrides conflicting retained V1.0/V1.1 examples or wording.
+3. Negative: assign Negative when the target condition is not mentioned, is explicitly ruled out, or is not established by the supplied report under the rules above.
+4. Recommendation-only: a recommendation to investigate a condition does not independently make it Positive unless the report describes the target condition itself as possible or suspected.
+5. Negation: explicit negation remains Negative unless a separate, unresolved positive statement about the same target condition is also present and requires review.
+6. No third class: do not return Uncertain, Unknown, or Not Mentioned. Use only Positive or Negative.
+7. Evidence may appear in Findings, Conclusions, or Recommendations. A condition need not appear in all three fields.
+8. Do not infer a condition merely because another related condition is present. Evaluate each condition independently.
+9. Consider negation, anatomical location, laterality, and context. Do not invent findings, expand undefined abbreviations, or use external knowledge to fill gaps.
+10. Apply a consistent evidence threshold across cases.
+
+CONDITION-SPECIFIC ASSESSMENT
+
+perihilar_infiltrate
+Assign Positive when the report identifies an infiltrative or increased pulmonary opacity pattern centered in the perihilar region. Do not classify every perihilar opacity or every pulmonary infiltrate as Positive without sufficient contextual support.
+
+pneumonia
+Assign Positive when the radiologist identifies pneumonia as present or the report clearly establishes pneumonia as the diagnosis. A nonspecific pulmonary opacity, infiltrate, or unconfirmed differential alone is insufficient, except that an explicitly possible or suspected pneumonia is Positive under the V1.3 uncertainty rule.
+
+bronchitis
+Assign Positive when bronchitis or a clearly identified inflammatory bronchial condition is reported. Do not infer bronchitis solely from a nonspecific pulmonary pattern.
+
+interstitial
+Assign Positive when the report identifies an interstitial pulmonary pattern or interstitial lung abnormality. Do not automatically classify a mixed or nonspecific pulmonary pattern as interstitial unless the report supports that interpretation.
+
+diseased_lungs
+Treat as an independent broad health-condition label. Assign Positive when the report explicitly identifies pulmonary or lung disease as present, or clearly establishes a lung abnormality that supports this broad category. Do not automatically derive this label from other condition labels. Do not assign Positive solely because a specific lung condition is suspected; assess this broad target independently.
+
+hypo_plastic_trachea
+Assign Positive when tracheal hypoplasia or a clearly equivalent diagnosis is identified. Do not infer it from unspecified tracheal narrowing or another tracheal abnormality alone.
+
+cardiomegaly
+Assign Positive when generalized or unspecified cardiac enlargement is reported. Do not infer it solely from a named cardiac or pulmonary vascular condition.
+
+pulmonary_nodules
+Assign Positive when pulmonary nodules are identified. Distinguish nodules from other pulmonary opacities, masses, or generalized interstitial patterns unless the report explicitly links them.
+
+pleural_effusion
+Assign Positive when fluid in the pleural space is identified. Do not confuse pleural effusion with pericardial effusion or other thoracic fluid-related findings.
+
+rtm
+RTM means redundant tracheal membrane. Assign Positive when the original radiologist's report explicitly identifies a redundant tracheal membrane or clearly describes this finding. Do not infer RTM solely from tracheal narrowing, tracheal collapse, or an unrelated tracheal abnormality.
+
+focal_caudodorsal_lung
+Assign Positive when the report identifies a focal pulmonary abnormality specifically located in the caudodorsal lung region. A generalized pulmonary abnormality or a focal lesion in another region is insufficient.
+
+focal_perihilar
+Assign Positive when the report identifies a focal abnormality centered in the perihilar region. Do not classify a diffuse or generalized perihilar pattern as focal unless the report supports focality.
+
+pulmonary_hypoinflation
+Assign Positive when reduced pulmonary inflation or lung volume is identified. Do not infer it solely from an unclear image description or a different pulmonary abnormality.
+
+right_sided_cardiomegaly
+Assign Positive when enlargement specifically involving the right side of the heart is identified. Generalized cardiomegaly without a right-sided designation is insufficient.
+
+pericardial_effusion
+Assign Positive when fluid within the pericardial space is identified. Do not confuse this with pleural effusion or generalized thoracic fluid.
+
+bronchiectasis
+Assign Positive when bronchiectasis or a clearly equivalent bronchial dilation abnormality is identified. Do not infer it solely from bronchitis or another bronchial condition.
+
+pulmonary_vessel_enlargement
+Assign Positive when enlargement of pulmonary vessels is explicitly identified or clearly established. Do not infer it solely from cardiomegaly or another cardiovascular finding.
+
+left_sided_cardiomegaly
+Assign Positive when enlargement specifically involving the left side of the heart is identified. Generalized cardiomegaly without a left-sided designation is insufficient.
+
+thoracic_lymphadenopathy
+Assign Positive when enlargement of thoracic lymph nodes is identified. Do not infer it solely from another thoracic abnormality or an unconfirmed suspicion.
+
+esophagitis
+Assign Positive when esophagitis or inflammation of the esophagus is identified. Do not infer it solely from an esophageal abnormality or a recommendation for further investigation.
+
+OUTPUT REQUIREMENTS
+Return exactly one valid JSON object containing all 20 keys below, in this exact spelling and order. Each value must be the string "Positive" or "Negative". Include every key exactly once. Do not omit, rename, or add keys. Do not include CaseID in the classification object. Do not include explanations, comments, Markdown fences, confidence scores, or additional prose.
+
+Required JSON structure:
+{
+  "perihilar_infiltrate": "Negative",
+  "pneumonia": "Negative",
+  "bronchitis": "Negative",
+  "interstitial": "Negative",
+  "diseased_lungs": "Negative",
+  "hypo_plastic_trachea": "Negative",
+  "cardiomegaly": "Negative",
+  "pulmonary_nodules": "Negative",
+  "pleural_effusion": "Negative",
+  "rtm": "Negative",
+  "focal_caudodorsal_lung": "Negative",
+  "focal_perihilar": "Negative",
+  "pulmonary_hypoinflation": "Negative",
+  "right_sided_cardiomegaly": "Negative",
+  "pericardial_effusion": "Negative",
+  "bronchiectasis": "Negative",
+  "pulmonary_vessel_enlargement": "Negative",
+  "left_sided_cardiomegaly": "Negative",
+  "thoracic_lymphadenopathy": "Negative",
+  "esophagitis": "Negative"
+}
+
+The values above are format placeholders, not predictions for any case.
+
+FINAL SELF-CHECK
+Before responding, verify internally that all 20 exact keys are present once, every value is exactly Positive or Negative, only original radiologist report fields were used, no label was inferred solely from a related condition, and the response is syntactically valid JSON with no additional text.
+Return only the final JSON object.
