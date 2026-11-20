@@ -187,3 +187,67 @@ class SyntheticRepo:
             if path.is_file() and path.suffix in (".json", ".jsonl"):
                 texts.append(path.read_text(encoding="utf-8"))
         return "\n".join(texts)
+
+
+# ---------------------------------------------------------------------------
+# Comparison fixtures (Phase 4): two synthetic "models" with known disagreements
+# ---------------------------------------------------------------------------
+
+# Synthetic Week 5 "OpenAI" and Week 7 "Gemini" flips (report number -> conditions).
+OPENAI_FLIPS: dict[int, tuple[str, ...]] = {
+    1: ("pneumonia", "rtm"), 2: ("cardiomegaly",), 10: ("esophagitis",),
+    55: ("bronchitis", "interstitial"),
+}
+GEMINI_FLIPS: dict[int, tuple[str, ...]] = {
+    1: ("pneumonia",), 3: ("cardiomegaly", "rtm"), 10: ("esophagitis",),
+    77: ("pleural_effusion",),
+}
+
+
+def predicted_labels(case_id: int, variant: int, flips: dict[int, Sequence[str]]
+                     ) -> dict[str, str]:
+    labels = reference_labels(case_id, variant)
+    for condition in flips.get(case_id, ()):
+        labels[condition] = "Negative" if labels[condition] == "Positive" else "Positive"
+    return labels
+
+
+def write_week5_openai(repo: SyntheticRepo, name: str, variant: int,
+                       flips: dict[int, Sequence[str]] = OPENAI_FLIPS,
+                       case_ids: Iterable[int] = range(1, 101),
+                       error_case_ids: Iterable[int] = (),
+                       extra_lines: Sequence[str] = ()) -> Path:
+    """Week 5-format OpenAI predictions (+ optional errors.jsonl) in the temporary Week 5 tree.
+
+    Simulates pre-existing Week 5 artifacts: written directly by the test, never by
+    Week 7 code (which refuses to write there). No run manifest is created.
+    """
+    from week_07.jsonl_store import failure_record, success_record
+    from week_07.tests.gemini_fakes import StepClock
+
+    spec = repo.spec(name)
+    spec.week5_output_dir.mkdir(parents=True, exist_ok=True)
+    clock = StepClock()
+    lines = [json.dumps(success_record(cid, 1, predicted_labels(cid, variant, flips), clock),
+                        ensure_ascii=False) for cid in case_ids]
+    lines.extend(extra_lines)
+    path = spec.week5_predictions_path
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    errors = [json.dumps(failure_record(cid, 2, "ResponseValidationError: synthetic", clock))
+              for cid in error_case_ids]
+    if errors:
+        spec.week5_errors_path.write_text("\n".join(errors) + "\n", encoding="utf-8")
+    return path
+
+
+def run_week7_gemini(repo: SyntheticRepo, name: str, variant: int,
+                     flips: dict[int, Sequence[str]] = GEMINI_FLIPS, **kwargs: Any) -> Path:
+    """Week 7 predictions + run manifest produced by the real batch with a fake model."""
+    from week_07.batch_runner import run_workflow_batch
+    from week_07.config import GeminiModelConfig
+    from week_07.tests.gemini_fakes import RecordingSleep, StepClock
+
+    run_workflow_batch(repo.spec(name), classifier=EchoClassifier(variant, flips),
+                       settings=GeminiModelConfig(), isolation=repo.policy,
+                       clock=StepClock(), sleep=RecordingSleep(), **kwargs)
+    return repo.spec(name).predictions_path
