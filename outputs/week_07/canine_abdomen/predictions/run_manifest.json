@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "application": "canine_abdomen",
+    "application_name": "Canine Abdomen",
+    "workflow": "matrix1",
+    "workflow_title": "Matrix 1 — Original Vetology scoring vs. LLM",
+    "prediction_source_workflow": "matrix1",
+    "predictions_reused_by_workflows": [
+      "matrix1",
+      "matrix2"
+    ],
+    "reference_labels": "Not used by the batch run (evaluation only)",
+    "provider": "OpenAI via langchain-openai ChatOpenAI",
+    "model": "gpt-4.1-mini",
+    "temperature": 0.0,
+    "transport_max_retries": 0,
+    "response_format": null,
+    "prompt": {
+      "name": "Canine Abdomen Master Prompt",
+      "version": "V1.4",
+      "file_sha256": "9336be3fa463be14bdfd71d93e2709b4bad70c626d0533d8e4f887809b2a254c",
+      "text_sha256": "d6c50d5d2e9e8dde080e7c77879cfd9c4c2ccc7fbcad96753a090803497dee91"
+    },
+    "human_instruction": "Classify the following canine abdomen radiology report according to the system instructions.",
+    "condition_keys": [
+      "gastritis",
+      "ascites",
+      "colitis",
+      "liver_mass",
+      "pancreatitis",
+      "microhepatia",
+      "small_intestinal_obstruction",
+      "splenic_mass",
+      "splenomegaly",
+      "hepatomegaly"
+    ],
+    "source_label_normalization": {},
+    "llm_input_fields": [
+      "Findings (original radiologist report)",
+      "Conclusions (original radiologist report)",
+      "Recommendations (original radiologist report)"
+    ],
+    "input_workbook": {
+      "file_name": "3_canine_abdomen_raw_data_encoded.xlsx",
+      "sha256": "583e7523abb30794cdabe745820a27c896ff0d8ddab5803c54511b8b747a5efe",
+      "worksheet": "Sheet1"
+    }
+  },
+  "runs": [
+    {
+      "started_at_utc": "2026-11-21T16:42:21.154945+00:00",
+      "finished_at_utc": "2026-11-21T16:44:40.669787+00:00",
+      "status": "completed",
+      "requested_limit": null,
+      "cases_selected": 100,
+      "timeout_seconds": 90.0,
+      "retry_policy": {
+        "transport_attempts_per_application_attempt": 1,
+        "transport_max_retries": 0,
+        "application_max_attempts": 2,
+        "transient_http_status_codes": [
+          408,
+          429,
+          500,
+          502,
+          503,
+          504
+        ],
+        "transient_handling": "bounded exponential backoff between application attempts",
+        "network_error_handling": "network timeouts and httpx/httpx2 NetworkError (connect/read/write/close) without an HTTP status: transient, same backoff as HTTP 408",
+        "rate_limit_handling": "HTTP 429 uses the same bounded backoff; Retry-After is not used",
+        "backoff_base_seconds": 2.0,
+        "backoff_factor": 2.0,
+        "backoff_max_seconds": 30.0,
+        "fatal_http_status_codes": [
+          400,
+          401,
+          403,
+          404
+        ],
+        "fatal_handling": "not retried; the batch stops and the case stays pending",
+        "validation_failure_handling": "retried immediately without backoff (Week 5)",
+        "other_error_handling": "retried immediately without backoff (Week 5)",
+        "classification_basis": "SDK exception class and HTTP status code attribute; exception messages are never parsed"
+      },
+      "package_versions": {
+        "python": "3.14.6",
+        "langchain-openai": "1.7.2",
+        "openai": "3.49.0",
+        "langchain-core": "1.7.7",
+        "httpx": "0.28.1",
+        "openpyxl": "3.1.5"
+      },
+      "summary": {
+        "total": 100,
+        "skipped": 0,
+        "succeeded": 100,
+        "failed": 0,
+        "transient_backoffs": 0
+      }
+    }
+  ]
+}

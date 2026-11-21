@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "application": "feline_thorax",
+    "application_name": "Feline Thorax",
+    "workflow": "matrix1",
+    "workflow_title": "Matrix 1 — Original Vetology scoring vs. LLM",
+    "prediction_source_workflow": "matrix1",
+    "predictions_reused_by_workflows": [
+      "matrix1",
+      "matrix2"
+    ],
+    "reference_labels": "Not used by the batch run (evaluation only)",
+    "provider": "OpenAI via langchain-openai ChatOpenAI",
+    "model": "gpt-4.1-mini",
+    "temperature": 0.0,
+    "transport_max_retries": 0,
+    "response_format": null,
+    "prompt": {
+      "name": "Feline Thorax Master Prompt",
+      "version": "V1.2",
+      "file_sha256": "9bbd36c4a1d9ac15cb24c39b3e9d0ad5af9106a9bddb3adf3401098e1c418f25",
+      "text_sha256": "a7adb7078bc50df891f23110d6c4de9046db779b118e39201b4923f96f9c81c3"
+    },
+    "human_instruction": "Classify the following feline thorax radiology report according to the system instructions.",
+    "condition_keys": [
+      "pulmonary_nodules",
+      "esophagitis",
+      "pneumonia",
+      "bronchitis",
+      "interstitial",
+      "diseased_lungs",
+      "hypo_plastic_trachea",
+      "cardiomegaly",
+      "pleural_effusion",
+      "perihilar_infiltrate",
+      "rtm",
+      "focal_caudodorsal_lung",
+      "right_sided_cardiomegaly",
+      "focal_perihilar",
+      "left_sided_cardiomegaly",
+      "bronchiectasis",
+      "pulmonary_vessel_enlargement",
+      "thoracic_lymphadenopathy",
+      "pulmonary_hypoinflation",
+      "pericardial_effusion",
+      "Fe_Alveolar"
+    ],
+    "source_label_normalization": {
+      "pulmonary_nodules": {
+        "Normal": "Negative",
+        "Abnormal": "Positive"
+      },
+      "esophagitis": {
+        "Normal": "Negative",
+        "Abnormal": "Positive"
+      },
+      "pneumonia": {
+        "Normal": "Negative",
+        "Abnormal": "Positive"
+      }
+    },
+    "llm_input_fields": [
+      "Findings (original radiologist report)",
+      "Conclusions (original radiologist report)",
+      "Recommendations (original radiologist report)"
+    ],
+    "input_workbook": {
+      "file_name": "2_feline_thorax_raw_data_encoded.xlsx",
+      "sha256": "ef8fcc979132b59d26f37ecae04c2331ad97b37247d123e72556a655a3815516",
+      "worksheet": "Sheet1"
+    }
+  },
+  "runs": [
+    {
+      "started_at_utc": "2026-11-21T16:22:06.135463+00:00",
+      "finished_at_utc": "2026-11-21T16:26:24.520612+00:00",
+      "status": "completed",
+      "requested_limit": null,
+      "cases_selected": 100,
+      "timeout_seconds": 90.0,
+      "retry_policy": {
+        "transport_attempts_per_application_attempt": 1,
+        "transport_max_retries": 0,
+        "application_max_attempts": 2,
+        "transient_http_status_codes": [
+          408,
+          429,
+          500,
+          502,
+          503,
+          504
+        ],
+        "transient_handling": "bounded exponential backoff between application attempts",
+        "network_error_handling": "network timeouts and httpx/httpx2 NetworkError (connect/read/write/close) without an HTTP status: transient, same backoff as HTTP 408",
+        "rate_limit_handling": "HTTP 429 uses the same bounded backoff; Retry-After is not used",
+        "backoff_base_seconds": 2.0,
+        "backoff_factor": 2.0,
+        "backoff_max_seconds": 30.0,
+        "fatal_http_status_codes": [
+          400,
+          401,
+          403,
+          404
+        ],
+        "fatal_handling": "not retried; the batch stops and the case stays pending",
+        "validation_failure_handling": "retried immediately without backoff (Week 5)",
+        "other_error_handling": "retried immediately without backoff (Week 5)",
+        "classification_basis": "SDK exception class and HTTP status code attribute; exception messages are never parsed"
+      },
+      "package_versions": {
+        "python": "3.14.6",
+        "langchain-openai": "1.7.2",
+        "openai": "3.49.0",
+        "langchain-core": "1.7.7",
+        "httpx": "0.28.1",
+        "openpyxl": "3.1.5"
+      },
+      "summary": {
+        "total": 100,
+        "skipped": 0,
+        "succeeded": 100,
+        "failed": 0,
+        "transient_backoffs": 0
+      }
+    }
+  ]
+}
