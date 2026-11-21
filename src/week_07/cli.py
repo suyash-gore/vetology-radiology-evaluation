@@ -1,6 +1,7 @@
 """Command-line interface for the Week 7 Gemini application.
 
-Run from the repository root (``src`` on ``PYTHONPATH``)::
+Run from the repository root (``src`` on ``PYTHONPATH``). Canine Thorax
+(Gemini) is the default application; every existing command works unchanged::
 
     python -m week_07 config             --workflow matrix1
     python -m week_07 validate-data      --workflow matrix1 [--input PATH]
@@ -9,8 +10,20 @@ Run from the repository root (``src`` on ``PYTHONPATH``)::
     python -m week_07 compare-references --workflow matrix1 [--input PATH]
     python -m week_07 compare            --workflow matrix1 [--openai PATH] [--gemini PATH]
 
-Only ``batch`` contacts Google Gemini: it makes billable requests for every case
-without a valid saved prediction. All other commands are offline.
+Feline Thorax and Canine Abdomen (OpenAI ``gpt-4.1-mini``) are selected with
+``--application``. Their predictions are generated ONCE, from the Matrix 1
+workbook, and reused by both evaluations::
+
+    python -m week_07 validate-data --application feline_thorax --workflow matrix1 --input M1.xlsx
+    python -m week_07 batch         --application feline_thorax --workflow matrix1 \
+                                    --provider openai --input M1.xlsx [--matrix2-input M2.xlsx]
+    python -m week_07 evaluate      --application feline_thorax --workflow matrix1 --input M1.xlsx
+    python -m week_07 evaluate      --application feline_thorax --workflow matrix2 --input M2.xlsx \
+                                    --prediction-source-input M1.xlsx
+
+Only ``batch`` contacts a model provider (Google Gemini for Canine Thorax, OpenAI
+for the other applications): it makes billable requests for every case without
+a valid saved prediction. All other commands are offline.
 
 Exit codes: 0 success; 1 compare-references found differences; 2 configuration
 or isolation error; 3 input error; 4 invalid argument; 5 not available;
@@ -22,16 +35,30 @@ import argparse
 from collections.abc import Sequence
 
 from week_07 import config
+from week_07.applications import (
+    APPLICATIONS,
+    CANINE_THORAX,
+    DEFAULT_APPLICATION,
+    PROVIDERS,
+    get_application,
+)
 from week_07.conditions import CONDITION_COUNT
 from week_07.dataset_loader import DatasetError
 from week_07.error_policy import FatalProviderError
 from week_07.evaluation.reconcile import EvaluationInputError
 from week_07.evaluation.reference_loader import ReferenceLoadError, ReferenceLoadingPending
 from week_07.isolation import ProtectedFileModified
-from week_07.prompts.prompt_loader import PROMPT_VERSION
+from week_07.prompts.prompt_loader import PROMPT_VERSION, PromptIntegrityError
 
 
 def _add_workflow_argument(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--application",
+        default=DEFAULT_APPLICATION,
+        choices=list(APPLICATIONS),
+        help="Application (default: canine_thorax, the Week 7 Gemini application). "
+             "feline_thorax and canine_abdomen use OpenAI gpt-4.1-mini.",
+    )
     parser.add_argument(
         "--workflow",
         required=True,
@@ -52,7 +79,8 @@ def _add_input_arguments(parser: argparse.ArgumentParser) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m week_07",
-        description="Vetology Week 7 canine thorax classification with Google Gemini.",
+        description="Vetology Week 7 radiology report classification: canine thorax "
+                    "(Google Gemini, default), feline thorax and canine abdomen (OpenAI).",
     )
     subcommands = parser.add_subparsers(dest="command", required=True)
 
@@ -76,6 +104,13 @@ def build_parser() -> argparse.ArgumentParser:
                        help="Output directory inside outputs/week_07 (default: the workflow's).")
     batch.add_argument("--max-attempts", type=int, default=config.DEFAULT_MAX_ATTEMPTS,
                        help="Application-level attempts per case (default: 2).")
+    batch.add_argument("--provider", choices=list(PROVIDERS),
+                       help="Model provider; must match the application (default: the "
+                            "application's provider: gemini for canine_thorax, openai otherwise).")
+    batch.add_argument("--matrix2-input",
+                       help="feline_thorax/canine_abdomen only: Matrix 2 workbook checked "
+                            "against the Matrix 1 input (same CaseIDs, identical report text) "
+                            "before the run.")
 
     evaluate = subcommands.add_parser(
         "evaluate", help="Compare saved predictions with reference labels (offline)."
@@ -90,8 +125,12 @@ def build_parser() -> argparse.ArgumentParser:
                           help="Evaluation workbook path inside outputs/week_07 "
                                "(default: the workflow's workbook).")
     evaluate.add_argument("--model-record",
-                          help="Model description for the workbook when the predictions have "
-                               "no Week 7 run manifest (e.g. a Week 5 replay).")
+                          help="canine_thorax only: model description for the workbook when the "
+                               "predictions have no Week 7 run manifest (e.g. a Week 5 replay).")
+    evaluate.add_argument("--prediction-source-input",
+                          help="feline_thorax/canine_abdomen matrix2 only: the Matrix 1 workbook "
+                               "the shared predictions were generated from (default: its "
+                               "configured path).")
 
     models = subcommands.add_parser(
         "compare",
@@ -123,6 +162,9 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _command_config(args: argparse.Namespace) -> int:
+    app = get_application(args.application)
+    if app is not CANINE_THORAX:
+        return _application_config(app, args)
     workflow = config.get_workflow(args.workflow)
     model = config.load_model_config(None, config.ENV_FILE)
     key_status = "set" if config.api_key_is_configured(None, config.ENV_FILE) else "NOT SET"
@@ -174,6 +216,9 @@ def _workflow_with_limit_check(args: argparse.Namespace) -> config.WorkflowSpec:
 def _command_validate_data(args: argparse.Namespace) -> int:
     from week_07.dataset_loader import load_dataset
 
+    app = get_application(args.application)
+    if app is not CANINE_THORAX:
+        return _application_validate_data(app, args)
     workflow = _workflow_with_limit_check(args)
     dataset = load_dataset(workflow, args.input, limit=args.limit, worksheet_name=args.sheet)
     print(f"Workflow: {workflow.name} ({workflow.title})")
@@ -191,6 +236,11 @@ def _command_validate_data(args: argparse.Namespace) -> int:
 def _command_batch(args: argparse.Namespace) -> int:
     from week_07.batch_runner import resolve_outputs, run_workflow_batch
 
+    app = get_application(args.application)
+    if app is not CANINE_THORAX:
+        return _application_batch(app, args)
+    _refuse_for_canine(args, "provider", "--provider", allowed=app.provider)
+    _refuse_for_canine(args, "matrix2_input", "--matrix2-input")
     workflow = _workflow_with_limit_check(args)
     policy = config.RetryPolicy(max_attempts=args.max_attempts)
     outputs = resolve_outputs(workflow, args.output_dir)
@@ -225,6 +275,10 @@ def _percent(value: float | None) -> str:
 def _command_evaluate(args: argparse.Namespace) -> int:
     from week_07.evaluation.evaluate import evaluate_workflow, write_evaluation_workbook
 
+    app = get_application(args.application)
+    if app is not CANINE_THORAX:
+        return _application_evaluate(app, args)
+    _refuse_for_canine(args, "prediction_source_input", "--prediction-source-input")
     workflow = config.get_workflow(args.workflow)
     result = evaluate_workflow(workflow, args.input, args.predictions,
                                model_record=args.model_record)
@@ -250,6 +304,9 @@ def _command_evaluate(args: argparse.Namespace) -> int:
 def _command_compare_references(args: argparse.Namespace) -> int:
     from week_07.evaluation.reference_loader import compare_reference_loaders
 
+    app = get_application(args.application)
+    if app is not CANINE_THORAX:
+        return _application_compare_references(app, args)
     workflow = config.get_workflow(args.workflow)
     path = workflow.default_input_path if args.input is None else args.input
     differences = compare_reference_loaders(workflow, path)
@@ -271,6 +328,11 @@ def _command_compare(args: argparse.Namespace) -> int:
     from week_07.comparison.compare import compare_workflow
     from week_07.comparison.comparison_workbook import summary_lines, write_comparison_workbook
 
+    app = get_application(args.application)
+    if app is not CANINE_THORAX:
+        raise ReferenceLoadingPending(
+            f"The Week 5 OpenAI vs Week 7 Gemini comparison exists only for canine_thorax; "
+            f"{app.key} has no Week 5 predecessor.")
     workflow = config.get_workflow(args.workflow)
     result = compare_workflow(
         workflow,
@@ -287,6 +349,187 @@ def _command_compare(args: argparse.Namespace) -> int:
     print(f"Comparison workbook created: {path}")
     print("No API request was made.")
     return 0
+
+
+# ---------------------------------------------------------------------------
+# Shared-prediction applications (Feline Thorax, Canine Abdomen)
+# ---------------------------------------------------------------------------
+
+def _refuse_for_canine(args: argparse.Namespace, attribute: str, flag: str,
+                       allowed: str | None = None) -> None:
+    value = getattr(args, attribute, None)
+    if value is not None and value != allowed:
+        raise ValueError(f"{flag} {value!r} is not available for canine_thorax.")
+
+
+def _refuse_limit(app, workflow: config.WorkflowSpec, args: argparse.Namespace) -> None:
+    if getattr(args, "limit", None) is not None and not workflow.configurable_limit:
+        raise ValueError(
+            f"--limit is not available for {workflow.qualified_name}; it always processes "
+            f"exactly {workflow.case_limit} cases.")
+
+
+def _prompt_status(app) -> str:
+    if app.prompt.is_pending:
+        return (f"{app.prompt.label} — PENDING approval (no approved file/digests registered; "
+                "batch runs are blocked)")
+    return f"{app.prompt.label} (sha256 {app.prompt.file_sha256})"
+
+
+def _application_config(app, args: argparse.Namespace) -> int:
+    from week_07.providers import provider_for
+
+    workflow = app.workflow(args.workflow)
+    provider = provider_for(app)
+    model = provider.load_settings(app)
+    key_status = "set" if provider.api_key_is_configured() else "NOT SET"
+    policy = config.DEFAULT_RETRY_POLICY
+    normalization = app.label_normalization(workflow.name)
+    lines = [
+        f"Application: {app.key} ({app.display_name})",
+        f"Workflow: {workflow.qualified_name} ({workflow.title})",
+        f"Reference labels: {workflow.reference_description}",
+        f"Default input: {workflow.default_input_path} (pass --input for a workbook elsewhere)",
+        f"Worksheet: {workflow.worksheet_name}",
+        f"Case limit: {workflow.case_limit}",
+        f"Conditions: {app.condition_count}",
+        "Reference-label normalisation: " + (
+            "; ".join(f"{c}: " + ", ".join(f"{a}->{b}" for a, b in m.items())
+                      for c, m in normalization.items()) or "none"),
+        f"Shared predictions (generated from {app.prediction_source_workflow}, reused by "
+        f"{', '.join(app.workflows)}): {workflow.predictions_path}",
+        f"Run manifest: {workflow.manifest_path}",
+        f"Evaluation workbook: {workflow.evaluation_workbook_path}",
+        f"Provider: {provider.label}",
+        f"Model: {model.model}",
+        f"Temperature: {model.temperature}",
+        f"Timeout (seconds): {model.timeout_seconds}",
+        f"SDK transport retries: {model.transport_max_retries} (one transport attempt per "
+        "application attempt)",
+        f"Prompt: {_prompt_status(app)}",
+        f"Application attempts per case (default): {policy.max_attempts}",
+        f"Transient HTTP codes (backoff): {sorted(policy.transient_status_codes)} "
+        "+ network timeouts/errors",
+        f"Fatal HTTP codes (not retried): {sorted(policy.fatal_status_codes)}",
+        f"{provider.api_key_var}: {key_status}",
+    ]
+    if config.openai_retry_setting_ignored(None, config.ENV_FILE):
+        lines.append(f"{config.OPENAI_IGNORED_RETRY_VAR}: set but IGNORED by Week 7 "
+                     "(the batch retry policy is the only retry system)")
+    lines.append("No API request was made.")
+    print("\n".join(lines))
+    return 0
+
+
+def _application_validate_data(app, args: argparse.Namespace) -> int:
+    from week_07.app_dataset_loader import load_application_dataset
+
+    workflow = app.workflow(args.workflow)
+    _refuse_limit(app, workflow, args)
+    dataset = load_application_dataset(app, workflow, args.input, limit=args.limit,
+                                       worksheet_name=args.sheet)
+    print(f"Application: {app.key} ({app.display_name})")
+    print(f"Workflow: {workflow.qualified_name} ({workflow.title})")
+    print(f"Workbook: {dataset.source_path}")
+    print(f"Worksheet: {dataset.worksheet_name}")
+    print(f"Cases loaded: {len(dataset.cases)}")
+    print(f"First / last CaseID: {dataset.case_ids[0]} / {dataset.case_ids[-1]}")
+    print(f"Conditions: {app.condition_count}")
+    print(f"Reference labels validated: {len(dataset.reference_labels) * app.condition_count} "
+          f"({dataset.reference_description})")
+    if dataset.normalized_label_counts:
+        for condition, counts in dataset.normalized_label_counts.items():
+            mapping = app.label_normalization(workflow.name)[condition]
+            detail = ", ".join(f"{source}->{mapping[source]}: {count}"
+                               for source, count in sorted(counts.items())) or "none"
+            print(f"Normalised reference column {condition}: {detail}")
+    else:
+        print("Reference-label normalisation: none")
+    print("LLM input fields: Findings, Conclusions, Recommendations (original radiologist report)")
+    print("No API request was made.")
+    return 0
+
+
+def _application_batch(app, args: argparse.Namespace) -> int:
+    from week_07.batch_runner import resolve_application_outputs, run_application_batch
+    from week_07.providers import provider_for
+
+    workflow = app.workflow(args.workflow)
+    _refuse_limit(app, workflow, args)
+    provider = provider_for(app, args.provider)
+    policy = config.RetryPolicy(max_attempts=args.max_attempts)
+    outputs = resolve_application_outputs(workflow, args.output_dir)
+    print(f"\n{app.display_name} — shared prediction run ({workflow.qualified_name})")
+    print(f"IMPORTANT: This run makes billable {provider.short_label} API requests for cases "
+          "without valid saved predictions.")
+    print(f"Prompt: {_prompt_status(app)}")
+    print(f"Maximum application attempts per case: {policy.max_attempts}")
+    print(f"Predictions/checkpoint (reused by {', '.join(app.workflows)}): "
+          f"{outputs.predictions_path}")
+    print(f"Errors: {outputs.errors_path}")
+    print(f"Run manifest: {outputs.manifest_path}")
+    summary = run_application_batch(
+        app, args.workflow, args.input,
+        provider=args.provider,
+        output_dir=outputs.output_dir,
+        retry_policy=policy,
+        worksheet_name=args.sheet,
+        matrix2_input=args.matrix2_input,
+    )
+    print("\nBATCH RUN FINISHED")
+    for key, value in summary.items():
+        print(f"{key.replace('_', ' ').capitalize()}: {value}")
+    print("Reference labels were not sent to the model or written to predictions.")
+    return 0
+
+
+def _application_evaluate(app, args: argparse.Namespace) -> int:
+    from week_07.evaluation.evaluate import evaluate_application, write_application_workbook
+
+    if args.model_record is not None:
+        raise ValueError(f"--model-record is not available for {app.key}: the model record "
+                         "always comes from the shared run manifest.")
+    workflow = app.workflow(args.workflow)
+    result = evaluate_application(app, args.workflow, args.input, args.predictions,
+                                  prediction_source_input=args.prediction_source_input)
+    micro = result.micro
+    for skipped in result.labels.skipped_lines:
+        print(f"WARNING: skipped prediction {skipped.describe()}")
+    print(f"Application: {app.key} ({app.display_name})")
+    print(f"Workflow: {workflow.qualified_name} ({workflow.title})")
+    print(f"Model: {result.model_record}")
+    print(f"Cases: {len(result.labels.case_ids)} | Conditions: {app.condition_count} | "
+          f"Paired labels: {micro.total}")
+    print(f"TP={micro.tp} FN={micro.fn} TN={micro.tn} FP={micro.fp}")
+    print(f"Micro accuracy={_percent(micro.accuracy)} | sensitivity={_percent(micro.sensitivity)}"
+          f" | specificity={_percent(micro.specificity)} | precision={_percent(micro.precision)}"
+          f" | F1={_percent(micro.f1)}")
+    for path, digest in result.source_digests.items():
+        print(f"Read-only source unchanged: {path.name} (sha256 {digest})")
+    path = write_application_workbook(app, args.workflow, result, args.output)
+    print(f"Evaluation workbook created: {path}")
+    print("No API request was made.")
+    return 0
+
+
+def _application_compare_references(app, args: argparse.Namespace) -> int:
+    from week_07.evaluation.app_reference_loader import compare_application_reference_loaders
+
+    workflow = app.workflow(args.workflow)
+    path = workflow.default_input_path if args.input is None else args.input
+    differences = compare_application_reference_loaders(app, workflow, path)
+    print(f"Workflow: {workflow.qualified_name} ({workflow.title})")
+    print(f"Workbook: {path}")
+    if not differences:
+        print("No differences: the batch loader and the evaluation loader select the same "
+              "cases, in the same order, with the same labels.")
+    else:
+        print(f"{len(differences)} difference(s) between the batch loader and the "
+              "evaluation loader:")
+        for difference in differences:
+            print(f"  - {difference}")
+    print("No API request was made.")
+    return 0 if not differences else 1
 
 
 COMMANDS = {
@@ -306,6 +549,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     except FatalProviderError as exc:
         print(f"Fatal provider error (not retried): {exc}")
         return 6
+    except PromptIntegrityError as exc:
+        print(f"Configuration error: {exc}")
+        return 2
     except ProtectedFileModified as exc:
         print(f"Read-only source changed: {exc}")
         return 7

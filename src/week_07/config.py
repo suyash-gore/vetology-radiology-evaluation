@@ -15,7 +15,9 @@ Variable                   Default               Rule
 
 The API key itself is never read into a Python object here: the LangChain
 Google client reads ``GOOGLE_API_KEY`` from the process environment. This module
-only checks that it is set. OpenAI variables are never read.
+only checks that it is set. The Gemini functions never read OpenAI variables;
+the OpenAI settings used by Feline Thorax and Canine Abdomen are defined at the
+end of this module.
 
 Retry policy (approved decision O3): the SDK makes exactly ONE transport
 attempt per application invocation (``TRANSPORT_MAX_RETRIES = 0`` is a fixed
@@ -39,6 +41,7 @@ import os
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
+from types import MappingProxyType
 from typing import Final
 
 from dotenv import load_dotenv
@@ -297,7 +300,18 @@ MANIFEST_FILENAME: Final[str] = "run_manifest.json"
 
 @dataclass(frozen=True)
 class WorkflowSpec:
-    """Everything that distinguishes one evaluation workflow from the other."""
+    """Everything that distinguishes one evaluation workflow from the other.
+
+    Application-aware fields (Week 7 extension; the Canine Thorax defaults
+    reproduce the original Matrix 1 / Matrix 2 specs exactly):
+
+    * ``application`` — the owning application key (``week_07.applications``).
+    * ``comparison_dir`` / ``week5_output_dir`` — ``None`` for applications that
+      have no OpenAI-vs-Gemini comparison and no Week 5 predecessor.
+    * ``shared_predictions_dir`` — when set, the batch outputs (predictions,
+      errors, run manifest) live in this application-wide directory, shared by
+      both workflows, while the evaluation workbook stays in ``output_dir``.
+    """
 
     name: str
     title: str
@@ -306,8 +320,8 @@ class WorkflowSpec:
     evaluation_workbook_filename: str
     comparison_workbook_filename: str
     output_dir: Path
-    comparison_dir: Path
-    week5_output_dir: Path
+    comparison_dir: Path | None = None
+    week5_output_dir: Path | None = None
     worksheet_name: str = WORKSHEET_NAME
     case_limit: int = CASE_LIMIT
     # Week 4/5 Matrix 1 loader raises when fewer than ``case_limit`` cases exist;
@@ -318,22 +332,35 @@ class WorkflowSpec:
     # Matrix 1's batch always runs exactly 100 cases (no --limit); Matrix 2 accepts --limit.
     configurable_limit: bool = True
     input_dir: Path = DEFAULT_INPUT_DIR
+    application: str = "canine_thorax"
+    shared_predictions_dir: Path | None = None
+
+    @property
+    def qualified_name(self) -> str:
+        """``<application>/<workflow>``: unique across all applications."""
+        return f"{self.application}/{self.name}"
 
     @property
     def default_input_path(self) -> Path:
         return self.input_dir / self.input_filename
 
     @property
+    def run_dir(self) -> Path:
+        """Directory of the batch outputs (predictions, errors, run manifest)."""
+        return self.output_dir if self.shared_predictions_dir is None \
+            else self.shared_predictions_dir
+
+    @property
     def predictions_path(self) -> Path:
-        return self.output_dir / PREDICTIONS_FILENAME
+        return self.run_dir / PREDICTIONS_FILENAME
 
     @property
     def errors_path(self) -> Path:
-        return self.output_dir / ERRORS_FILENAME
+        return self.run_dir / ERRORS_FILENAME
 
     @property
     def manifest_path(self) -> Path:
-        return self.output_dir / MANIFEST_FILENAME
+        return self.run_dir / MANIFEST_FILENAME
 
     @property
     def evaluation_workbook_path(self) -> Path:
@@ -341,17 +368,26 @@ class WorkflowSpec:
 
     @property
     def comparison_workbook_path(self) -> Path:
-        return self.comparison_dir / self.comparison_workbook_filename
+        return self._require(self.comparison_dir, "comparison") \
+            / self.comparison_workbook_filename
 
     @property
     def week5_predictions_path(self) -> Path:
         """Read-only Week 5 OpenAI predictions for this workflow (comparison source)."""
-        return self.week5_output_dir / PREDICTIONS_FILENAME
+        return self._require(self.week5_output_dir, "Week 5") / PREDICTIONS_FILENAME
 
     @property
     def week5_errors_path(self) -> Path:
         """Read-only Week 5 OpenAI error log for this workflow (informational only)."""
-        return self.week5_output_dir / ERRORS_FILENAME
+        return self._require(self.week5_output_dir, "Week 5") / ERRORS_FILENAME
+
+    def _require(self, directory: Path | None, what: str) -> Path:
+        if directory is None:
+            raise ConfigurationError(
+                f"{self.qualified_name} has no {what} output directory; "
+                "this feature is not available for this application."
+            )
+        return directory
 
 
 MATRIX1: Final[WorkflowSpec] = WorkflowSpec(
@@ -393,3 +429,206 @@ def get_workflow(name: str) -> WorkflowSpec:
         raise ConfigurationError(
             f"Unknown workflow {name!r}. Expected one of: {', '.join(WORKFLOWS)}."
         ) from None
+
+
+# ---------------------------------------------------------------------------
+# Additional applications (Feline Thorax, Canine Abdomen)
+# ---------------------------------------------------------------------------
+#
+# Each application owns ``outputs/week_07/<application>/``:
+#
+# * ``predictions/`` — the ONE shared batch run (predictions, errors, manifest),
+#   generated from the Matrix 1 workbook and reused by both evaluations;
+# * ``matrix_1/`` and ``matrix_2/`` — the two separate evaluation workbooks.
+#
+# The input workbooks live outside the repository and are normally given with
+# ``--input``; ``WEEK7_INPUT_DIR`` is only the fallback location when no path is
+# given. Nothing is ever copied there. ``config.WORKFLOWS`` stays Canine Thorax
+# only (Week 5 parity); ``ALL_WORKFLOWS`` lists every application's workflows.
+
+WEEK7_INPUT_DIR: Final[Path] = DATA_DIR / "week_07_inputs"
+CANINE_THORAX_APPLICATION: Final[str] = "canine_thorax"
+FELINE_THORAX_APPLICATION: Final[str] = "feline_thorax"
+CANINE_ABDOMEN_APPLICATION: Final[str] = "canine_abdomen"
+
+# Each new application's own output tree. Canine Thorax has none: its outputs
+# stay directly under ``outputs/week_07/`` (matrix_1, matrix_2, comparison).
+APPLICATION_OUTPUT_ROOTS: Final[Mapping[str, Path]] = MappingProxyType({
+    FELINE_THORAX_APPLICATION: OUTPUT_ROOT / FELINE_THORAX_APPLICATION,
+    CANINE_ABDOMEN_APPLICATION: OUTPUT_ROOT / CANINE_ABDOMEN_APPLICATION,
+})
+
+
+def _application_workflows(application: str, matrix1_input: str,
+                           matrix2_input: str) -> tuple[WorkflowSpec, WorkflowSpec]:
+    root = APPLICATION_OUTPUT_ROOTS[application]
+    shared = root / "predictions"
+    matrix1 = WorkflowSpec(
+        name=MATRIX1.name,
+        title=MATRIX1.title,
+        reference_description=MATRIX1.reference_description,
+        input_filename=matrix1_input,
+        evaluation_workbook_filename=f"{application}_matrix1_evaluation_workbook.xlsx",
+        comparison_workbook_filename="",
+        output_dir=root / "matrix_1",
+        require_exact_case_count=True,
+        max_case_limit=CASE_LIMIT,
+        configurable_limit=False,
+        input_dir=WEEK7_INPUT_DIR,
+        application=application,
+        shared_predictions_dir=shared,
+    )
+    matrix2 = WorkflowSpec(
+        name=MATRIX2.name,
+        title=MATRIX2.title,
+        reference_description=MATRIX2.reference_description,
+        input_filename=matrix2_input,
+        evaluation_workbook_filename=f"{application}_matrix2_evaluation_workbook.xlsx",
+        comparison_workbook_filename="",
+        output_dir=root / "matrix_2",
+        require_exact_case_count=False,
+        input_dir=WEEK7_INPUT_DIR,
+        application=application,
+        shared_predictions_dir=shared,
+    )
+    return matrix1, matrix2
+
+
+FELINE_THORAX_MATRIX1, FELINE_THORAX_MATRIX2 = _application_workflows(
+    FELINE_THORAX_APPLICATION,
+    "2_feline_thorax_raw_data_encoded.xlsx",
+    "2_feline_thorax_gold_standard_score_draft.xlsx",
+)
+CANINE_ABDOMEN_MATRIX1, CANINE_ABDOMEN_MATRIX2 = _application_workflows(
+    CANINE_ABDOMEN_APPLICATION,
+    "3_canine_abdomen_raw_data_encoded.xlsx",
+    "3_canine_abdomen_gold_standard_score_draft.xlsx",
+)
+
+ALL_WORKFLOWS: Final[Mapping[str, WorkflowSpec]] = MappingProxyType({
+    spec.qualified_name: spec
+    for spec in (MATRIX1, MATRIX2, FELINE_THORAX_MATRIX1, FELINE_THORAX_MATRIX2,
+                 CANINE_ABDOMEN_MATRIX1, CANINE_ABDOMEN_MATRIX2)
+})
+
+
+# ---------------------------------------------------------------------------
+# OpenAI model configuration (Feline Thorax, Canine Abdomen)
+# ---------------------------------------------------------------------------
+#
+# =========================  ==================  ==================================
+# Variable                   Default             Rule
+# =========================  ==================  ==================================
+# ``OPENAI_API_KEY``         (required, live)    presence check only
+# ``OPENAI_MODEL``           ``gpt-4.1-mini``    non-empty
+# ``OPENAI_TEMPERATURE``     ``0``               0 to 2
+# ``OPENAI_TIMEOUT_SECONDS`` ``90``              greater than 0
+# =========================  ==================  ==================================
+#
+# Same names and defaults as Week 5. The key value is never read into Python:
+# LangChain's ``ChatOpenAI`` reads it from the process environment. The OpenAI
+# functions never read ``GOOGLE_API_KEY`` and the Gemini functions above never
+# read ``OPENAI_*``.
+#
+# Retries: the SDK transport makes exactly ONE attempt per application attempt
+# (``max_retries=0`` is a fixed constant). ``OPENAI_MAX_RETRIES`` (a Week 5
+# setting) is deliberately ignored by Week 7 so that the batch retry policy
+# (``RetryPolicy``) is the only retry system; ``config`` reports it as ignored.
+
+OPENAI_API_KEY_VAR: Final[str] = "OPENAI_API_KEY"
+OPENAI_MODEL_VAR: Final[str] = "OPENAI_MODEL"
+OPENAI_TEMPERATURE_VAR: Final[str] = "OPENAI_TEMPERATURE"
+OPENAI_TIMEOUT_VAR: Final[str] = "OPENAI_TIMEOUT_SECONDS"
+OPENAI_IGNORED_RETRY_VAR: Final[str] = "OPENAI_MAX_RETRIES"
+
+OPENAI_DEFAULT_MODEL: Final[str] = "gpt-4.1-mini"
+OPENAI_TRANSPORT_MAX_RETRIES: Final[int] = 0
+
+
+@dataclass(frozen=True)
+class OpenAIModelConfig:
+    """OpenAI model settings. Deliberately contains no credential."""
+
+    model: str = OPENAI_DEFAULT_MODEL
+    temperature: float = 0.0
+    timeout_seconds: float = 90.0
+    transport_max_retries: int = OPENAI_TRANSPORT_MAX_RETRIES
+
+    def __post_init__(self) -> None:
+        if self.transport_max_retries != OPENAI_TRANSPORT_MAX_RETRIES:
+            raise ConfigurationError(
+                f"OpenAI transport retries are fixed at {OPENAI_TRANSPORT_MAX_RETRIES} (one "
+                "transport attempt per application attempt); received "
+                f"{self.transport_max_retries}."
+            )
+        if not isinstance(self.model, str) or not self.model.strip():
+            raise ConfigurationError("The OpenAI model name must not be empty.")
+        if not 0.0 <= self.temperature <= 2.0:
+            raise ConfigurationError("OpenAI temperature must be between 0 and 2.")
+        if not self.timeout_seconds > 0:
+            raise ConfigurationError("OpenAI timeout must be greater than 0.")
+
+
+def load_openai_model_config(
+    environ: Mapping[str, str] | None = None,
+    env_file: Path | None = ENV_FILE,
+    *,
+    default_model: str = OPENAI_DEFAULT_MODEL,
+) -> OpenAIModelConfig:
+    """Read and validate OpenAI settings (``environ`` bypasses os.environ and .env)."""
+    env = _environment(environ, env_file)
+    model = env.get(OPENAI_MODEL_VAR, default_model).strip()
+    if not model:
+        raise ConfigurationError(
+            f"{OPENAI_MODEL_VAR} is empty. Set a valid model name in .env.")
+    temperature = _parse_float(env.get(OPENAI_TEMPERATURE_VAR, DEFAULT_TEMPERATURE),
+                               OPENAI_TEMPERATURE_VAR)
+    if not 0.0 <= temperature <= 2.0:
+        raise ConfigurationError(
+            f"{OPENAI_TEMPERATURE_VAR} must be between 0 and 2; received {temperature}.")
+    timeout = _parse_float(env.get(OPENAI_TIMEOUT_VAR, DEFAULT_TIMEOUT_SECONDS),
+                           OPENAI_TIMEOUT_VAR)
+    if timeout <= 0:
+        raise ConfigurationError(
+            f"{OPENAI_TIMEOUT_VAR} must be greater than 0; received {timeout}.")
+    return OpenAIModelConfig(model=model, temperature=temperature, timeout_seconds=timeout)
+
+
+def openai_retry_setting_ignored(
+    environ: Mapping[str, str] | None = None,
+    env_file: Path | None = ENV_FILE,
+) -> bool:
+    """Whether ``OPENAI_MAX_RETRIES`` is set (it is ignored by Week 7)."""
+    return OPENAI_IGNORED_RETRY_VAR in _environment(environ, env_file)
+
+
+def openai_api_key_is_configured(
+    environ: Mapping[str, str] | None = None,
+    env_file: Path | None = ENV_FILE,
+) -> bool:
+    """Return whether a non-blank OpenAI key is available. The value is never returned."""
+    env = _environment(environ, env_file)
+    return bool(env.get(OPENAI_API_KEY_VAR, "").strip())
+
+
+def require_openai_api_key(
+    environ: Mapping[str, str] | None = None,
+    env_file: Path | None = ENV_FILE,
+) -> None:
+    """Fail fast when ``OPENAI_API_KEY`` is missing or blank."""
+    if not openai_api_key_is_configured(environ, env_file):
+        raise ConfigurationError(
+            f"{OPENAI_API_KEY_VAR} was not found. Add it to the repository-root .env file. "
+            "Do not paste the key into source code or commit the .env file."
+        )
+
+
+def validate_openai_runtime_configuration(
+    environ: Mapping[str, str] | None = None,
+    env_file: Path | None = ENV_FILE,
+    *,
+    default_model: str = OPENAI_DEFAULT_MODEL,
+) -> OpenAIModelConfig:
+    """Validate the OpenAI credential and settings before any classification starts."""
+    require_openai_api_key(environ, env_file)
+    return load_openai_model_config(environ, env_file, default_model=default_model)

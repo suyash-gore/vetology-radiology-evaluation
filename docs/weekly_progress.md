@@ -145,3 +145,28 @@ The Week 4 application and optional JSON prompt-configuration task are implement
 - In both matrices Gemini was more specific (fewer false positives), and OpenAI was more sensitive with higher accuracy and F1. High agreement between the models does not imply accuracy against the reference labels.
 - Matrix 1 and Matrix 2 use different reference-label sets and must not be combined. These are pilot results, not evidence of clinical readiness.
 - Veterinary adjudication of the model disagreements and mismatches remains pending.
+
+## Week 7 extension — Feline Thorax and Canine Abdomen
+
+### Completed
+- Made the Week 7 engine application-aware with a registry of three applications (branch `week-07/feline-thorax-and-canine-abdomen`):
+  - `canine_thorax`: Gemini, 20 conditions, V1.3. Unchanged; still the default.
+  - `feline_thorax`: OpenAI `gpt-4.1-mini`, 21 conditions.
+  - `canine_abdomen`: OpenAI `gpt-4.1-mini`, 10 conditions.
+- Added the OpenAI provider, with one transport attempt per application attempt so the existing batch retry policy stays the only retry system. Each provider requires only its own API key.
+- Shared predictions: each new application predicts its 100 Matrix 1 cases once and reuses the predictions for the Matrix 1 (Vetology) and Matrix 2 (Gold Standard) evaluations. The tracks stay separate. Matrix 2 reuse requires identical CaseIDs, order and report text.
+- Feline Matrix 1 normalisation: `Normal`/`Abnormal` → `Negative`/`Positive` for `pulmonary_nodules`, `esophagitis` and `pneumonia` only. All other labels are validated strictly.
+- Isolation by `<application>/<workflow>`: each application is confined to `outputs/week_07/<application>/` for writes and prediction reads, and Canine Thorax paths are unchanged.
+- Matrix 1 and Matrix 2 evaluation workbooks use application-specific condition rows, headers and counts, prompt records and dataset names. The CLI gained `--application`, `--provider`, `--matrix2-input` and `--prediction-source-input`, and existing commands are unchanged.
+- Validated the four supplied real workbooks offline:
+  - each has `Sheet1` and the expected headers;
+  - 100 unique CaseIDs (1–100) each, with the Gold Standard blank rows skipped;
+  - the loaders agree and the Matrix 2 guardrail passes;
+  - the normalisation counts were correct;
+  - the two matrices have identical cases and report text in both applications.
+- Tests: Week 7 484 run (479 passed, 5 skipped), Week 5 338 run (329 passed, 9 skipped), 0 failures; flake8 clean.
+
+### Limitations / open items
+- **The approved prompts (Feline Thorax V1.1 and Canine Abdomen V1.2) have not been supplied yet.** They are registered as pending, and live OpenAI runs are blocked until the files and their SHA-256 digests are added.
+- **No Feline Thorax or Canine Abdomen model results exist yet.** The offline end-to-end run used a fake classifier and is not an evaluation result.
+- The live runs need `OPENAI_API_KEY` in the local `.env`.

@@ -6,6 +6,30 @@ Python project for the Vetology training assignments. The project processes vete
 
 ## Current status
 
+### Week 7 extension — Feline Thorax and Canine Abdomen (implemented; live runs pending approved prompts)
+
+Week 7 (branch `week-07/feline-thorax-and-canine-abdomen`) now runs three applications on one shared engine, chosen with `--application`. Canine Thorax is still the default.
+
+| Application | Provider / model | Conditions | Prompt | Status |
+|---|---|---:|---|---|
+| `canine_thorax` | Google Gemini `gemini-3.8-flash` | 20 | Canine Thorax Master Prompt V1.3 (SHA-256 pinned) | Unchanged, existing results kept |
+| `feline_thorax` | OpenAI `gpt-4.1-mini` | 21 | Feline Thorax Master Prompt V1.1 | **Pending**: approved prompt file not yet supplied |
+| `canine_abdomen` | OpenAI `gpt-4.1-mini` | 10 | Canine Abdomen Master Prompt V1.2 | **Pending**: approved prompt file not yet supplied |
+
+- **Predictions:** each new application generates its predictions **once**, from the Matrix 1 workbook, and reuses them for **both** evaluations. Matrix 1 uses the Vetology reference labels, Matrix 2 the Gold Standard labels, and the two reference tracks stay separate.
+- **Workbook check:** before the shared predictions serve Matrix 2, the Matrix 2 workbook must hold the same 100 unique CaseIDs, in the same order, with identical report text.
+- **Feline Matrix 1 normalisation:** only the columns `pulmonary_nodules`, `esophagitis` and `pneumonia` are mapped (`Normal`→`Negative`, `Abnormal`→`Positive`) before strict validation. Nothing else is ever normalised: no other column, not Feline Matrix 2, not Canine Abdomen.
+- **Isolation:** workflows are identified as `<application>/<workflow>`. Each application writes and reads only inside its own `outputs/week_07/<application>/`, and Canine Thorax paths are unchanged.
+- **Prompts:** the Feline and Abdomen prompts are registered as **pending**. Until the approved files and their SHA-256 digests are added, they cannot be loaded and every live `batch` run is refused before anything is written. No prompt text has been invented.
+- **Real input workbooks (validated offline, unmodified):**
+  - All four workbooks have the expected headers, worksheet `Sheet1`, and exactly 100 unique integer CaseIDs (1–100).
+  - The Gold Standard drafts have trailing blank rows, which are skipped.
+  - The batch loader and the evaluation loader agree on every workbook, including the Matrix 2 ambiguity guardrail.
+  - Matrix 1 and Matrix 2 have identical cases and report text for both applications.
+- **Tests:** 484 Week 7 tests (479 passed, 5 opt-in local tests skipped) and 338 Week 5 tests (329 passed, 9 skipped), with 0 failures and 0 errors; flake8 clean. All run offline with fake model responses.
+
+Details: `docs/project_documentation.md` §18.
+
 ### Week 7 — Gemini model evaluation (complete)
 
 An independent Google Gemini pipeline was implemented under `src/week_07/` (branch `week-07/gemini-model-evaluation`). It reruns both Week 5 workflows with Gemini and compares the results with the saved Week 5 OpenAI predictions. `src/week_04/` and `src/week_05/` are unchanged, and Week 7 does not import either at runtime.
@@ -112,6 +136,13 @@ vetology-radiology-evaluation/
 │       ├── isolation.py              # output isolation and read-only source protection
 │       ├── evaluation/               # metrics, reference loaders, Matrix 1/2 workbooks
 │       ├── comparison/               # OpenAI vs Gemini sources, agreement, six-sheet workbook
+│       ├── applications.py           # application registry (canine_thorax, feline_thorax,
+│       │                             # canine_abdomen): conditions, provider, prompt, workflows
+│       ├── prompts/registry.py       # per-application prompt identity + pinned SHA-256 checks
+│       ├── app_dataset_loader.py     # application-aware loading, normalisation, cross-matrix check
+│       ├── app_validator.py          # application-aware strict response validation
+│       ├── openai_client.py, openai_error_policy.py, providers.py   # OpenAI provider
+│       ├── evaluation/app_*.py       # application-aware reference loading and reconciliation
 │       └── tests/                    # offline tests + opt-in local artifact tests
 ├── outputs/week_04/matrix_1/single_case_test.json
 ├── docs/                             # CHANGELOG, DECISION_LOG, testing_log, weekly_progress,
@@ -122,7 +153,13 @@ vetology-radiology-evaluation/
 
 Week 5 writes its outputs to `outputs/week_05/matrix_1/` and `outputs/week_05/matrix_2/`; workbooks and JSONL files are gitignored and must not be committed.
 
-Week 7 writes only under `outputs/week_07/`: `matrix_1/` and `matrix_2/` hold the batch outputs (`predictions.jsonl`, `errors.jsonl`, `run_manifest.json`, evaluation workbook), and `comparison/matrix_1/` and `comparison/matrix_2/` hold the comparison workbooks. Predictions, error logs and workbooks stay local. The two `run_manifest.json` files are execution metadata and are the only generated Week 7 outputs intended for version control.
+Week 7 writes only under `outputs/week_07/`. For Canine Thorax, `matrix_1/` and `matrix_2/` hold the batch outputs (`predictions.jsonl`, `errors.jsonl`, `run_manifest.json`, evaluation workbook), and `comparison/matrix_1/` and `comparison/matrix_2/` hold the comparison workbooks. Predictions, error logs and workbooks stay local. The two `run_manifest.json` files are execution metadata and are the only generated Week 7 outputs intended for version control.
+
+Feline Thorax and Canine Abdomen each own one folder, `outputs/week_07/<application>/`:
+- `predictions/` holds the one shared batch run: `predictions.jsonl`, `errors.jsonl` and `run_manifest.json`.
+- `matrix_1/` and `matrix_2/` hold the two separate evaluation workbooks, `<application>_matrix1_evaluation_workbook.xlsx` and `<application>_matrix2_evaluation_workbook.xlsx`.
+
+Output-directory overrides must stay inside the application's own folder.
 
 The 2026-11-12 live execution produced 100 successful predictions for each workflow. Matrix 1 and Matrix 2 results use different reference-label sets and should be interpreted separately, not as a direct like-for-like comparison of model quality. These are pilot evaluations, not evidence of clinical readiness.
 
@@ -185,6 +222,17 @@ Week 7 loads the same root `.env` (existing environment variables take precedenc
 
 `GEMINI_MAX_RETRIES` is not supported, and Week 7 refuses to run if it is set. Transport retries are fixed, and application attempts are set with `batch --max-attempts` (default 2).
 
+The Week 7 Feline Thorax and Canine Abdomen applications read only the OpenAI variables, never `GOOGLE_API_KEY`. Canine Thorax, in turn, never needs `OPENAI_API_KEY`.
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `OPENAI_API_KEY` | OpenAI credential (read by the SDK; Week 7 only checks that it is set) | Required for live `batch` runs |
+| `OPENAI_MODEL` | OpenAI model name | `gpt-4.1-mini` |
+| `OPENAI_TEMPERATURE` | Sampling temperature (0 to 2) | `0` |
+| `OPENAI_TIMEOUT_SECONDS` | Request timeout (> 0) | `90` |
+
+Week 7 fixes the OpenAI transport retries at 0, so the batch retry policy is the only retry system. `OPENAI_MAX_RETRIES` (a Week 5 setting) is ignored by Week 7, and `config` reports it as ignored.
+
 ## Week 5 — using the rebuilt application
 
 Run commands from the repository root with the project virtual environment active and `src` on `PYTHONPATH`.
@@ -233,6 +281,34 @@ python -m week_07 compare --workflow matrix1                # OpenAI (Week 5) vs
 - `evaluate` reads `outputs/week_07/<matrix>/predictions.jsonl` unless `--predictions` is given. Options: `--input`, `--output`, `--model-record`.
 - `compare` reads the Week 5 OpenAI predictions (`outputs/week_05/<matrix>/predictions.jsonl`, read-only) and the Week 7 Gemini predictions with their run manifest. It writes `outputs/week_07/comparison/matrix_1/matrix1_openai_vs_gemini_comparison.xlsx` or `outputs/week_07/comparison/matrix_2/matrix2_openai_vs_gemini_comparison.xlsx`. Options: `--openai`, `--gemini`, `--reference`, `--openai-errors`, `--gemini-errors`, `--output`.
 - Exit codes: 0 success; 1 `compare-references` found differences; 2 configuration or isolation error; 3 input error; 4 invalid argument; 5 not available; 6 fatal provider error (HTTP 400/401/403/404); 7 a read-only source changed.
+
+### Week 7 — Feline Thorax and Canine Abdomen
+
+Add `--application feline_thorax` or `--application canine_abdomen` to any command. The real input workbooks live outside the repository, so pass each one with `--input`. The fallback location `data/week_07_inputs/` is used only when `--input` is omitted.
+
+```bash
+python -m week_07 config        --application feline_thorax --workflow matrix1           # settings, prompt status (offline)
+python -m week_07 validate-data --application feline_thorax --workflow matrix1 --input M1.xlsx
+python -m week_07 validate-data --application feline_thorax --workflow matrix2 --input M2.xlsx
+python -m week_07 compare-references --application feline_thorax --workflow matrix2 --input M2.xlsx
+python -m week_07 batch    --application feline_thorax --workflow matrix1 --provider openai --input M1.xlsx --matrix2-input M2.xlsx   # BILLABLE: OpenAI
+python -m week_07 evaluate --application feline_thorax --workflow matrix1 --input M1.xlsx
+python -m week_07 evaluate --application feline_thorax --workflow matrix2 --input M2.xlsx --prediction-source-input M1.xlsx
+```
+
+The same commands work with `--application canine_abdomen`. Notes:
+
+- **Batch:**
+  - Runs only for `--workflow matrix1`, the prediction source. A Matrix 2 batch is refused because Matrix 2 reuses the shared predictions.
+  - `--limit` is not available.
+  - `--provider` must match the application.
+  - `--matrix2-input` checks the Matrix 2 workbook against the Matrix 1 input before the run.
+  - **Live runs are blocked while the application's prompt is pending.**
+- **Evaluate:**
+  - Reads the shared `outputs/week_07/<application>/predictions/predictions.jsonl` and requires its run manifest. The manifest's application, provider, condition keys and prompt must match, and its input digest must equal the Matrix 1 workbook's.
+  - For Matrix 2 it also checks the Matrix 1 workbook (`--prediction-source-input`) against the Gold Standard workbook.
+  - `--model-record` is not available.
+- **Compare:** `compare` (OpenAI vs Gemini) exists only for Canine Thorax.
 
 ## Week 4 — first application (historical)
 
@@ -308,6 +384,8 @@ python -m unittest week_07.tests.test_local_artifacts -v
 
 In the local Week 7 run, 288 tests ran: 282 passed and 6 were skipped, with 0 failures and 0 errors. One skip is a symlink test that needs privileges on Windows. Five are the opt-in local artifact tests, which skip when the opt-in is not set.
 
+After the Feline Thorax / Canine Abdomen extension, the Week 7 suite has 484 tests. In the Linux development container 479 passed and 5 were skipped (the opt-in local artifact tests), with 0 failures and 0 errors. The new tests use synthetic workbooks and fake model responses; they make no API request.
+
 Week 4 (unchanged; the top-level Week 4 tests are standalone scripts, so `unittest discover` on `src/week_04` finds no tests):
 
 ```bash
@@ -332,4 +410,4 @@ Do not describe planned or unverified functionality as complete.
 
 ## Version control
 
-Each assignment is developed on its own branch: Week 5 on `week-05/claude-code-rebuild` (committed after each reviewed phase; closeout tag `week-05-closeout`) and Week 7 on `week-07/gemini-model-evaluation`. Before committing, inspect staged files and confirm no confidential data, `.env`, datasets, predictions, error logs, or generated workbooks are included. Of the generated Week 7 outputs, only `outputs/week_07/matrix_1/run_manifest.json` and `outputs/week_07/matrix_2/run_manifest.json` are intended for commit, and only after checking their contents.
+Each assignment is developed on its own branch: Week 5 on `week-05/claude-code-rebuild` (committed after each reviewed phase; closeout tag `week-05-closeout`), Week 7 on `week-07/gemini-model-evaluation`, and the Week 7 Feline Thorax / Canine Abdomen extension on `week-07/feline-thorax-and-canine-abdomen`. Before committing, inspect staged files and confirm no confidential data, `.env`, datasets, predictions, error logs, or generated workbooks are included. Of the generated Week 7 outputs, only `outputs/week_07/matrix_1/run_manifest.json` and `outputs/week_07/matrix_2/run_manifest.json` are intended for commit, and only after checking their contents.

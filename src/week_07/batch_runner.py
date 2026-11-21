@@ -47,6 +47,7 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from week_07 import config, run_manifest
+from week_07.app_validator import load_successful_case_ids_for, validator_for
 from week_07.config import (
     DEFAULT_RETRY_POLICY,
     ConfigurationError,
@@ -72,6 +73,7 @@ from week_07.response_validator import validate_model_response
 logger = logging.getLogger("week_07.batch_runner")
 
 Classifier = Callable[[Mapping[str, str]], str]
+ErrorClassifier = Callable[[BaseException, RetryPolicy], Any]
 Sleep = Callable[[float], None]
 
 
@@ -105,8 +107,15 @@ def run_batch(
     clock: Clock = utc_now,
     sleep: Sleep = time.sleep,
     settings: GeminiModelConfig | None = None,
+    condition_keys: Sequence[str] | None = None,
+    error_classifier: ErrorClassifier | None = None,
 ) -> dict[str, int]:
     """Classify cases, validate every response and checkpoint successes.
+
+    ``condition_keys`` and ``error_classifier`` default to Canine Thorax
+    (``response_validator`` / ``jsonl_store`` checkpoint contract and the Gemini
+    ``error_policy``) — the Week 5/7 behaviour. ``run_application_batch`` passes
+    the application's keys and its provider's error policy.
 
     Returns ``{"total", "skipped", "succeeded", "failed", "transient_backoffs"}``
     (Week 5's summary plus the number of backoff waits). On a fatal error the
@@ -121,7 +130,13 @@ def run_batch(
     results_file.parent.mkdir(parents=True, exist_ok=True)
     errors_file.parent.mkdir(parents=True, exist_ok=True)
 
-    completed = load_successful_case_ids(results_file)
+    if condition_keys is None:
+        validate = validate_model_response
+        completed = load_successful_case_ids(results_file)
+    else:
+        validate = validator_for(condition_keys)
+        completed = load_successful_case_ids_for(results_file, condition_keys)
+    classify = classify_error if error_classifier is None else error_classifier
     counts = _new_counts(len(cases))
 
     pending = sum(1 for case in cases if checkpoint_key(case.case_id) not in completed)
@@ -147,11 +162,11 @@ def run_batch(
         for attempt in range(1, max_attempts + 1):
             try:
                 raw_response = classifier(case.to_llm_payload())
-                predictions = validate_model_response(raw_response)
+                predictions = validate(raw_response)
                 record = success_record(case.case_id, attempt, predictions, clock)
                 break
             except Exception as exc:  # noqa: BLE001 — classified below
-                decision = classify_error(exc, retry_policy)
+                decision = classify(exc, retry_policy)
                 last_error = format_error(exc)
                 if decision.error_class is ErrorClass.FATAL:
                     logger.error("CaseID %s attempt %d/%d fatal (%s): %s",
@@ -299,6 +314,164 @@ def run_workflow_batch(
             clock=clock,
             sleep=sleep,
             settings=settings,
+        )
+    except FatalProviderError as exc:
+        manifest.finish(run_manifest.STATUS_FATAL, exc.counts, str(exc))
+        raise
+    except ConfigurationError as exc:
+        manifest.finish(run_manifest.STATUS_CONFIGURATION, None, format_error(exc))
+        raise
+    except BaseException as exc:
+        manifest.finish(run_manifest.STATUS_INTERRUPTED, None, type(exc).__name__)
+        raise
+    manifest.finish(run_manifest.STATUS_COMPLETED, counts)
+    return counts
+
+
+# ---------------------------------------------------------------------------
+# Shared-prediction applications (Feline Thorax, Canine Abdomen)
+# ---------------------------------------------------------------------------
+
+def _require_application_workflow(app: Any, workflow: Any) -> tuple[Any, WorkflowSpec]:
+    """Explicit, valid application + workflow, or a ConfigurationError/ValueError."""
+    from week_07.applications import ApplicationSpec
+
+    if not isinstance(app, ApplicationSpec):
+        raise ConfigurationError(
+            "An explicit application specification (ApplicationSpec) is required.")
+    if not app.shared_predictions:
+        raise ConfigurationError(
+            f"{app.key} keeps one batch run per workflow; use run_workflow_batch for it.")
+    if not isinstance(workflow, str) or not workflow:
+        raise ConfigurationError(
+            f"An explicit workflow name is required for {app.key} "
+            f"(expected {app.prediction_source_workflow!r}).")
+    spec = app.workflow(workflow)  # unknown names raise ConfigurationError
+    if spec.name != app.prediction_source_workflow:
+        raise ValueError(
+            f"{app.key} generates its predictions once, from the "
+            f"{app.prediction_source_workflow} workbook, and reuses them for every "
+            f"reference matrix; a {spec.name} batch run is not available."
+        )
+    return app, spec
+
+
+def resolve_application_outputs(
+    spec: WorkflowSpec,
+    output_dir: str | Path | None = None,
+    *,
+    isolation: IsolationPolicy = DEFAULT_POLICY,
+) -> BatchOutputs:
+    """The application's shared batch outputs (default ``<app>/predictions/``), guarded."""
+    directory = isolation.assert_writable(
+        spec.run_dir if output_dir is None else output_dir, spec, OutputArea.RUN)
+    return BatchOutputs(
+        output_dir=directory,
+        predictions_path=directory / config.PREDICTIONS_FILENAME,
+        errors_path=directory / config.ERRORS_FILENAME,
+        manifest_path=directory / config.MANIFEST_FILENAME,
+    )
+
+
+def run_application_batch(
+    app: Any,
+    workflow: str,
+    input_path: str | Path | None = None,
+    *,
+    provider: str | None = None,
+    output_dir: str | Path | None = None,
+    retry_policy: RetryPolicy = DEFAULT_RETRY_POLICY,
+    worksheet_name: str | None = None,
+    matrix2_input: str | Path | None = None,
+    classifier: Classifier | None = None,
+    settings: Any = None,
+    isolation: IsolationPolicy = DEFAULT_POLICY,
+    clock: Clock = utc_now,
+    sleep: Sleep = time.sleep,
+) -> dict[str, int]:
+    """Run the ONE shared prediction batch of a Feline Thorax / Canine Abdomen application.
+
+    * ``app`` and ``workflow`` are mandatory and must be a shared-prediction
+      application and its prediction source workflow (``matrix1``). Matrix 2
+      never has its own batch run: it reuses these predictions.
+    * Cases come from the Matrix 1 workbook (application loader; exactly 100
+      cases). Only ``case.to_llm_payload()`` reaches the classifier; reference
+      labels are validated, then discarded here.
+    * ``matrix2_input``, when given, is checked against the Matrix 1 workbook
+      (same CaseIDs in the same order, identical report text) before any write.
+    * The application's prompt must be pinned (a pending prompt stops the run
+      before anything is written) and is recorded in the run manifest identity
+      together with the application, provider, model, condition keys and input
+      digest. Resuming with a different identity is refused.
+    * Credentials: only the application's provider key is required, and only
+      when a case still needs classifying with the real client.
+    """
+    from week_07.app_dataset_loader import check_cross_matrix, load_application_dataset
+    from week_07.prompts.prompt_loader import PromptIntegrityError
+    from week_07.prompts.registry import prompt_identity
+    from week_07.providers import provider_for
+
+    app, spec = _require_application_workflow(app, workflow)
+    provider_spec = provider_for(app, provider)
+    outputs = resolve_application_outputs(spec, output_dir, isolation=isolation)
+
+    dataset = load_application_dataset(app, spec, input_path, worksheet_name=worksheet_name)
+    if len(dataset.cases) != spec.case_limit:
+        raise DatasetError(f"{spec.qualified_name} batch requires exactly {spec.case_limit} "
+                           f"cases; loaded {len(dataset.cases)}.")
+    if matrix2_input is not None:
+        check_cross_matrix(app, dataset.source_path, matrix2_input)
+    cases = dataset.cases  # reference labels are deliberately not kept
+
+    try:
+        prompt = prompt_identity(app.prompt)
+    except PromptIntegrityError as exc:
+        raise ConfigurationError(str(exc)) from exc
+
+    completed = load_successful_case_ids_for(outputs.predictions_path, app.condition_keys)
+    pending = sum(1 for case in cases if checkpoint_key(case.case_id) not in completed)
+    if settings is None:
+        if classifier is None and pending:
+            settings = provider_spec.validate_runtime(app)
+        else:
+            settings = provider_spec.load_settings(app)
+    elif classifier is None and pending and not provider_spec.api_key_is_configured():
+        raise ConfigurationError(
+            f"{provider_spec.api_key_var} was not found. Add it to the repository-root .env "
+            "file. Do not paste the key into source code or commit the .env file.")
+    if classifier is None:
+        classifier = provider_spec.make_classifier(app, settings)
+
+    identity = run_manifest.application_run_identity(
+        app, spec, provider_spec.label, settings, dataset.source_path, dataset.worksheet_name,
+        prompt)
+    manifest = run_manifest.RunManifest.begin(
+        outputs.manifest_path, outputs.predictions_path, identity,
+        run_manifest.run_details(None, len(cases), settings, retry_policy),
+        spec=spec, isolation=isolation, clock=clock, packages=provider_spec.packages,
+    )
+
+    logger.info("%s input: %s (worksheet %s)", spec.qualified_name, dataset.source_path.name,
+                dataset.worksheet_name)
+    logger.info("%s cases selected: %d (%d pending)", spec.qualified_name, len(cases), pending)
+    logger.info("%s provider: %s; model: %s, temperature %s", spec.qualified_name,
+                provider_spec.name, settings.model, settings.temperature)
+    logger.info("%s shared predictions/checkpoint: %s", spec.qualified_name,
+                outputs.predictions_path)
+
+    try:
+        counts = run_batch(
+            cases=cases,
+            results_path=outputs.predictions_path,
+            errors_path=outputs.errors_path,
+            retry_policy=retry_policy,
+            classifier=classifier,
+            spec=spec,
+            isolation=isolation,
+            clock=clock,
+            sleep=sleep,
+            condition_keys=app.condition_keys,
+            error_classifier=provider_spec.error_classifier(),
         )
     except FatalProviderError as exc:
         manifest.finish(run_manifest.STATUS_FATAL, exc.counts, str(exc))

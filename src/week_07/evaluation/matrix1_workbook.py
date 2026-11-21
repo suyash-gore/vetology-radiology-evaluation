@@ -39,6 +39,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
+from week_07.applications import CANINE_THORAX, ApplicationSpec
 from week_07.conditions import CONDITION_KEYS
 from week_07.evaluation.metrics import ConfusionMetrics, MacroMetrics
 from week_07.evaluation.reconcile import ReconciledLabels, sorted_case_ids
@@ -83,12 +84,13 @@ METRIC_DEFINITIONS = [
 ]
 
 
-def _summary_rows(cases: int, micro: ConfusionMetrics, macro: MacroMetrics) -> list[tuple]:
+def _summary_rows(cases: int, micro: ConfusionMetrics, macro: MacroMetrics,
+                  keys: tuple[str, ...] = CONDITION_KEYS) -> list[tuple]:
     return [
         ("Cases evaluated", cases, "Unique matched CaseIDs",
          "Fresh 100-case Matrix 1 evaluation."),
-        ("Conditions evaluated", len(CONDITION_KEYS), "Condition columns",
-         "All 20 Matrix 1 conditions evaluated independently."),
+        ("Conditions evaluated", len(keys), "Condition columns",
+         f"All {len(keys)} Matrix 1 conditions evaluated independently."),
         ("Total paired labels", micro.total, "Cases × conditions",
          "Each case-condition pair contributes one label comparison."),
         ("True Positive (TP)", micro.tp, "GS Positive; model Positive",
@@ -160,8 +162,16 @@ def build_matrix1_workbook(
     *,
     model_record: str,
     clock: Clock = utc_now,
+    application: ApplicationSpec | None = None,
 ) -> Path:
-    """Write the Matrix 1 evaluation workbook and return its path."""
+    """Write the Matrix 1 evaluation workbook and return its path.
+
+    ``application`` (default Canine Thorax) supplies the condition keys, their
+    count and the prompt record; every other cell is the A5 layout.
+    """
+    app = CANINE_THORAX if application is None else application
+    keys = app.condition_keys
+    prompt_record = PROMPT_RECORD if app is CANINE_THORAX else app.prompt.label
     if labels.workflow != "matrix1":
         raise ValueError(f"The Matrix 1 workbook cannot be built for {labels.workflow!r}.")
     if not isinstance(model_record, str) or not model_record.strip():
@@ -172,24 +182,24 @@ def build_matrix1_workbook(
     summary.title = "Overall Summary"
     summary.append([SUMMARY_TITLE])
     summary.append(["Metric", "Result", "Calculation / Definition", "Interpretation"])
-    for row in _summary_rows(len(labels.case_ids), micro, macro):
+    for row in _summary_rows(len(labels.case_ids), micro, macro, keys):
         summary.append(list(row))
 
     condition_sheet = wb.create_sheet("Condition Summary")
     condition_sheet.append(CONDITION_SUMMARY_HEADERS)
-    for condition in CONDITION_KEYS:
+    for condition in keys:
         condition_sheet.append(_condition_row(condition, per_condition[condition]))
     condition_sheet.append(_condition_row("TOTAL", micro))
 
     case_sheet = wb.create_sheet("Case Predictions")
     columns = ["CaseID"]
-    for condition in CONDITION_KEYS:
+    for condition in keys:
         columns.extend([f"{condition} - Gold Standard", f"{condition} - Model Prediction",
                         f"{condition} - Agreement"])
     case_sheet.append(columns)
     for case_id in sorted_case_ids(labels.case_ids):
         row = [case_id]
-        for condition in CONDITION_KEYS:
+        for condition in keys:
             actual = labels.reference[case_id][condition]
             predicted = labels.predictions[case_id][condition]
             row.extend([actual, predicted, "Match" if actual == predicted else "Mismatch"])
@@ -197,7 +207,7 @@ def build_matrix1_workbook(
 
     confusion = wb.create_sheet("Confusion Matrix")
     confusion.append(CONFUSION_HEADERS)
-    for condition in CONDITION_KEYS:
+    for condition in keys:
         confusion.append(_confusion_row(condition, per_condition[condition]))
     confusion.append(_confusion_row("TOTAL", micro))
 
@@ -213,16 +223,17 @@ def build_matrix1_workbook(
         ("Prediction file", predictions_name),
         ("Cases in ground truth", len(labels.reference)),
         ("Prediction records", len(labels.predictions)),
-        ("Conditions", len(CONDITION_KEYS)),
-        ("Expected paired labels", len(labels.reference) * len(CONDITION_KEYS)),
+        ("Conditions", len(keys)),
+        ("Expected paired labels", len(labels.reference) * len(keys)),
         ("Actual paired labels", micro.total),
         ("CaseID reconciliation",
          "PASS — exact match; no missing, duplicate, or unexpected CaseIDs"),
         ("Prediction validation",
-         "PASS — all records successful; exact 20 keys; Positive/Negative labels only"),
+         f"PASS — all records successful; exact {len(keys)} keys; Positive/Negative labels "
+         "only"),
         *_skipped_line_rows(labels),
         ("Model", model_record),
-        ("Prompt version", PROMPT_RECORD),
+        ("Prompt version", prompt_record),
         ("Evaluation generated (UTC)", clock().strftime("%Y-%m-%d %H:%M:%S UTC")),
         ("Metric scope", "Model predictions compared against Matrix 1 encoded ground truth only"),
         ("Clinical interpretation",
@@ -235,7 +246,7 @@ def build_matrix1_workbook(
     for row in METRIC_DEFINITIONS:
         definitions.append(list(row))
 
-    _apply_week4_formatting(wb)
+    _apply_week4_formatting(wb, len(keys))
 
     destination = Path(output_path)
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -243,7 +254,7 @@ def build_matrix1_workbook(
     return destination
 
 
-def _apply_week4_formatting(wb: Workbook) -> None:
+def _apply_week4_formatting(wb: Workbook, condition_count: int = len(CONDITION_KEYS)) -> None:
     """Formatting pass in the same order as Week 4 (later steps override earlier); A5 values."""
     thin = Side(style="thin", color="D9E1F2")
     for sheet in wb.worksheets:
@@ -281,7 +292,7 @@ def _apply_week4_formatting(wb: Workbook) -> None:
                 cell.font = Font(bold=True)
             widths = [30, 15, 15, 15, 15, 14, 14, 12, 20, 20, 14, 14, 14, 12]
         elif sheet.title == "Case Predictions":
-            widths = [12] + [22, 22, 14] * len(CONDITION_KEYS)
+            widths = [12] + [22, 22, 14] * condition_count
             for row in sheet.iter_rows(min_row=2):
                 for cell in row:
                     if cell.value == "Mismatch":

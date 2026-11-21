@@ -233,3 +233,64 @@ Both workbooks were opened and inspected, and their aggregates reconciled with t
 - Predictions, error logs and workbooks under `outputs/week_07/` are local-only and gitignored.
 
 **Limitations:** single 100-case sample per workflow; class imbalance affects aggregate accuracy; no veterinary adjudication of the disagreements was undertaken in this closeout.
+
+## Week 7 extension — Feline Thorax and Canine Abdomen: verification record (2026-11-21)
+
+**Environment:** Linux development container (Python 3.13), packages installed from the unchanged `requirements.txt`. All checks were offline: no API key was configured, and no model request was made.
+
+### Automated tests
+
+| Check | Command | Result |
+|---|---|---|
+| Week 7 suite | `PYTHONPATH=src python -m unittest discover -s src/week_07/tests -t src` | **484 run: 479 passed, 5 skipped**, 0 failures, 0 errors (the 5 skips are the opt-in local artifact tests) |
+| Week 5 parity | `PYTHONPATH=src python -m unittest week_07.tests.test_week05_parity` | 16 run, all passed: the verbatim modules, the Canine workbooks and the loaders are unchanged |
+| Isolation | `test_isolation` + `test_app_isolation` | 62 run, all passed |
+| Week 5 regression | `PYTHONPATH=src python -m unittest discover -s src/week_05/tests -t src` | 338 run: 329 passed, 9 skipped (baseline artifacts absent), 0 failures, 0 errors |
+| Lint | `python -m flake8 --max-line-length=100 src/week_07` | Clean |
+| Whitespace | `git diff --check` | Clean |
+
+The 196 new tests (fake model responses, synthetic workbooks, temporary trees) cover these areas:
+
+| Area | Test module |
+|---|---|
+| Registry, 20/21/10 condition order | `test_applications` |
+| Prompt pinning and pending refusal | `test_app_prompts` |
+| Strict validation for all applications, plus Canine parity with the verbatim validator | `test_app_validator` |
+| Loaders and normalisation of exactly the three Feline Matrix 1 columns; no normalisation for Feline Matrix 2 or Abdomen; payload boundary; CaseID uniqueness; cross-matrix check | `test_app_dataset_loader` |
+| OpenAI config, credential independence, client construction with `max_retries=0`, error classification with real `openai` exception classes | `test_openai_provider` |
+| Shared batch, checkpoint/resume, identity mismatch, explicit-spec and pending-prompt refusal, retry policy | `test_app_batch` |
+| Isolation across applications | `test_app_isolation` |
+| Matrix 1 / Matrix 2 workbooks for both applications, manifest checks | `test_app_evaluation` |
+| CLI end to end and backward compatibility | `test_app_cli` |
+
+### Real-data validation (four supplied workbooks, read-only)
+
+| Workbook | Sheet | Rows | Populated CaseIDs | Loaders agree | Notes |
+|---|---|---:|---|---|---|
+| `2_feline_thorax_raw_data_encoded.xlsx` (M1) | Sheet1 | 100 | 1–100, unique | Yes | Normalised: `pulmonary_nodules` 94 Normal / 6 Abnormal; `esophagitis` 41 / 59; `pneumonia` 49 / 51. All other columns Positive/Negative. |
+| `2_feline_thorax_gold_standard_score_draft.xlsx` (M2) | Sheet1 | 1,891 | 1–100, unique | Yes (guardrail passes) | 1,791 fully blank rows skipped; no normalisation |
+| `3_canine_abdomen_raw_data_encoded.xlsx` (M1) | Sheet1 | 100 | 1–100, unique | Yes | Positive/Negative only |
+| `3_canine_abdomen_gold_standard_score_draft.xlsx` (M2) | Sheet1 | 3,768 | 1–100, unique | Yes (guardrail passes) | 3,668 fully blank rows skipped |
+
+- **Cross-matrix:** identical CaseIDs, order and original report text between M1 and M2 for both applications, so the shared predictions are valid for both reference tracks.
+- **Columns:** the headers include the 21 / 10 condition columns (with `Fe_Alveolar`), the three original report fields, `Original Radiologist` and the AI report fields. Only the three original report fields are read for the model.
+- **Workbooks unchanged:** the workbooks were not modified, and their SHA-256 digests are unchanged.
+
+### Offline end-to-end run (not a model result)
+The real Matrix 1 / Matrix 2 workbooks went through the full pipeline in a temporary directory:
+- batch with a deterministic fake classifier and a temporary stand-in prompt, then a resume;
+- evaluation of both matrices, and workbook generation.
+
+Results:
+- **Batch:** 100 succeeded, and the resume skipped all 100.
+- **Workbooks:**
+  - Feline: 21 condition rows and 64 Case Predictions columns per workbook.
+  - Abdomen: 10 rows and 31 columns.
+  - Matrix 1 workbooks have six sheets; Matrix 2 workbooks have five.
+  - The prompt, model and dataset records were correct.
+- **Classifier input:** in 200 calls it only ever received `findings`, `conclusions` and `recommendations`.
+
+These numbers measure the pipeline, not model quality.
+
+### Not executed
+- **Live OpenAI batch runs for Feline Thorax and Canine Abdomen:** the approved prompts are pending, so the CLI refuses with exit 2 before writing anything, as verified. No `OPENAI_API_KEY` was available in the container either.

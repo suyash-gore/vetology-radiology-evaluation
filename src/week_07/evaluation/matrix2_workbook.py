@@ -56,7 +56,8 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
-from week_07.conditions import CONDITION_COUNT, CONDITION_KEYS
+from week_07.applications import CANINE_THORAX, ApplicationSpec
+from week_07.conditions import CONDITION_KEYS
 from week_07.evaluation.metrics import ConfusionMetrics
 from week_07.evaluation.reconcile import ReconciledLabels, sorted_case_ids
 from week_07.jsonl_store import STATUS_SUCCESS
@@ -68,6 +69,7 @@ PERCENT = "0.00%"
 
 SUMMARY_TITLE = "VETOLOGY WEEK 7 - OVERALL EVALUATION SUMMARY"
 DATASET_NAME = "Canine thorax Gold Standard pilot"
+
 NOT_APPLICABLE = "N/A - no separate radiologist-agreement reference supplied"
 NOT_CALCULATED = "Not calculated - separate radiologist-agreement reference not supplied"
 FAILURE_COUNT_SOURCE = (
@@ -95,6 +97,13 @@ LOG_HEADERS = ["CaseID", "Status", "Attempts", "Completed At (UTC)"]
 # ---------------------------------------------------------------------------
 # Style helpers (A6 values)
 # ---------------------------------------------------------------------------
+
+def dataset_name(application: ApplicationSpec) -> str:
+    """Execution Log "Dataset" value; Canine Thorax keeps the A6 text."""
+    if application is CANINE_THORAX:
+        return DATASET_NAME
+    return f"{application.region_phrase.capitalize()} Gold Standard pilot"
+
 
 def _fill(colour: str) -> PatternFill:
     return PatternFill("solid", fgColor=colour)
@@ -166,8 +175,8 @@ def _case_range(case_ids) -> str:
     return f"{len(ordered)} CaseIDs matched."
 
 
-def _validation_note(labels: ReconciledLabels) -> str:
-    return (f"All {len(labels.predictions)} records successful; exact {CONDITION_COUNT} "
+def _validation_note(labels: ReconciledLabels, keys: tuple[str, ...] = CONDITION_KEYS) -> str:
+    return (f"All {len(labels.predictions)} records successful; exact {len(keys)} "
             "condition keys; valid Positive/Negative labels; " + _case_range(labels.case_ids))
 
 
@@ -175,7 +184,8 @@ def _validation_note(labels: ReconciledLabels) -> str:
 # Sheets
 # ---------------------------------------------------------------------------
 
-def _overall_summary(wb: Workbook, labels: ReconciledLabels, micro: ConfusionMetrics) -> None:
+def _overall_summary(wb: Workbook, labels: ReconciledLabels, micro: ConfusionMetrics,
+                     keys: tuple[str, ...] = CONDITION_KEYS) -> None:
     sheet = wb.active
     sheet.title = "Overall Summary"
     cases = len(labels.case_ids)
@@ -201,7 +211,7 @@ def _overall_summary(wb: Workbook, labels: ReconciledLabels, micro: ConfusionMet
         ("False Negatives (FN)", micro.fn, "Gold Standard Positive and model Negative", None),
         ("True Negatives (TN)", micro.tn, "Gold Standard Negative and model Negative", None),
         ("False Positives (FP)", micro.fp, "Gold Standard Negative and model Positive", None),
-        ("Total evaluated labels", micro.total, f"{cases} cases × {CONDITION_COUNT} conditions",
+        ("Total evaluated labels", micro.total, f"{cases} cases × {len(keys)} conditions",
          None),
         ("Positive Gold Standard labels", micro.positive_gt, "TP + FN", None),
         ("Negative Gold Standard labels", micro.negative_gt, "TN + FP", None),
@@ -209,7 +219,7 @@ def _overall_summary(wb: Workbook, labels: ReconciledLabels, micro: ConfusionMet
     scope_rows = [
         ("Cases evaluated", cases, f"All {cases} cases had successful validated predictions.",
          None),
-        ("Conditions evaluated", CONDITION_COUNT,
+        ("Conditions evaluated", len(keys),
          "Each condition independently evaluated as Positive or Negative.", None),
         ("Prediction records", len(labels.predictions),
          "One validated prediction record per case.", None),
@@ -290,10 +300,10 @@ def _condition_row(name: str, m: ConfusionMetrics) -> list:
 
 
 def _condition_summary(wb: Workbook, per_condition: Mapping[str, ConfusionMetrics],
-                       micro: ConfusionMetrics) -> None:
+                       micro: ConfusionMetrics, keys: tuple[str, ...] = CONDITION_KEYS) -> None:
     sheet = wb.create_sheet("Condition Summary")
     sheet.append(CONDITION_SUMMARY_HEADERS)
-    for condition in CONDITION_KEYS:
+    for condition in keys:
         sheet.append(_condition_row(condition, per_condition[condition]))
     sheet.append(_condition_row("MICRO TOTAL", micro))
     _table_formatting(sheet, percent_columns=range(9, 14), total_font=Font(bold=True))
@@ -306,10 +316,10 @@ def _confusion_row(name: str, m: ConfusionMetrics, agreement: str) -> list:
 
 
 def _confusion_matrix(wb: Workbook, per_condition: Mapping[str, ConfusionMetrics],
-                      micro: ConfusionMetrics) -> None:
+                      micro: ConfusionMetrics, keys: tuple[str, ...] = CONDITION_KEYS) -> None:
     sheet = wb.create_sheet("Confusion Matrix")
     sheet.append(CONFUSION_HEADERS)
-    for condition in CONDITION_KEYS:
+    for condition in keys:
         sheet.append(_confusion_row(condition, per_condition[condition], NOT_APPLICABLE))
     sheet.append(_confusion_row("TOTAL", micro, NOT_CALCULATED))
     _table_formatting(sheet, percent_columns=(6, 7),
@@ -340,16 +350,17 @@ def _table_formatting(sheet, *, percent_columns, total_font: Font) -> None:
     sheet.auto_filter.ref = sheet.dimensions
 
 
-def _case_predictions(wb: Workbook, labels: ReconciledLabels) -> None:
+def _case_predictions(wb: Workbook, labels: ReconciledLabels,
+                      keys: tuple[str, ...] = CONDITION_KEYS) -> None:
     sheet = wb.create_sheet("Case Predictions")
     header = ["CaseID"]
-    for condition in CONDITION_KEYS:
+    for condition in keys:
         header.extend([f"{condition} - Gold Standard", f"{condition} - Model Prediction",
                        f"{condition} - Agreement"])
     sheet.append(header)
     for case_id in sorted_case_ids(labels.case_ids):
         row: list[Any] = [case_id]
-        for condition in CONDITION_KEYS:
+        for condition in keys:
             actual = labels.reference[case_id][condition]
             predicted = labels.predictions[case_id][condition]
             row.extend([actual, predicted, "Match" if actual == predicted else "Mismatch"])
@@ -367,11 +378,12 @@ def _case_predictions(wb: Workbook, labels: ReconciledLabels) -> None:
     sheet.row_dimensions[1].height = 36
     sheet.freeze_panes = "B2"
     sheet.auto_filter.ref = sheet.dimensions
-    _widths(sheet, [10] + [18, 18, 13] * len(CONDITION_KEYS))
+    _widths(sheet, [10] + [18, 18, 13] * len(keys))
 
 
 def _execution_log(wb: Workbook, labels: ReconciledLabels, micro: ConfusionMetrics,
-                   model_record: str) -> None:
+                   model_record: str, keys: tuple[str, ...] = CONDITION_KEYS,
+                   dataset_name: str = DATASET_NAME) -> None:
     sheet = wb.create_sheet("Execution Log")
     meta = labels.prediction_metadata
     attempts = _attempt_counts(labels)
@@ -385,7 +397,7 @@ def _execution_log(wb: Workbook, labels: ReconciledLabels, micro: ConfusionMetri
 
     rows: list[list[Any]] = [
         ["Metric", "Value", None, None],
-        ["Dataset", DATASET_NAME, None, None],
+        ["Dataset", dataset_name, None, None],
         ["Prediction file", pred_name, f"Model: {model_record}", None],
         ["Gold Standard file", gold_name, None, None],
         ["Cases in Gold Standard", len(labels.reference), None, None],
@@ -393,7 +405,7 @@ def _execution_log(wb: Workbook, labels: ReconciledLabels, micro: ConfusionMetri
         ["Successful records", successes, None, None],
         ["Failed records", failed, FAILURE_COUNT_SOURCE, None],
         ["Unique CaseIDs", len(set(labels.case_ids)), None, None],
-        ["Conditions per case", CONDITION_COUNT, None, None],
+        ["Conditions per case", len(keys), None, None],
         ["Total evaluated labels", micro.total, None, None],
         ["First-attempt completions", attempts.get(1, 0), None, None],
         *[[label, count, None, None] for label, count in _retry_rows(attempts)],
@@ -402,7 +414,7 @@ def _execution_log(wb: Workbook, labels: ReconciledLabels, micro: ConfusionMetri
                             "per-condition metrics alongside support counts.", None, None],
         ["Radiologist agreement", "Not calculated: a separate radiologist-agreement reference "
                                   "was not provided.", None, None],
-        ["Validation", _validation_note(labels), None, None],
+        ["Validation", _validation_note(labels, keys), None, None],
     ]
     if labels.skipped_lines:
         rows.append(["Skipped prediction lines",
@@ -435,18 +447,25 @@ def build_matrix2_workbook(
     output_path: str | Path,
     *,
     model_record: str,
+    application: ApplicationSpec | None = None,
 ) -> Path:
-    """Write the Matrix 2 evaluation workbook and return its path."""
+    """Write the Matrix 2 evaluation workbook and return its path.
+
+    ``application`` (default Canine Thorax) supplies the condition keys, their
+    count and the dataset name; every other cell is the A6-derived layout.
+    """
+    app = CANINE_THORAX if application is None else application
+    keys = app.condition_keys
     if labels.workflow != "matrix2":
         raise ValueError(f"The Matrix 2 workbook cannot be built for {labels.workflow!r}.")
     if not isinstance(model_record, str) or not model_record.strip():
         raise ValueError("model_record must be a non-empty description of the model.")
     wb = Workbook()
-    _overall_summary(wb, labels, micro)
-    _condition_summary(wb, per_condition, micro)
-    _case_predictions(wb, labels)
-    _confusion_matrix(wb, per_condition, micro)
-    _execution_log(wb, labels, micro, model_record)
+    _overall_summary(wb, labels, micro, keys)
+    _condition_summary(wb, per_condition, micro, keys)
+    _case_predictions(wb, labels, keys)
+    _confusion_matrix(wb, per_condition, micro, keys)
+    _execution_log(wb, labels, micro, model_record, keys, dataset_name(app))
     destination = Path(output_path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     wb.save(destination)

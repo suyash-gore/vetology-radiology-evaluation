@@ -53,9 +53,9 @@ class ManifestMismatch(ConfigurationError):
     """The existing predictions were produced under a different run identity."""
 
 
-def package_versions() -> dict[str, str | None]:
+def package_versions(packages: tuple[str, ...] = PACKAGES) -> dict[str, str | None]:
     versions: dict[str, str | None] = {"python": platform.python_version()}
-    for name in PACKAGES:
+    for name in packages:
         try:
             versions[name] = metadata.version(name)
         except metadata.PackageNotFoundError:
@@ -100,6 +100,62 @@ def model_record(identity: Mapping[str, Any], workflow_label: str) -> str:
     """Human-readable model description for the evaluation workbooks."""
     return (f"{identity['model']} (Google Gemini, temperature {identity['temperature']}, "
             f"from {workflow_label} batch run manifest)")
+
+
+def application_run_identity(
+    app: Any,
+    spec: WorkflowSpec,
+    provider_label: str,
+    settings: Any,
+    input_path: Path,
+    worksheet_name: str,
+    prompt: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Run identity of a shared-prediction application batch (Feline Thorax, Canine Abdomen).
+
+    A superset of the Canine Thorax identity fields plus everything that makes the
+    predictions application-specific: application, ordered condition keys, the
+    human instruction, the reference-label normalisation applied to the source
+    workbook, the prediction source workflow and the workflows that reuse the
+    predictions, and the fixed transport retry setting. The Canine Thorax
+    ``run_identity`` is unchanged (existing manifests keep matching).
+    """
+    return {
+        "application": app.key,
+        "application_name": app.display_name,
+        "workflow": spec.name,
+        "workflow_title": spec.title,
+        "prediction_source_workflow": app.prediction_source_workflow,
+        "predictions_reused_by_workflows": list(app.workflows),
+        "reference_labels": "Not used by the batch run (evaluation only)",
+        "provider": provider_label,
+        "model": settings.model,
+        "temperature": settings.temperature,
+        "transport_max_retries": settings.transport_max_retries,
+        "response_format": None,
+        "prompt": dict(prompt),
+        "human_instruction": app.human_instruction,
+        "condition_keys": list(app.condition_keys),
+        "source_label_normalization": {
+            condition: dict(mapping)
+            for condition, mapping in app.label_normalization(spec.name).items()
+        },
+        "llm_input_fields": ["Findings (original radiologist report)",
+                             "Conclusions (original radiologist report)",
+                             "Recommendations (original radiologist report)"],
+        "input_workbook": {
+            "file_name": input_path.name,
+            "sha256": sha256_file(input_path),
+            "worksheet": worksheet_name,
+        },
+    }
+
+
+def application_model_record(identity: Mapping[str, Any], provider_short_label: str) -> str:
+    """Model description for a shared-prediction application's evaluation workbooks."""
+    return (f"{identity['model']} ({provider_short_label}, temperature "
+            f"{identity['temperature']}, from {identity['application_name']} shared batch run "
+            "manifest)")
 
 
 def read_manifest(path: Path) -> dict[str, Any] | None:
@@ -161,6 +217,7 @@ class RunManifest:
         spec: WorkflowSpec | None = None,
         isolation: IsolationPolicy = DEFAULT_POLICY,
         clock: Clock = utc_now,
+        packages: tuple[str, ...] = PACKAGES,
     ) -> RunManifest:
         """Validate the run identity against existing outputs and record a new run.
 
@@ -191,7 +248,7 @@ class RunManifest:
             "finished_at_utc": None,
             "status": STATUS_RUNNING,
             **dict(run_details),
-            "package_versions": package_versions(),
+            "package_versions": package_versions(packages),
             "summary": None,
         })
         manifest = cls(path, data, clock)

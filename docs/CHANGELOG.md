@@ -193,3 +193,77 @@ An independent Google Gemini evaluation pipeline was built under `src/week_07/` 
 
 ### Scope note
 - These are pilot results on one 100-case sample. Matrix 1 and Matrix 2 use different reference-label sets and are reported separately. Veterinary adjudication was outside the scope of this closeout.
+
+
+## Week 7 extension — Feline Thorax and Canine Abdomen (2026-11-21)
+
+Branch `week-07/feline-thorax-and-canine-abdomen`. The Week 7 engine is now application-aware. Canine Thorax (Gemini) is unchanged and is still the default. Two OpenAI applications share the engine. `src/week_04/`, `src/week_05/`, the Week 5-parity-protected Week 7 modules and the V1.3 prompt were not modified.
+
+### Added
+- **Application registry** (`applications.py`). Each application declares its condition keys (in exact order, count enforced), provider, default model, prompt, workflows, prediction-sharing mode and reference-label normalisation:
+  - `canine_thorax`: Gemini, 20 conditions, V1.3. Reuses the original objects.
+  - `feline_thorax`: OpenAI `gpt-4.1-mini`, 21 conditions, Feline Thorax Master Prompt V1.1.
+  - `canine_abdomen`: OpenAI `gpt-4.1-mini`, 10 conditions, Canine Abdomen Master Prompt V1.2.
+- **Prompt registry** (`prompts/registry.py`):
+  - Each application has its own prompt identity, checked with the same rules as V1.3: file SHA-256, stripped-text SHA-256 and length.
+  - Canine Thorax delegates to the original `load_system_prompt()`.
+  - Feline V1.1 and Abdomen V1.2 are registered as **pending**. No approved text has been supplied yet, so no prompt file exists, and loading or building a run identity is refused.
+- **Application-aware loading** (`app_dataset_loader.py`, `evaluation/app_reference_loader.py`): the Week 5 loader rules, parameterised by condition columns.
+  - Feline Matrix 1 only: `Normal`→`Negative` and `Abnormal`→`Positive` for `pulmonary_nodules`, `esophagitis` and `pneumonia`, applied before strict validation and counted.
+  - Matrix 2 ambiguity guardrail applied per application.
+  - `check_cross_matrix`: same CaseIDs, same order and identical report payloads in both workbooks, so one prediction run serves both reference tracks. Labels are never compared or merged.
+- **Strict application-aware validation** (`app_validator.py`): verbatim parsing and label stages, keys from the application, and an application-aware checkpoint reader.
+- **OpenAI provider:**
+  - `OpenAIModelConfig` (`OPENAI_MODEL`, `OPENAI_TEMPERATURE`, `OPENAI_TIMEOUT_SECONDS`; transport `max_retries` fixed at 0; `OPENAI_MAX_RETRIES` ignored).
+  - `openai_client.OpenAIClassifier`, following the Week 5 `ChatOpenAI` pattern.
+  - `openai_error_policy.classify_openai_error`, with the same fatal / transient / retryable classes as the Gemini policy.
+  - `providers.py`, the provider registry.
+- **Shared-prediction batch** (`batch_runner.run_application_batch`):
+  - Requires an explicit `ApplicationSpec` and the `matrix1` workflow; Matrix 2 batches are refused.
+  - Predicts the 100 Matrix 1 cases once, into `outputs/week_07/<application>/predictions/`.
+  - Optional `matrix2_input` cross-check.
+  - Prompt pinning and credential checks run before any write.
+  - Same retry, checkpoint and resume semantics as Canine Thorax.
+- **Run manifest** `application_run_identity`. Adds application, prediction source workflow, condition keys, human instruction, source-label normalisation and the transport retry setting to the existing identity fields. The Canine Thorax identity is byte-identical.
+- **Evaluation:**
+  - `evaluation/app_reconcile.py` and `evaluate.evaluate_application` / `write_application_workbook` cover both matrices. The run manifest's application, provider, condition keys, prompt and source-workbook digest are verified.
+  - Matrix 2 also runs the cross-matrix check.
+  - The Matrix 1 (A5) and Matrix 2 (A6) builders take an `application` argument. Condition rows, headers and counts, the prompt record and the dataset name come from it. Canine output is unchanged (parity tests).
+- **CLI:**
+  - `--application` on every command (default `canine_thorax`).
+  - `batch --provider` and `--matrix2-input`; `evaluate --prediction-source-input`.
+  - `config` shows the provider, model, prompt status and key presence. Pending prompts give exit 2.
+- **Tests:** 196 new offline tests (Week 7 total 484). They cover the registry, prompts, validators, loaders and normalisation, the cross-matrix check, the OpenAI provider, batch, manifests, isolation, evaluation, workbooks and CLI backward compatibility.
+
+### Changed
+- **Isolation** (`isolation.py`):
+  - Workflows are identified as `<application>/<workflow>`, and the default policy holds all six workflows plus both application roots.
+  - No workflow may write into another application's tree.
+  - Feline/Abdomen writes, overrides included, must stay inside their own `outputs/week_07/<application>/`.
+  - Only an application's own two workflows share its `predictions/` folder.
+  - Canine Thorax permissions and messages are unchanged. Writes without a workflow keep the previous rules.
+- **`evaluate.check_prediction_source`:**
+  - Refuses predictions anywhere inside another application's tree.
+  - A new application may read predictions under `outputs/week_07/` only from its own tree.
+  - A Canine evaluation refuses a run manifest that names another application.
+- **`WorkflowSpec`:** gains `application` and `shared_predictions_dir`, and `comparison_dir` / `week5_output_dir` may be `None`. All defaults reproduce the original Canine Thorax specs.
+- **`run_batch`:** gains optional `condition_keys` and `error_classifier` parameters. Their defaults keep the existing behaviour.
+
+### Verified
+- Week 7: 484 tests, 479 passed, 5 skipped (opt-in local artifact tests), 0 failures and 0 errors.
+- Week 5: 338 tests, 329 passed, 9 skipped, 0 failures and 0 errors.
+- `test_week05_parity` passes, and flake8 is clean.
+- Real-data validation of the four supplied workbooks, offline, with no workbook modified:
+  - each has worksheet `Sheet1`, the expected headers and exactly 100 unique integer CaseIDs (1–100);
+  - the Gold Standard drafts have trailing fully blank rows, which are skipped;
+  - the batch and evaluation loaders agree, so the Matrix 2 guardrail passes;
+  - Feline Matrix 1 normalisation touched only the three approved columns;
+  - Matrix 1 and Matrix 2 have identical cases and report text.
+- An offline end-to-end run on the real workbooks produced all four evaluation workbooks in a temporary directory. It used a fake classifier and a temporary stand-in prompt; these are not model results.
+
+### Not done (blocked)
+- **Live OpenAI runs:** blocked until the approved Feline Thorax V1.1 and Canine Abdomen V1.2 prompt files and their SHA-256 digests are supplied and registered. No `OPENAI_API_KEY` was available in the development container either.
+- **No Feline Thorax or Canine Abdomen model results exist yet.**
+
+### Dependencies
+- None changed. `langchain-openai==1.7.2`, `openai==3.49.0`, `langchain-core`, `httpx` and `openpyxl` were already pinned.

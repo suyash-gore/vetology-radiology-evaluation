@@ -9,8 +9,22 @@ predictions/errors, run manifest, evaluation workbooks, comparison workbooks):
    ``outputs/week_05``, ``data/``, ``src/`` or ``.git``.
 3. It must be strictly inside ``outputs/week_07/`` (never the root itself).
 4. When a workflow is given, it must not overlap any directory that belongs to
-   the other workflow, nor the other output area of the same workflow (batch
-   run outputs vs. comparison outputs).
+   another workflow, nor the other output area of the same workflow (batch
+   run outputs vs. comparison outputs). Workflows are identified by their
+   application-qualified identity ``<application>/<workflow>`` (Stage 2.1), so
+   ``feline_thorax/matrix1`` is a different workflow from ``canine_thorax/matrix1``.
+   The only directory two workflows may share is an application's shared
+   predictions directory, and only between workflows of that same application.
+5. When a workflow is given, it must not overlap the output root of any OTHER
+   application (``outputs/week_07/feline_thorax/``, ``.../canine_abdomen/``), so
+   no application can write anywhere inside another application's tree.
+6. When the workflow's application has its own output root (Stage 2.2), every
+   write — including a custom output-directory override — must stay strictly
+   inside that root. Canine Thorax has no application root, so its override
+   behaviour is unchanged (anywhere in ``outputs/week_07/`` allowed by 1-5).
+
+Writes with no workflow (``spec=None``) apply rules 1-3 only, as before; the
+new-application execution path is required to pass an explicit spec (Stage 5).
 
 Read-only sources (Week 5 OpenAI predictions and error logs, input workbooks)
 are protected by ``ReadOnlyGuard``: SHA-256 digests are taken before use and
@@ -48,8 +62,24 @@ def _overlaps(a: Path, b: Path) -> bool:
     return a == b or a.is_relative_to(b) or b.is_relative_to(a)
 
 
-def _area_dir(spec: WorkflowSpec, area: OutputArea) -> Path:
-    return spec.output_dir if area is OutputArea.RUN else spec.comparison_dir
+def _area_dirs(spec: WorkflowSpec, area: OutputArea) -> tuple[Path, ...]:
+    """The directories a workflow owns in one output area.
+
+    RUN: ``output_dir`` plus, for shared-prediction applications, the shared
+    predictions directory. COMPARISON: ``comparison_dir`` (none for applications
+    without a comparison).
+    """
+    if area is OutputArea.RUN:
+        if spec.shared_predictions_dir is None:
+            return (spec.output_dir,)
+        return (spec.output_dir, spec.shared_predictions_dir)
+    return () if spec.comparison_dir is None else (spec.comparison_dir,)
+
+
+def _label(spec: WorkflowSpec) -> str:
+    """Workflow label in messages; Canine Thorax keeps its original bare name."""
+    return spec.name if spec.application == config.CANINE_THORAX_APPLICATION \
+        else spec.qualified_name
 
 
 @dataclass(frozen=True)
@@ -59,6 +89,9 @@ class IsolationPolicy:
     output_root: Path
     protected_roots: tuple[Path, ...]
     workflows: Mapping[str, WorkflowSpec] = field(default_factory=dict)
+    # application key -> that application's own output tree (applications whose
+    # outputs live directly under ``output_root``, i.e. Canine Thorax, have none).
+    application_roots: Mapping[str, Path] = field(default_factory=dict)
 
     def assert_writable(
         self,
@@ -81,18 +114,39 @@ class IsolationPolicy:
             raise IsolationError(f"Week 7 may only write inside {root}: {target}")
 
         if spec is not None:
+            own = {directory.resolve() for directory in _area_dirs(spec, area)}
             foreign: list[tuple[str, Path]] = []
             for other in self.workflows.values():
                 for other_area in OutputArea:
-                    if other.name == spec.name and other_area is area:
+                    if other.qualified_name == spec.qualified_name and other_area is area:
                         continue
-                    foreign.append((f"{other.name} {other_area.value}",
-                                    _area_dir(other, other_area).resolve()))
+                    for directory in _area_dirs(other, other_area):
+                        directory = directory.resolve()
+                        if (other.application == spec.application and other_area is area
+                                and directory in own):
+                            continue  # the application's shared predictions directory
+                        foreign.append((f"{_label(other)} {other_area.value}", directory))
             for label, directory in foreign:
                 if _overlaps(target, directory):
                     raise IsolationError(
-                        f"{spec.name} {area.value} output cannot be written to or around the "
-                        f"{label} output directory ({directory}): {target}"
+                        f"{_label(spec)} {area.value} output cannot be written to or around "
+                        f"the {label} output directory ({directory}): {target}"
+                    )
+            for application, app_root in self.application_roots.items():
+                app_root = app_root.resolve()
+                if application != spec.application and _overlaps(target, app_root):
+                    raise IsolationError(
+                        f"{_label(spec)} {area.value} output cannot be written to or around "
+                        f"the {application} application output directory ({app_root}): "
+                        f"{target}"
+                    )
+            own_root = self.application_roots.get(spec.application)
+            if own_root is not None:
+                own_root = own_root.resolve()
+                if target == own_root or not target.is_relative_to(own_root):
+                    raise IsolationError(
+                        f"{_label(spec)} {area.value} output must stay inside its own "
+                        f"application output directory ({own_root}): {target}"
                     )
         return target
 
@@ -106,7 +160,8 @@ DEFAULT_POLICY = IsolationPolicy(
         config.SRC_DIR,
         config.REPO_ROOT / ".git",
     ),
-    workflows=config.WORKFLOWS,
+    workflows=config.ALL_WORKFLOWS,
+    application_roots=config.APPLICATION_OUTPUT_ROOTS,
 )
 
 
