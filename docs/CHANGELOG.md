@@ -300,3 +300,13 @@ Owner-approved corrections (D-065, D-066). The supplied originals are kept byte-
 - **Applications:** `feline_thorax` now uses V1.2 and `canine_abdomen` V1.3, so run manifests record these versions and digests.
 - **Tests:** 501 Week 7 tests (496 passed, 5 skipped) and 338 Week 5 tests (329 passed, 9 skipped); parity and flake8 clean.
 - **Not executed:** live OpenAI runs.
+
+## Week 7 extension — Canine Abdomen Master Prompt V1.4 (2026-11-21)
+
+- **Added** `canine_abdomen_master_prompt_v1_4.txt` (D-067), now active for `canine_abdomen`. V1.3 is kept byte-for-byte, still pinned, as superseded provenance.
+- **Change:** only Section 4.1 item 3 and the header version label. The ambiguous clause "or provides sufficient supporting evidence" is replaced:
+  - a differential-only mention is Negative, and supporting findings alone do not make it Positive;
+  - it may be Positive only if the report independently establishes the condition (item 1 and Section 6) or explicitly elevates it in the Conclusions/Impression (item 2).
+- **Digests:** file SHA-256 `9336be3fa463be14bdfd71d93e2709b4bad70c626d0533d8e4f887809b2a254c`; text SHA-256 `d6c50d5d2e9e8dde080e7c77879cfd9c4c2ccc7fbcad96753a090803497dee91`; 17,996 characters (18,133 bytes).
+- **Tests:** Week 7 504 run (499 passed, 5 skipped); Week 5 338 run (329 passed, 9 skipped); parity and flake8 clean.
+- **Not executed:** live OpenAI runs.

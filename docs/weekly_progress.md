@@ -164,12 +164,14 @@ The Week 4 application and optional JSON prompt-configuration task are implement
   - the loaders agree and the Matrix 2 guardrail passes;
   - the normalisation counts were correct;
   - the two matrices have identical cases and report text in both applications.
-- Tests: Week 7 501 run (496 passed, 5 skipped), Week 5 338 run (329 passed, 9 skipped), 0 failures; flake8 clean.
+- Tests: Week 7 504 run (499 passed, 5 skipped), Week 5 338 run (329 passed, 9 skipped), 0 failures; flake8 clean.
 
 ### Limitations / open items
 - The approved prompts were supplied (Feline Thorax V1.1, Canine Abdomen V1.2) and then corrected with the owner's approval.
   - **Feline Thorax V1.2:** the JSON output example is now valid JSON.
   - **Canine Abdomen V1.3:** the uncertainty rules are consistent.
+  - **Canine Abdomen V1.4:** Section 4.1 item 3 is tightened so that a differential-only mention stays Negative even with supporting findings.
+  - Feline V1.2 and Abdomen V1.4 are the active versions.
   - Both corrected versions are active and pinned; the originals are kept for provenance.
 - **The live OpenAI runs have not been executed yet**; they are to be run locally.
 - **No Feline Thorax or Canine Abdomen model results exist yet.** The offline end-to-end run used a fake classifier and is not an evaluation result.

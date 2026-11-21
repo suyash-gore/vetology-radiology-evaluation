@@ -140,7 +140,7 @@ class TestRefusals(AppCliCase):
                                   "matrix1", "--input", str(abdomen.m1.default_input_path))
         self.assertEqual(code, 2)
         self.assertIn("OPENAI_API_KEY was not found", text)
-        self.assertIn("Canine Abdomen Master Prompt V1.3 (sha256 142d8e53", text)
+        self.assertIn("Canine Abdomen Master Prompt V1.4 (sha256 9336be3f", text)
         self.assertNotIn("GOOGLE_API_KEY", text)
         self.assertEqual(real_tree.exists(), existed)
 
@@ -158,7 +158,7 @@ class TestRefusals(AppCliCase):
             code, text = self.run_cli("batch", "--application", "canine_abdomen", "--workflow",
                                       "matrix1", "--input", str(pending.m1.default_input_path))
         self.assertEqual(code, 2)
-        self.assertIn("Configuration error: Canine Abdomen Master Prompt V1.3 is pending approval",
+        self.assertIn("Configuration error: Canine Abdomen Master Prompt V1.4 is pending approval",
                       text)
         self.assertFalse(pending.week7.exists())
 

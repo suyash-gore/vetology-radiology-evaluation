@@ -14,11 +14,12 @@ Canine Thorax V1.3 is NOT re-implemented here: ``load_prompt`` delegates to
 constants pinned in ``prompt_loader``, so its behaviour and digests are
 unchanged.
 
-Active prompts: Feline Thorax V1.2 and Canine Abdomen V1.3, the owner-approved
+Active prompts: Feline Thorax V1.2 and Canine Abdomen V1.4, the owner-approved
 corrections of the originally supplied Feline Thorax V1.1 and Canine Abdomen V1.2
-files. The originals are kept byte-for-byte and still pinned (``SUPERSEDED_PROMPTS``)
-for provenance; no application uses them. A prompt whose pins
-are ``None`` is PENDING: it cannot be loaded and has no run identity (both raise
+files (Canine Abdomen V1.3 was an intermediate correction). The superseded
+versions are kept byte-for-byte and still pinned (``SUPERSEDED_PROMPTS``) for
+provenance; no application uses them. A prompt whose pins are ``None`` is
+PENDING: it cannot be loaded and has no run identity (both raise
 ``PromptIntegrityError``); that mechanism remains for any future prompt.
 """
 from __future__ import annotations
@@ -133,9 +134,10 @@ FELINE_THORAX_PROMPT: Final[PromptSpec] = PromptSpec(
 # V1.2 with the inclusive uncertainty policy applied consistently: general rules
 # 7 and 11 and checklist item 5 rescoped to Section 4.1 (renumbered 2 and 6), the
 # general rules renumbered 1-10, the Section 6 heading corrected and the header
-# version label set to V1.3. Sections 4, 4.1 and 6 are unchanged.
+# version label set to V1.3. Sections 4, 4.1 and 6 are unchanged from V1.2.
 # 17,913 bytes, UTF-8, LF, no BOM; 17,776 characters after strip().
-CANINE_ABDOMEN_PROMPT: Final[PromptSpec] = PromptSpec(
+# Superseded by V1.4 (kept, still pinned, for provenance).
+CANINE_ABDOMEN_PROMPT_V1_3: Final[PromptSpec] = PromptSpec(
     name="Canine Abdomen Master Prompt",
     version="V1.3",
     filename="canine_abdomen_master_prompt_v1_3.txt",
@@ -144,10 +146,25 @@ CANINE_ABDOMEN_PROMPT: Final[PromptSpec] = PromptSpec(
     text_length=17776,
 )
 
+# V1.3 with ONLY Section 4.1 item 3 tightened (a differential-only mention is
+# Negative; supporting findings alone do not make it Positive; it may be Positive
+# only when the report independently establishes the condition or explicitly
+# elevates it in the Conclusions/Impression) and the header version label set to
+# V1.4. Everything else is identical to V1.3.
+# 18,133 bytes, UTF-8, LF, no BOM; 17,996 characters after strip().
+CANINE_ABDOMEN_PROMPT: Final[PromptSpec] = PromptSpec(
+    name="Canine Abdomen Master Prompt",
+    version="V1.4",
+    filename="canine_abdomen_master_prompt_v1_4.txt",
+    file_sha256="9336be3fa463be14bdfd71d93e2709b4bad70c626d0533d8e4f887809b2a254c",
+    text_sha256="d6c50d5d2e9e8dde080e7c77879cfd9c4c2ccc7fbcad96753a090803497dee91",
+    text_length=17996,
+)
+
 # Superseded versions per application key (provenance only).
 SUPERSEDED_PROMPTS: Final[dict[str, tuple[PromptSpec, ...]]] = {
     "feline_thorax": (FELINE_THORAX_PROMPT_V1_1,),
-    "canine_abdomen": (CANINE_ABDOMEN_PROMPT_V1_2,),
+    "canine_abdomen": (CANINE_ABDOMEN_PROMPT_V1_2, CANINE_ABDOMEN_PROMPT_V1_3),
 }
 
 

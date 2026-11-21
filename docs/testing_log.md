@@ -356,3 +356,29 @@ New tests:
 - **Execution path:** the real OpenAI path sends V1.2 / V1.3 and records their name, version and digests in the run manifest.
 
 Live OpenAI runs were not executed.
+
+## Week 7 extension — Canine Abdomen V1.4: verification record (2026-11-21)
+
+**Environment:** Linux development container, offline (no API key, no model request). All retained prompt files are unchanged: Feline V1.1/V1.2, Abdomen V1.2/V1.3 and Canine Thorax V1.3.
+
+| Prompt | Status | Bytes | File SHA-256 | Stripped-text SHA-256 | Text length |
+|---|---|---:|---|---|---:|
+| Canine Abdomen Master Prompt V1.4 | active | 18,133 | `9336be3fa463be14bdfd71d93e2709b4bad70c626d0533d8e4f887809b2a254c` | `d6c50d5d2e9e8dde080e7c77879cfd9c4c2ccc7fbcad96753a090803497dee91` | 17,996 |
+| Canine Abdomen Master Prompt V1.3 | superseded | 17,913 | `142d8e53…2e654e93` (unchanged) | `4a0ee63a…6fdd9549` | 17,776 |
+
+| Check | Result |
+|---|---|
+| Week 7 suite | **504 run: 499 passed, 5 skipped** (opt-in local artifact tests), 0 failures, 0 errors |
+| Prompt, provider, batch, CLI, isolation and evaluation modules | 193 run, all passed |
+| `test_week05_parity` | 16 run, all passed |
+| Week 5 suite | 338 run: 329 passed, 9 skipped, 0 failures, 0 errors |
+| flake8 `src/week_07`, `git diff --check` | clean |
+
+New tests:
+- **Exact diff:** V1.4 equals V1.3 with only item 3 and the header label replaced.
+- **Item 3:** the ambiguous clause is absent, and the new item 3 wording is present.
+- **Carried over:** the V1.3 policy statements and all other sections are unchanged.
+- **Superseded:** V1.3 is in the superseded set and still verifies.
+- **Execution path:** `canine_abdomen` loads V1.4 and records V1.4 with its digests in the run manifest.
+
+Live OpenAI runs were not executed.

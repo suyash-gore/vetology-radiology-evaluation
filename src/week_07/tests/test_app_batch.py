@@ -334,6 +334,6 @@ class TestOpenAIExecutionPathWithApprovedPrompts(OfflineTestCase):
                 self.assertEqual(identity["prompt"]["text_sha256"], app.prompt.text_sha256)
                 self.assertEqual(identity["prompt"]["version"], app.prompt.version)
                 self.assertEqual(identity["prompt"]["version"],
-                                 {"feline_thorax": "V1.2", "canine_abdomen": "V1.3"}[key])
+                                 {"feline_thorax": "V1.2", "canine_abdomen": "V1.4"}[key])
                 self.assertEqual(identity["prompt"]["name"], app.prompt.name)
                 self.assertEqual(identity["condition_keys"], list(app.condition_keys))

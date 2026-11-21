@@ -81,11 +81,15 @@ ACTIVE = {
                       "feline_thorax_master_prompt_v1_2.txt", 25892,
                       "9bbd36c4a1d9ac15cb24c39b3e9d0ad5af9106a9bddb3adf3401098e1c418f25",
                       "a7adb7078bc50df891f23110d6c4de9046db779b118e39201b4923f96f9c81c3", 25833),
-    "canine_abdomen": ("Canine Abdomen Master Prompt", "V1.3",
+    "canine_abdomen": ("Canine Abdomen Master Prompt", "V1.4",
+                       "canine_abdomen_master_prompt_v1_4.txt", 18133,
+                       "9336be3fa463be14bdfd71d93e2709b4bad70c626d0533d8e4f887809b2a254c",
+                       "d6c50d5d2e9e8dde080e7c77879cfd9c4c2ccc7fbcad96753a090803497dee91", 17996),
+}
+CANINE_ABDOMEN_V1_3 = ("Canine Abdomen Master Prompt", "V1.3",
                        "canine_abdomen_master_prompt_v1_3.txt", 17913,
                        "142d8e532fcd851dda98c3982e4ece1f4561c1f844c0232dc2ef1b312e654e93",
-                       "4a0ee63a855853b0b9a931618affb6e1987ee244e502244ec755cfa60fdd9549", 17776),
-}
+                       "4a0ee63a855853b0b9a931618affb6e1987ee244e502244ec755cfa60fdd9549", 17776)
 ORIGINALS = {
     "feline_thorax": ("Feline Thorax Master Prompt", "V1.1",
                       "feline_thorax_master_prompt_v1_1.txt", 26060,
@@ -123,7 +127,7 @@ class TestActivePrompts(OfflineTestCase):
         self.assertIs(FELINE_THORAX.prompt, FELINE_THORAX_PROMPT)
         self.assertIs(CANINE_ABDOMEN.prompt, CANINE_ABDOMEN_PROMPT)
         self.assertEqual((FELINE_THORAX.prompt.version, CANINE_ABDOMEN.prompt.version),
-                         ("V1.2", "V1.3"))
+                         ("V1.2", "V1.4"))
         for app in (FELINE_THORAX, CANINE_ABDOMEN):
             with self.subTest(app=app.key):
                 _check_spec(self, app.prompt, ACTIVE[app.key])
@@ -136,7 +140,7 @@ class TestActivePrompts(OfflineTestCase):
         self.assertIn("FELINE THORAX MASTER PROMPT\nV1.2 Application",
                       load_prompt(FELINE_THORAX_PROMPT))
         self.assertTrue(load_prompt(CANINE_ABDOMEN_PROMPT).startswith(
-            "Canine Abdomen Master Prompt V1.3\n"))
+            "Canine Abdomen Master Prompt V1.4\n"))
 
     def test_output_examples_are_valid_json_with_the_application_keys_in_order(self):
         import json
@@ -190,12 +194,14 @@ class TestSupersededOriginals(OfflineTestCase):
     def test_originals_retained_byte_for_byte_and_still_pinned(self):
         self.assertEqual(registry.SUPERSEDED_PROMPTS, {
             "feline_thorax": (registry.FELINE_THORAX_PROMPT_V1_1,),
-            "canine_abdomen": (registry.CANINE_ABDOMEN_PROMPT_V1_2,)})
-        for key, spec in (("feline_thorax", registry.FELINE_THORAX_PROMPT_V1_1),
-                          ("canine_abdomen", registry.CANINE_ABDOMEN_PROMPT_V1_2)):
+            "canine_abdomen": (registry.CANINE_ABDOMEN_PROMPT_V1_2,
+                               registry.CANINE_ABDOMEN_PROMPT_V1_3)})
+        for spec, expected in ((registry.FELINE_THORAX_PROMPT_V1_1, ORIGINALS["feline_thorax"]),
+                               (registry.CANINE_ABDOMEN_PROMPT_V1_2, ORIGINALS["canine_abdomen"]),
+                               (registry.CANINE_ABDOMEN_PROMPT_V1_3, CANINE_ABDOMEN_V1_3)):
             with self.subTest(prompt=spec.label):
-                _check_spec(self, spec, ORIGINALS[key])
-                self.assertEqual(len(verify_prompt(spec)), ORIGINALS[key][6])
+                _check_spec(self, spec, expected)
+                self.assertEqual(len(verify_prompt(spec)), expected[6])
 
     def test_originals_are_not_used_by_any_application(self):
         used = {app.prompt for app in APPLICATIONS.values()}
@@ -236,14 +242,16 @@ class TestFelineV12Correction(OfflineTestCase):
 
 
 class TestCanineAbdomenV13Hierarchy(OfflineTestCase):
+    """V1.2 -> V1.3 (retained superseded version): the inclusive-policy correction."""
+
     ALLOWED_CHANGED_V12_LINES = {1, 108, 111, 112, 114, 118, 122, 126, 128, 129, 131, 134, 144,
                                  147, 150, 372, 373}
 
     def setUp(self):
         super().setUp()
         self.old = _lines(registry.CANINE_ABDOMEN_PROMPT_V1_2)
-        self.new = _lines(CANINE_ABDOMEN_PROMPT)
-        self.text = load_prompt(CANINE_ABDOMEN_PROMPT)
+        self.new = _lines(registry.CANINE_ABDOMEN_PROMPT_V1_3)
+        self.text = load_prompt(registry.CANINE_ABDOMEN_PROMPT_V1_3)
 
     def test_changes_limited_to_the_approved_lines(self):
         import difflib
@@ -316,6 +324,70 @@ class TestCanineAbdomenV13Hierarchy(OfflineTestCase):
             self.assertEqual(self.text.count("\n" + heading + "\n"), 1, heading)
 
 
+class TestCanineAbdomenV14Item3(OfflineTestCase):
+    """V1.3 -> V1.4 (active): only Section 4.1 item 3 tightened, plus the header label."""
+
+    OLD_ITEM3 = ("3.  Specific condition named only in a broad or unranked differential\n"
+                 "    list \u2014 Negative unless the report elsewhere elevates it to a\n"
+                 "    primary/meaningful interpretation or provides sufficient supporting\n"
+                 "    evidence.")
+    NEW_ITEM3 = ("3.  Specific condition named only in a broad or unranked differential\n"
+                 "    list \u2014 Negative. Supporting findings alone do not make a\n"
+                 "    differential-only mention Positive. The condition may be Positive only\n"
+                 "    if the report elsewhere independently establishes it (item 1 and the\n"
+                 "    relevant Section 6 definition) or explicitly elevates it to a\n"
+                 "    principal or meaningful clinical interpretation in the\n"
+                 "    Conclusions/Impression (item 2).")
+
+    def setUp(self):
+        super().setUp()
+        self.v13 = registry.CANINE_ABDOMEN_PROMPT_V1_3.path.read_text(encoding="utf-8")
+        self.v14 = CANINE_ABDOMEN_PROMPT.path.read_text(encoding="utf-8")
+
+    def test_only_item_3_and_the_header_changed(self):
+        self.assertEqual(self.v13.count(self.OLD_ITEM3), 1)
+        expected = self.v13.replace(self.OLD_ITEM3, self.NEW_ITEM3).replace(
+            "Canine Abdomen Master Prompt V1.3\n", "Canine Abdomen Master Prompt V1.4\n", 1)
+        self.assertEqual(self.v14, expected)
+
+    def test_ambiguous_clause_removed_and_differential_only_is_negative(self):
+        flat = " ".join(load_prompt(CANINE_ABDOMEN_PROMPT).split())
+        self.assertNotIn("or provides sufficient supporting evidence", flat)
+        self.assertIn("unless the report elsewhere elevates it", " ".join(self.v13.split()))
+        self.assertNotIn("unless the report elsewhere elevates it", flat)
+        for required in (
+                "named only in a broad or unranked differential list \u2014 Negative.",
+                "Supporting findings alone do not make a differential-only mention Positive.",
+                "The condition may be Positive only if the report elsewhere independently "
+                "establishes it (item 1 and the relevant Section 6 definition) or explicitly "
+                "elevates it to a principal or meaningful clinical interpretation in the "
+                "Conclusions/Impression (item 2)."):
+            with self.subTest(required=required[:40]):
+                self.assertIn(required, flat)
+
+    def test_approved_v13_rules_carried_over_unchanged(self):
+        flat = " ".join(load_prompt(CANINE_ABDOMEN_PROMPT).split())
+        for rule in (
+                "a suspected, likely, probable, or cannot-be-excluded condition may be Positive "
+                "only when it is explicitly identified in the Conclusions/Impression as a "
+                "principal or meaningful clinical interpretation and is supported by the "
+                "described findings",
+                "Classify Negative for broad or unranked differential lists, remote "
+                "possibilities, unsupported findings, recommendation-only mentions, and negated "
+                "conditions.",
+                "Qualified statements (including \u201ccannot exclude\u201d) are Positive only "
+                "when they meet Section 4.1 item 2 and the relevant Section 6 definition."):
+            with self.subTest(rule=rule[:40]):
+                self.assertIn(rule, flat)
+        for section in (("1.  Role and task", "4.1 Apply this decision hierarchy"),
+                        ("4.  Remote, unlikely", "9.  Final quality-control checklist")):
+            start, end = section
+            a = self.v13[self.v13.index(start):self.v13.index(end)]
+            b = self.v14[self.v14.index(start):self.v14.index(end)]
+            with self.subTest(section=start):
+                self.assertEqual(a.replace("V1.3", "V1.4"), b.replace("V1.3", "V1.4"))
+
+
 class TestPendingMechanism(OfflineTestCase):
     """The pending state still blocks loading for any prompt registered without pins."""
 
@@ -384,7 +456,7 @@ class TestPinnedPromptVerification(TempDirCase):
         identities = [prompt_identity(CANINE_THORAX_PROMPT), prompt_identity(feline),
                       prompt_identity(abdomen)]
         self.assertEqual(len({i["file_sha256"] for i in identities}), 3)
-        self.assertEqual([i["version"] for i in identities], ["V1.3", "V1.2", "V1.3"])
+        self.assertEqual([i["version"] for i in identities], ["V1.3", "V1.2", "V1.4"])
         self.assertEqual(load_prompt(feline), "Feline prompt text.")
         self.assertEqual(load_prompt(abdomen), "Abdomen prompt text.")
         self.assertNotEqual(load_prompt(feline), load_prompt(CANINE_THORAX_PROMPT))
