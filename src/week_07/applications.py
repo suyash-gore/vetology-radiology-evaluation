@@ -3,9 +3,9 @@
 * ``canine_thorax``  — gemini, ``gemini-3.8-flash``, 20 conditions, Canine Thorax Master
   Prompt V1.3 (existing application).
 * ``feline_thorax``  — openai, ``gpt-4.1-mini``, 21 conditions, Feline Thorax Master
-  Prompt V1.1 (pending).
+  Prompt V1.2 (supersedes V1.1).
 * ``canine_abdomen`` — openai, ``gpt-4.1-mini``, 10 conditions, Canine Abdomen Master
-  Prompt V1.2 (pending).
+  Prompt V1.3 (supersedes V1.2).
 
 Canine Thorax is the existing application. Its entry reuses the original
 objects (``conditions.CONDITION_KEYS``, ``config.MATRIX1``/``MATRIX2``, the

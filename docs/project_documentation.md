@@ -446,15 +446,21 @@ The Feline keys are the 20 Canine Thorax keys plus `Fe_Alveolar`, in a different
 ### 18.4 Prompts
 `prompts/registry.py` gives each application a `PromptSpec` (name, version, file name, file SHA-256, stripped-text SHA-256, length).
 - **Canine Thorax:** delegates to the original `load_system_prompt()`; its digests are unchanged.
-- **Feline Thorax V1.1 and Canine Abdomen V1.2:** the owner-approved files, stored byte-for-byte in `src/week_07/prompts/` (UTF-8, LF, no BOM) and pinned:
+- **Feline Thorax and Canine Abdomen:** all prompt files are UTF-8, LF and without a BOM, stored in `src/week_07/prompts/` and pinned. The applications use the active versions (D-065, D-066):
 
-| Prompt | File | Bytes | File SHA-256 | Stripped-text SHA-256 | Text length |
-|---|---|---:|---|---|---:|
-| Feline Thorax Master Prompt V1.1 | `feline_thorax_master_prompt_v1_1.txt` | 26,060 | `7696598eda2faa39ef44df3e9c260ca7870d487094df40ae6e05c4b0c2665d27` | `bf9142f7b753e3bfdf67d64869332672082796859e02aaafac0c11e202eeb103` | 25,833 |
-| Canine Abdomen Master Prompt V1.2 | `canine_abdomen_master_prompt_v1_2.txt` | 17,216 | `f25b56fb0fbd2a7e697be287ef51357a8e911243523464d860eff7726a5e17aa` | `1156c72a6ceaed5f466a77e5490add36ec25214bd3ccb1b785a0bef205402305` | 17,081 |
+| Prompt | Status | File | Bytes | File SHA-256 | Stripped-text SHA-256 | Text length |
+|---|---|---|---:|---|---|---:|
+| Feline Thorax Master Prompt V1.2 | **active** | `feline_thorax_master_prompt_v1_2.txt` | 25,892 | `9bbd36c4a1d9ac15cb24c39b3e9d0ad5af9106a9bddb3adf3401098e1c418f25` | `a7adb7078bc50df891f23110d6c4de9046db779b118e39201b4923f96f9c81c3` | 25,833 |
+| Canine Abdomen Master Prompt V1.3 | **active** | `canine_abdomen_master_prompt_v1_3.txt` | 17,913 | `142d8e532fcd851dda98c3982e4ece1f4561c1f844c0232dc2ef1b312e654e93` | `4a0ee63a855853b0b9a931618affb6e1987ee244e502244ec755cfa60fdd9549` | 17,776 |
+| Feline Thorax Master Prompt V1.1 | superseded (provenance) | `feline_thorax_master_prompt_v1_1.txt` | 26,060 | `7696598eda2faa39ef44df3e9c260ca7870d487094df40ae6e05c4b0c2665d27` | `bf9142f7b753e3bfdf67d64869332672082796859e02aaafac0c11e202eeb103` | 25,833 |
+| Canine Abdomen Master Prompt V1.2 | superseded (provenance) | `canine_abdomen_master_prompt_v1_2.txt` | 17,216 | `f25b56fb0fbd2a7e697be287ef51357a8e911243523464d860eff7726a5e17aa` | `1156c72a6ceaed5f466a77e5490add36ec25214bd3ccb1b785a0bef205402305` | 17,081 |
 
 - **Integrity:** any change to a file (one character, whitespace, line endings, a BOM) makes loading and run-identity creation fail.
-- **Contracts:** each prompt's output contract lists exactly its application's condition keys, in order (tested).
+- **Contracts:** each active prompt's output example is valid JSON listing exactly its application's condition keys, in order (tested).
+- **Feline V1.2:** differs from V1.1 only in the header version label and the 84 quotation marks of the JSON example (lines 563–573), as tested.
+- **Canine Abdomen V1.3:** differs from V1.2 only in the header, the general rules and checklist item 5 (Sections 4, 4.1 and 6 are byte-identical, as tested).
+  - V1.3 general rule 6 states the policy: a suspected, likely, probable or cannot-be-excluded condition may be Positive only when it is explicitly identified in the Conclusions/Impression as a principal or meaningful clinical interpretation and is supported by the described findings.
+  - Broad or unranked differentials, remote possibilities, unsupported findings, recommendation-only mentions and negated conditions are Negative.
 - **Pending prompts:** a prompt registered without pins is pending and blocks any run.
 
 ### 18.5 Inputs, references and normalisation

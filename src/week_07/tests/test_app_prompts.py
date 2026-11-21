@@ -76,7 +76,17 @@ class TestCanineThoraxPromptUnchanged(OfflineTestCase):
         self.assertEqual(prompt_identity(CANINE_THORAX_PROMPT), expected)
 
 
-APPROVED = {
+ACTIVE = {
+    "feline_thorax": ("Feline Thorax Master Prompt", "V1.2",
+                      "feline_thorax_master_prompt_v1_2.txt", 25892,
+                      "9bbd36c4a1d9ac15cb24c39b3e9d0ad5af9106a9bddb3adf3401098e1c418f25",
+                      "a7adb7078bc50df891f23110d6c4de9046db779b118e39201b4923f96f9c81c3", 25833),
+    "canine_abdomen": ("Canine Abdomen Master Prompt", "V1.3",
+                       "canine_abdomen_master_prompt_v1_3.txt", 17913,
+                       "142d8e532fcd851dda98c3982e4ece1f4561c1f844c0232dc2ef1b312e654e93",
+                       "4a0ee63a855853b0b9a931618affb6e1987ee244e502244ec755cfa60fdd9549", 17776),
+}
+ORIGINALS = {
     "feline_thorax": ("Feline Thorax Master Prompt", "V1.1",
                       "feline_thorax_master_prompt_v1_1.txt", 26060,
                       "7696598eda2faa39ef44df3e9c260ca7870d487094df40ae6e05c4b0c2665d27",
@@ -88,55 +98,54 @@ APPROVED = {
 }
 
 
-class TestApprovedPrompts(OfflineTestCase):
-    def test_registered_identity_and_pins(self):
-        for app in (FELINE_THORAX, CANINE_ABDOMEN):
-            name, version, filename, size, file_sha, text_sha, length = APPROVED[app.key]
-            spec = app.prompt
-            with self.subTest(app=app.key):
-                self.assertEqual((spec.name, spec.version, spec.filename),
-                                 (name, version, filename))
-                self.assertEqual((spec.file_sha256, spec.text_sha256, spec.text_length),
-                                 (file_sha, text_sha, length))
-                self.assertFalse(spec.is_pending)
-                self.assertEqual(spec.directory, prompt_loader.PROMPT_PATH.parent)
-                self.assertEqual(spec.path.stat().st_size, size)
+def _check_spec(test, spec, expected):
+    name, version, filename, size, file_sha, text_sha, length = expected
+    test.assertEqual((spec.name, spec.version, spec.filename), (name, version, filename))
+    test.assertEqual((spec.file_sha256, spec.text_sha256, spec.text_length),
+                     (file_sha, text_sha, length))
+    test.assertFalse(spec.is_pending)
+    test.assertEqual(spec.directory, prompt_loader.PROMPT_PATH.parent)
+    data = spec.path.read_bytes()
+    test.assertEqual(len(data), size)
+    test.assertEqual(hashlib.sha256(data).hexdigest(), file_sha)
+    test.assertFalse(data.startswith(b"\xef\xbb\xbf"))   # no BOM
+    test.assertNotIn(b"\r", data)                       # LF line endings
+    test.assertEqual(prompt_identity(spec), {"name": name, "version": version,
+                                             "file_sha256": file_sha, "text_sha256": text_sha})
+
+
+def _json_example(text: str) -> str:
+    return text[text.rindex("{"):text.rindex("}") + 1]
+
+
+class TestActivePrompts(OfflineTestCase):
+    def test_applications_use_the_corrected_versions(self):
         self.assertIs(FELINE_THORAX.prompt, FELINE_THORAX_PROMPT)
         self.assertIs(CANINE_ABDOMEN.prompt, CANINE_ABDOMEN_PROMPT)
-
-    def test_files_are_stored_exactly(self):
-        for app in (FELINE_THORAX, CANINE_ABDOMEN):
-            data = app.prompt.path.read_bytes()
-            with self.subTest(app=app.key):
-                self.assertEqual(hashlib.sha256(data).hexdigest(), APPROVED[app.key][4])
-                self.assertFalse(data.startswith(b"\xef\xbb\xbf"))   # no BOM
-                self.assertNotIn(b"\r", data)                       # LF line endings
-                data.decode("utf-8")                                # valid UTF-8
-
-    def test_prompts_load_and_identify(self):
+        self.assertEqual((FELINE_THORAX.prompt.version, CANINE_ABDOMEN.prompt.version),
+                         ("V1.2", "V1.3"))
         for app in (FELINE_THORAX, CANINE_ABDOMEN):
             with self.subTest(app=app.key):
+                _check_spec(self, app.prompt, ACTIVE[app.key])
                 text = load_prompt(app.prompt)
                 self.assertEqual(text, verify_prompt(app.prompt))
-                self.assertEqual(len(text), APPROVED[app.key][6])
+                self.assertEqual(len(text), ACTIVE[app.key][6])
                 self.assertEqual(text, app.prompt.path.read_text(encoding="utf-8").strip())
-                self.assertEqual(prompt_identity(app.prompt), {
-                    "name": APPROVED[app.key][0], "version": APPROVED[app.key][1],
-                    "file_sha256": APPROVED[app.key][4],
-                    "text_sha256": APPROVED[app.key][5]})
-        self.assertIn("FELINE THORAX MASTER PROMPT", load_prompt(FELINE_THORAX_PROMPT))
-        self.assertTrue(load_prompt(CANINE_ABDOMEN_PROMPT).startswith(
-            "Canine Abdomen Master Prompt V1.2"))
 
-    def test_output_contract_lists_exactly_the_application_keys_in_order(self):
-        import re
+    def test_header_names_the_registered_version(self):
+        self.assertIn("FELINE THORAX MASTER PROMPT\nV1.2 Application",
+                      load_prompt(FELINE_THORAX_PROMPT))
+        self.assertTrue(load_prompt(CANINE_ABDOMEN_PROMPT).startswith(
+            "Canine Abdomen Master Prompt V1.3\n"))
+
+    def test_output_examples_are_valid_json_with_the_application_keys_in_order(self):
+        import json
 
         for app in (FELINE_THORAX, CANINE_ABDOMEN):
-            text = load_prompt(app.prompt)
-            contract = text[text.rindex("{"):text.rindex("}") + 1]
-            keys = tuple(re.findall(r'["\u201c]([A-Za-z_]+)["\u201d]\s*:', contract))
             with self.subTest(app=app.key):
-                self.assertEqual(keys, app.condition_keys)
+                example = json.loads(_json_example(load_prompt(app.prompt)))
+                self.assertEqual(tuple(example), app.condition_keys)
+                self.assertLessEqual(set(example.values()), {"Positive", "Negative"})
 
     def test_any_modification_fails_integrity_verification(self):
         for app in (FELINE_THORAX, CANINE_ABDOMEN):
@@ -148,6 +157,7 @@ class TestApprovedPrompts(OfflineTestCase):
                 "CRLF line endings": original.replace(b"\n", b"\r\n"),
                 "BOM added": b"\xef\xbb\xbf" + original,
                 "truncated": original[:-200],
+                "curly quote restored": original.replace(b'"', "\u201c".encode(), 1),
             }
             for label, content in edits.items():
                 with self.subTest(app=app.key, edit=label), tempfile.TemporaryDirectory() as tmp:
@@ -174,6 +184,136 @@ class TestApprovedPrompts(OfflineTestCase):
     def test_prompts_are_distinct(self):
         texts = {load_prompt(app.prompt) for app in APPLICATIONS.values()}
         self.assertEqual(len(texts), 3)
+
+
+class TestSupersededOriginals(OfflineTestCase):
+    def test_originals_retained_byte_for_byte_and_still_pinned(self):
+        self.assertEqual(registry.SUPERSEDED_PROMPTS, {
+            "feline_thorax": (registry.FELINE_THORAX_PROMPT_V1_1,),
+            "canine_abdomen": (registry.CANINE_ABDOMEN_PROMPT_V1_2,)})
+        for key, spec in (("feline_thorax", registry.FELINE_THORAX_PROMPT_V1_1),
+                          ("canine_abdomen", registry.CANINE_ABDOMEN_PROMPT_V1_2)):
+            with self.subTest(prompt=spec.label):
+                _check_spec(self, spec, ORIGINALS[key])
+                self.assertEqual(len(verify_prompt(spec)), ORIGINALS[key][6])
+
+    def test_originals_are_not_used_by_any_application(self):
+        used = {app.prompt for app in APPLICATIONS.values()}
+        for specs in registry.SUPERSEDED_PROMPTS.values():
+            for spec in specs:
+                self.assertNotIn(spec, used)
+
+    def test_original_feline_example_was_not_valid_json(self):
+        import json
+
+        with self.assertRaises(json.JSONDecodeError):
+            json.loads(_json_example(load_prompt(registry.FELINE_THORAX_PROMPT_V1_1)))
+
+
+def _lines(spec):
+    return spec.path.read_text(encoding="utf-8").split("\n")
+
+
+class TestFelineV12Correction(OfflineTestCase):
+    def test_only_the_json_quotes_and_version_label_changed(self):
+        old, new = _lines(registry.FELINE_THORAX_PROMPT_V1_1), _lines(FELINE_THORAX_PROMPT)
+        self.assertEqual(len(old), len(new))
+        changed = [i + 1 for i, (a, b) in enumerate(zip(old, new)) if a != b]
+        self.assertEqual(changed, [2, *range(563, 574)])
+        self.assertEqual(new[1], old[1].replace("V1.1", "V1.2", 1))
+        replaced = 0
+        for a, b in zip(old[562:573], new[562:573]):
+            replaced += a.count("\u201c") + a.count("\u201d")
+            self.assertEqual(b, a.replace("\u201c", '"').replace("\u201d", '"'))
+            self.assertNotIn("\u201c", b)
+            self.assertNotIn("\u201d", b)
+        self.assertEqual(replaced, 84)
+
+    def test_prose_curly_quotes_untouched(self):
+        text = load_prompt(FELINE_THORAX_PROMPT)
+        outside = text.replace(_json_example(text), "")
+        self.assertEqual(outside.count("\u201c") + outside.count("\u201d"), 24)
+
+
+class TestCanineAbdomenV13Hierarchy(OfflineTestCase):
+    ALLOWED_CHANGED_V12_LINES = {1, 108, 111, 112, 114, 118, 122, 126, 128, 129, 131, 134, 144,
+                                 147, 150, 372, 373}
+
+    def setUp(self):
+        super().setUp()
+        self.old = _lines(registry.CANINE_ABDOMEN_PROMPT_V1_2)
+        self.new = _lines(CANINE_ABDOMEN_PROMPT)
+        self.text = load_prompt(CANINE_ABDOMEN_PROMPT)
+
+    def test_changes_limited_to_the_approved_lines(self):
+        import difflib
+
+        changed = set()
+        matcher = difflib.SequenceMatcher(a=self.old, b=self.new, autojunk=False)
+        for tag, i1, i2, _, _ in matcher.get_opcodes():
+            if tag != "equal":
+                changed.update(range(i1 + 1, i2 + 1))
+        self.assertLessEqual(changed, self.ALLOWED_CHANGED_V12_LINES)
+        self.assertTrue({1, 111, 112, 126, 128, 129, 150, 372, 373} <= changed)
+
+    def _section(self, lines, start, end):
+        text = "\n".join(lines)
+        return text[text.index(start):text.index(end)]
+
+    def test_sections_4_41_and_condition_definitions_unchanged(self):
+        for start, end in (("4.  Label definitions", "5.  General interpretation rules"),
+                           ("6.1 gastritis", "8.  Output format")):
+            with self.subTest(section=start):
+                self.assertEqual(self._section(self.old, start, end),
+                                 self._section(self.new, start, end))
+
+    def test_contradictory_statements_removed(self):
+        for removed in ("Classify Negative unless the report separately\n    establishes the "
+                        "condition.",
+                        "clearly qualified as uncertain",
+                        "Equivocal, differential-only, \u201ccannot exclude,\u201d and\n    "
+                        "recommendation-only statements are not treated as Positive."):
+            with self.subTest(removed=removed[:40]):
+                self.assertIn(removed, "\n".join(self.old))
+                self.assertNotIn(removed, self.text)
+
+    def test_inclusive_policy_stated_in_rule_6_and_checklist(self):
+        flat = " ".join(self.text.split())
+        self.assertIn("a suspected, likely, probable, or cannot-be-excluded condition may be "
+                      "Positive only when it is explicitly identified in the "
+                      "Conclusions/Impression as a principal or meaningful clinical "
+                      "interpretation and is supported by the described findings", flat)
+        self.assertIn("Classify Negative for broad or unranked differential lists, remote "
+                      "possibilities, unsupported findings, recommendation-only mentions, and "
+                      "negated conditions.", flat)
+        self.assertIn("Give greatest weight to explicit diagnoses and to the radiologist\u2019s "
+                      "primary Conclusions/Impression, provided they are not negated. Apply "
+                      "Section 4.1 to qualified conclusions", flat)
+        self.assertIn("Qualified statements (including \u201ccannot exclude\u201d) are Positive "
+                      "only when they meet Section 4.1 item 2 and the relevant Section 6 "
+                      "definition.", flat)
+        self.assertIn("Differential-only, remote or unsupported, recommendation-only, and "
+                      "negated statements are not treated as Positive.", flat)
+
+    def test_numbering_corrected(self):
+        import re
+
+        general = self._section(self.new, "5.  General interpretation rules",
+                                "6.  Condition-specific operational definitions")
+        numbers = [int(n) for n in re.findall(r"^(\d+)\.\s", general, flags=re.M)]
+        self.assertEqual(numbers, [5, *range(1, 11)])
+        self.assertIn("\n6.  Condition-specific operational definitions\n", self.text)
+        self.assertNotIn("16. Condition-specific", self.text)
+        headings = ("1.  Role and task", "2.  Permitted input", "3.  Strict information boundaries",
+                    "4.  Label definitions and evidence hierarchy",
+                    "5.  General interpretation rules",
+                    "6.  Condition-specific operational definitions",
+                    "7.  Independent condition assessment", "8.  Output format — mandatory",
+                    "9.  Final quality-control checklist")
+        positions = [self.text.index("\n" + heading + "\n") for heading in headings]
+        self.assertEqual(positions, sorted(positions))
+        for heading in headings:
+            self.assertEqual(self.text.count("\n" + heading + "\n"), 1, heading)
 
 
 class TestPendingMechanism(OfflineTestCase):
@@ -244,7 +384,7 @@ class TestPinnedPromptVerification(TempDirCase):
         identities = [prompt_identity(CANINE_THORAX_PROMPT), prompt_identity(feline),
                       prompt_identity(abdomen)]
         self.assertEqual(len({i["file_sha256"] for i in identities}), 3)
-        self.assertEqual([i["version"] for i in identities], ["V1.3", "V1.1", "V1.2"])
+        self.assertEqual([i["version"] for i in identities], ["V1.3", "V1.2", "V1.3"])
         self.assertEqual(load_prompt(feline), "Feline prompt text.")
         self.assertEqual(load_prompt(abdomen), "Abdomen prompt text.")
         self.assertNotEqual(load_prompt(feline), load_prompt(CANINE_THORAX_PROMPT))

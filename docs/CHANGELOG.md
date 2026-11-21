@@ -280,3 +280,23 @@ Branch `week-07/feline-thorax-and-canine-abdomen`. The Week 7 engine is now appl
 
 - **Tests:** approved-prompt loading and tamper detection, output-contract key order, and the real OpenAI execution path with a fake chat model. Pending-state tests now use a synthetic pending spec. Week 7: 492 run, 487 passed, 5 skipped; Week 5: 338 run, 329 passed, 9 skipped; parity and flake8 clean.
 - **Not executed:** live OpenAI runs. They are to be run locally with `OPENAI_API_KEY` in `.env`.
+
+## Week 7 extension — corrected prompts Feline Thorax V1.2 and Canine Abdomen V1.3 (2026-11-21)
+
+Owner-approved corrections (D-065, D-066). The supplied originals are kept byte-for-byte, still pinned, as superseded provenance (`SUPERSEDED_PROMPTS`).
+
+- **Feline Thorax Master Prompt V1.2** (`feline_thorax_master_prompt_v1_2.txt`):
+  - the 84 curly quotation marks of the JSON output example (V1.1 lines 563–573) are replaced by straight double quotes, so the example is valid JSON;
+  - the header version label is V1.2;
+  - no key, value, definition or instruction changed.
+  - Digests: file SHA-256 `9bbd36c4a1d9ac15cb24c39b3e9d0ad5af9106a9bddb3adf3401098e1c418f25`; text SHA-256 `a7adb7078bc50df891f23110d6c4de9046db779b118e39201b4923f96f9c81c3`; 25,833 characters.
+- **Canine Abdomen Master Prompt V1.3** (`canine_abdomen_master_prompt_v1_3.txt`): the inclusive uncertainty policy is applied consistently.
+  - General rule 7 → new rule 2: conclusions carry weight unless negated, and qualified conclusions follow Section 4.1.
+  - Rule 11 → new rule 6: the policy statement.
+  - Checklist item 5 is rescoped to Section 4.1.
+  - General rules renumbered 1–10; Section 6 heading corrected; header version V1.3.
+  - Sections 4, 4.1 and 6 unchanged.
+  - Digests: file SHA-256 `142d8e532fcd851dda98c3982e4ece1f4561c1f844c0232dc2ef1b312e654e93`; text SHA-256 `4a0ee63a855853b0b9a931618affb6e1987ee244e502244ec755cfa60fdd9549`; 17,776 characters.
+- **Applications:** `feline_thorax` now uses V1.2 and `canine_abdomen` V1.3, so run manifests record these versions and digests.
+- **Tests:** 501 Week 7 tests (496 passed, 5 skipped) and 338 Week 5 tests (329 passed, 9 skipped); parity and flake8 clean.
+- **Not executed:** live OpenAI runs.

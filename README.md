@@ -13,20 +13,24 @@ Week 7 (branch `week-07/feline-thorax-and-canine-abdomen`) now runs three applic
 | Application | Provider / model | Conditions | Prompt | Status |
 |---|---|---:|---|---|
 | `canine_thorax` | Google Gemini `gemini-3.8-flash` | 20 | Canine Thorax Master Prompt V1.3 (SHA-256 pinned) | Unchanged, existing results kept |
-| `feline_thorax` | OpenAI `gpt-4.1-mini` | 21 | Feline Thorax Master Prompt V1.1 (SHA-256 pinned) | Ready; live run not yet executed |
-| `canine_abdomen` | OpenAI `gpt-4.1-mini` | 10 | Canine Abdomen Master Prompt V1.2 (SHA-256 pinned) | Ready; live run not yet executed |
+| `feline_thorax` | OpenAI `gpt-4.1-mini` | 21 | Feline Thorax Master Prompt V1.2 (SHA-256 pinned; supersedes V1.1) | Ready; live run not yet executed |
+| `canine_abdomen` | OpenAI `gpt-4.1-mini` | 10 | Canine Abdomen Master Prompt V1.3 (SHA-256 pinned; supersedes V1.2) | Ready; live run not yet executed |
 
 - **Predictions:** each new application generates its predictions **once**, from the Matrix 1 workbook, and reuses them for **both** evaluations. Matrix 1 uses the Vetology reference labels, Matrix 2 the Gold Standard labels, and the two reference tracks stay separate.
 - **Workbook check:** before the shared predictions serve Matrix 2, the Matrix 2 workbook must hold the same 100 unique CaseIDs, in the same order, with identical report text.
 - **Feline Matrix 1 normalisation:** only the columns `pulmonary_nodules`, `esophagitis` and `pneumonia` are mapped (`Normal`→`Negative`, `Abnormal`→`Positive`) before strict validation. Nothing else is ever normalised: no other column, not Feline Matrix 2, not Canine Abdomen.
 - **Isolation:** workflows are identified as `<application>/<workflow>`. Each application writes and reads only inside its own `outputs/week_07/<application>/`, and Canine Thorax paths are unchanged.
-- **Prompts:** the approved Feline Thorax V1.1 and Canine Abdomen V1.2 files are stored byte-for-byte in `src/week_07/prompts/`. Their file SHA-256, stripped-text SHA-256 and text length are pinned, so any modification makes loading fail. A prompt registered without pins is pending and blocks every batch run.
+- **Prompts:** the applications use the owner-approved corrections, Feline Thorax V1.2 and Canine Abdomen V1.3.
+  - **Feline V1.2:** the JSON output example now uses straight quotes, so it is valid JSON.
+  - **Abdomen V1.3:** the general rules follow the inclusive uncertainty policy of Section 4.1 consistently.
+  - **Originals:** the supplied V1.1 and V1.2 files are kept byte-for-byte for provenance and are still pinned.
+  - **Integrity:** every prompt's file SHA-256, stripped-text SHA-256 and text length are pinned, so any modification makes loading fail. A prompt registered without pins is pending and blocks every batch run.
 - **Real input workbooks (validated offline, unmodified):**
   - All four workbooks have the expected headers, worksheet `Sheet1`, and exactly 100 unique integer CaseIDs (1–100).
   - The Gold Standard drafts have trailing blank rows, which are skipped.
   - The batch loader and the evaluation loader agree on every workbook, including the Matrix 2 ambiguity guardrail.
   - Matrix 1 and Matrix 2 have identical cases and report text for both applications.
-- **Tests:** 492 Week 7 tests (487 passed, 5 opt-in local tests skipped) and 338 Week 5 tests (329 passed, 9 skipped), with 0 failures and 0 errors; flake8 clean. All run offline with fake model responses.
+- **Tests:** 501 Week 7 tests (496 passed, 5 opt-in local tests skipped) and 338 Week 5 tests (329 passed, 9 skipped), with 0 failures and 0 errors; flake8 clean. All run offline with fake model responses.
 
 Details: `docs/project_documentation.md` §18.
 
@@ -384,7 +388,7 @@ python -m unittest week_07.tests.test_local_artifacts -v
 
 In the local Week 7 run, 288 tests ran: 282 passed and 6 were skipped, with 0 failures and 0 errors. One skip is a symlink test that needs privileges on Windows. Five are the opt-in local artifact tests, which skip when the opt-in is not set.
 
-After the Feline Thorax / Canine Abdomen extension and prompt registration, the Week 7 suite has 492 tests. In the Linux development container 487 passed and 5 were skipped (the opt-in local artifact tests), with 0 failures and 0 errors. The new tests use synthetic workbooks and fake model responses; they make no API request.
+After the Feline Thorax / Canine Abdomen extension and the prompt corrections, the Week 7 suite has 501 tests. In the Linux development container 496 passed and 5 were skipped (the opt-in local artifact tests), with 0 failures and 0 errors. The new tests use synthetic workbooks and fake model responses; they make no API request.
 
 Week 4 (unchanged; the top-level Week 4 tests are standalone scripts, so `unittest discover` on `src/week_04` finds no tests):
 

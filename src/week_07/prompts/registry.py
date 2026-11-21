@@ -14,8 +14,10 @@ Canine Thorax V1.3 is NOT re-implemented here: ``load_prompt`` delegates to
 constants pinned in ``prompt_loader``, so its behaviour and digests are
 unchanged.
 
-Feline Thorax V1.1 and Canine Abdomen V1.2 are the approved files supplied by
-the project owner, stored byte-for-byte and pinned below. A prompt whose pins
+Active prompts: Feline Thorax V1.2 and Canine Abdomen V1.3, the owner-approved
+corrections of the originally supplied Feline Thorax V1.1 and Canine Abdomen V1.2
+files. The originals are kept byte-for-byte and still pinned (``SUPERSEDED_PROMPTS``)
+for provenance; no application uses them. A prompt whose pins
 are ``None`` is PENDING: it cannot be loaded and has no run identity (both raise
 ``PromptIntegrityError``); that mechanism remains for any future prompt.
 """
@@ -89,9 +91,11 @@ CANINE_THORAX_PROMPT: Final[PromptSpec] = PromptSpec(
     directory=prompt_loader.PROMPT_PATH.parent,
 )
 
-# Approved file supplied by the project owner, stored byte-for-byte
-# (26,060 bytes, UTF-8, LF, no BOM; 25,833 characters after strip()).
-FELINE_THORAX_PROMPT: Final[PromptSpec] = PromptSpec(
+# ---- Superseded originals (kept, still pinned, for provenance; never used for runs) ----
+
+# Owner-supplied original, stored byte-for-byte (26,060 bytes, UTF-8, LF, no BOM;
+# 25,833 characters after strip()). Its JSON output example used curly quotes.
+FELINE_THORAX_PROMPT_V1_1: Final[PromptSpec] = PromptSpec(
     name="Feline Thorax Master Prompt",
     version="V1.1",
     filename="feline_thorax_master_prompt_v1_1.txt",
@@ -100,9 +104,9 @@ FELINE_THORAX_PROMPT: Final[PromptSpec] = PromptSpec(
     text_length=25833,
 )
 
-# Approved file supplied by the project owner, stored byte-for-byte
-# (17,216 bytes, UTF-8, LF, no BOM; 17,081 characters after strip()).
-CANINE_ABDOMEN_PROMPT: Final[PromptSpec] = PromptSpec(
+# Owner-supplied original, stored byte-for-byte (17,216 bytes, UTF-8, LF, no BOM;
+# 17,081 characters after strip()). Its general rules contradicted Section 4.1.
+CANINE_ABDOMEN_PROMPT_V1_2: Final[PromptSpec] = PromptSpec(
     name="Canine Abdomen Master Prompt",
     version="V1.2",
     filename="canine_abdomen_master_prompt_v1_2.txt",
@@ -110,6 +114,41 @@ CANINE_ABDOMEN_PROMPT: Final[PromptSpec] = PromptSpec(
     text_sha256="1156c72a6ceaed5f466a77e5490add36ec25214bd3ccb1b785a0bef205402305",
     text_length=17081,
 )
+
+# ---- Active prompts (owner-approved corrections, 2026-11-21) ----
+
+# V1.1 with ONLY the 84 curly quotation marks of the JSON output example (lines
+# 563-573) replaced by straight double quotes, and the header version label set
+# to V1.2. No key, value, definition or instruction changed.
+# 25,892 bytes, UTF-8, LF, no BOM; 25,833 characters after strip().
+FELINE_THORAX_PROMPT: Final[PromptSpec] = PromptSpec(
+    name="Feline Thorax Master Prompt",
+    version="V1.2",
+    filename="feline_thorax_master_prompt_v1_2.txt",
+    file_sha256="9bbd36c4a1d9ac15cb24c39b3e9d0ad5af9106a9bddb3adf3401098e1c418f25",
+    text_sha256="a7adb7078bc50df891f23110d6c4de9046db779b118e39201b4923f96f9c81c3",
+    text_length=25833,
+)
+
+# V1.2 with the inclusive uncertainty policy applied consistently: general rules
+# 7 and 11 and checklist item 5 rescoped to Section 4.1 (renumbered 2 and 6), the
+# general rules renumbered 1-10, the Section 6 heading corrected and the header
+# version label set to V1.3. Sections 4, 4.1 and 6 are unchanged.
+# 17,913 bytes, UTF-8, LF, no BOM; 17,776 characters after strip().
+CANINE_ABDOMEN_PROMPT: Final[PromptSpec] = PromptSpec(
+    name="Canine Abdomen Master Prompt",
+    version="V1.3",
+    filename="canine_abdomen_master_prompt_v1_3.txt",
+    file_sha256="142d8e532fcd851dda98c3982e4ece1f4561c1f844c0232dc2ef1b312e654e93",
+    text_sha256="4a0ee63a855853b0b9a931618affb6e1987ee244e502244ec755cfa60fdd9549",
+    text_length=17776,
+)
+
+# Superseded versions per application key (provenance only).
+SUPERSEDED_PROMPTS: Final[dict[str, tuple[PromptSpec, ...]]] = {
+    "feline_thorax": (FELINE_THORAX_PROMPT_V1_1,),
+    "canine_abdomen": (CANINE_ABDOMEN_PROMPT_V1_2,),
+}
 
 
 def _sha256(data: bytes) -> str:

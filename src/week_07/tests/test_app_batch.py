@@ -129,7 +129,7 @@ class TestManifestIdentity(BatchCase):
         self.assertEqual((identity["model"], identity["temperature"],
                           identity["transport_max_retries"]), ("gpt-4.1-mini", 0.0, 0))
         self.assertEqual(identity["condition_keys"], list(self.app.condition_keys))
-        self.assertEqual(identity["prompt"]["version"], "V1.1")
+        self.assertEqual(identity["prompt"]["version"], "V1.2")
         self.assertEqual(identity["prompt"]["file_sha256"], self.app.prompt.file_sha256)
         self.assertEqual(set(identity["source_label_normalization"]),
                          {"pulmonary_nodules", "esophagitis", "pneumonia"})
@@ -333,4 +333,7 @@ class TestOpenAIExecutionPathWithApprovedPrompts(OfflineTestCase):
                 self.assertEqual(identity["prompt"]["file_sha256"], app.prompt.file_sha256)
                 self.assertEqual(identity["prompt"]["text_sha256"], app.prompt.text_sha256)
                 self.assertEqual(identity["prompt"]["version"], app.prompt.version)
+                self.assertEqual(identity["prompt"]["version"],
+                                 {"feline_thorax": "V1.2", "canine_abdomen": "V1.3"}[key])
+                self.assertEqual(identity["prompt"]["name"], app.prompt.name)
                 self.assertEqual(identity["condition_keys"], list(app.condition_keys))

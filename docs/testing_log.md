@@ -324,3 +324,35 @@ New and updated tests:
 - **Pending mechanism:** still enforced, tested on a synthetic pending spec.
 - **Execution path:** the real `OpenAIClassifier` (chat model faked) sends each application's own approved prompt and region instruction. Its predictions carry the application's keys, and the run manifest records the approved prompt digests.
 - **Without `OPENAI_API_KEY`:** a CLI batch for the real application stops before any write.
+
+## Week 7 extension — corrected prompts Feline Thorax V1.2 and Canine Abdomen V1.3: verification record (2026-11-21)
+
+**Environment:** Linux development container, offline (no API key, no model request). The original V1.1 and V1.2 files and their pinned hashes are unchanged, and so is the Canine Thorax V1.3 prompt.
+
+| Prompt | Status | Bytes | File SHA-256 | Stripped-text SHA-256 | Text length |
+|---|---|---:|---|---|---:|
+| Feline Thorax Master Prompt V1.2 | active | 25,892 | `9bbd36c4a1d9ac15cb24c39b3e9d0ad5af9106a9bddb3adf3401098e1c418f25` | `a7adb7078bc50df891f23110d6c4de9046db779b118e39201b4923f96f9c81c3` | 25,833 |
+| Canine Abdomen Master Prompt V1.3 | active | 17,913 | `142d8e532fcd851dda98c3982e4ece1f4561c1f844c0232dc2ef1b312e654e93` | `4a0ee63a855853b0b9a931618affb6e1987ee244e502244ec755cfa60fdd9549` | 17,776 |
+| Feline Thorax Master Prompt V1.1 | superseded | 26,060 | `7696598e…2665d27` (unchanged) | `bf9142f7…2eeb103` | 25,833 |
+| Canine Abdomen Master Prompt V1.2 | superseded | 17,216 | `f25b56fb…5e17aa` (unchanged) | `1156c72a…402305` | 17,081 |
+
+| Check | Result |
+|---|---|
+| Week 7 suite | **501 run: 496 passed, 5 skipped** (opt-in local artifact tests), 0 failures, 0 errors |
+| Prompt, provider, batch, CLI, isolation and evaluation modules | 190 run, all passed |
+| `test_week05_parity` | 16 run, all passed |
+| Week 5 suite | 338 run: 329 passed, 9 skipped, 0 failures, 0 errors |
+| flake8 `src/week_07`, `git diff --check` | clean |
+
+New tests:
+- **Versions:** the applications use V1.2 / V1.3, with their pins, identity, header version and stored bytes checked.
+- **JSON examples:** both active examples are valid JSON with the application keys in order. The V1.1 example fails JSON parsing, which documents the defect.
+- **Feline diff:** V1.2 differs from V1.1 only on line 2 (version label) and lines 563–573 (exactly 84 quotes replaced); the 24 prose curly quotes are untouched.
+- **Abdomen diff:** V1.3 changes only the approved V1.2 lines, and Sections 4, 4.1 and 6 to 8 are byte-identical.
+  - The three contradictory statements are absent, and the inclusive policy appears in rule 2, rule 6 and checklist item 5.
+  - The general rules are numbered 1–10, and the top-level headings appear once each, in order 1–9.
+- **Tampering:** any modification, including restoring one curly quote, fails verification.
+- **Originals:** the superseded originals still verify, and no application uses them.
+- **Execution path:** the real OpenAI path sends V1.2 / V1.3 and records their name, version and digests in the run manifest.
+
+Live OpenAI runs were not executed.
