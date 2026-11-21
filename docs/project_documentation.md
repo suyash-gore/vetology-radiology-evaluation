@@ -328,3 +328,92 @@ Do not commit or publish:
 - local virtual environments.
 
 `*.xlsx`, `*.jsonl` and `data/` are gitignored. Check `git status` and staged files before every commit.
+
+## 17. Week 7 — Gemini model evaluation
+
+### 17.1 Scope and architecture
+Week 7 reruns the two Week 5 evaluation workflows with Google Gemini and compares the results with the saved Week 5 OpenAI predictions. It is implemented independently under `src/week_07/` on branch `week-07/gemini-model-evaluation`. Components that must behave identically to Week 5 are verbatim copies, with parity asserted by tests: conditions, prompt loader, dataset loader, response validator, JSONL store, metrics, reconciliation, reference loaders and workbook comparison. Week 7 never imports `week_04` or `week_05` at runtime (only parity tests do), and Weeks 4 and 5 were not modified. Decisions are D-044 to D-054 in `DECISION_LOG.md`.
+
+### 17.2 Modules
+
+| Module | Responsibility |
+|---|---|
+| `config.py` | Gemini settings from the environment and `.env`; retry policy; Matrix 1 / Matrix 2 workflow specs and output paths |
+| `conditions.py`, `prompts/` | 20 condition keys; byte-identical V1.3 prompt and integrity-checked loader |
+| `llm_client.py` | Message construction (identical to Week 5) and the LangChain `ChatGoogleGenerativeAI` client |
+| `error_policy.py` | Fatal / transient / retryable classification of failed attempts |
+| `dataset_loader.py`, `response_validator.py` | Week 5 input loading with report/reference separation; strict V1.3 output contract |
+| `batch_runner.py`, `jsonl_store.py` | Resumable batch execution, retries, backoff, checkpoints, Week 4/5 JSONL records |
+| `run_manifest.py` | Per-workflow `run_manifest.json`: run identity and per-run details |
+| `isolation.py` | Write guard (only inside `outputs/week_07/`) and read-only source protection (SHA-256 before/after) |
+| `evaluation/` | Week 5 metric engine, reference loaders, reconciliation, Matrix 1 / Matrix 2 workbooks |
+| `comparison/` | `sources.py` (read-only prediction and error-log sources), `agreement.py` (pure calculations), `compare.py` (orchestration), `comparison_workbook.py` (six sheets) |
+| `cli.py`, `__main__.py` | `python -m week_07` commands: `config`, `validate-data`, `batch`, `evaluate`, `compare-references`, `compare` |
+
+### 17.3 Model configuration and environment variables
+- Provider: Google Gemini via `langchain-google-genai` `ChatGoogleGenerativeAI`, on the Google GenAI SDK (`google-genai`).
+- `GEMINI_MODEL` (default `gemini-3.8-flash`, must be non-empty), `GEMINI_TEMPERATURE` (default `0`, range 0–2), `GEMINI_TIMEOUT_SECONDS` (default `90`, > 0). The root `.env` is loaded without overriding existing variables, and OpenAI variables are never read.
+- `GOOGLE_API_KEY` must be set for `batch`. Week 7 checks only that it is present; the SDK reads it from the process environment, and it is never stored, printed or written.
+- Response MIME type `application/json`, with no response schema. Markdown fences are not stripped and invalid JSON is not repaired, so the strict validator decides validity.
+- `GEMINI_MAX_RETRIES` is refused if present. Settings are validated before any classification.
+
+### 17.4 Prompt integrity
+The prompt file is the Week 4/5 V1.3 file byte for byte (8,715 bytes; SHA-256 `31a7dab6…`). The text sent to the model is the stripped text (8,710 characters; SHA-256 `97ad5b74…`). Loading fails if either digest changes. No Gemini-specific wording is added. Both digests are recorded in every run manifest.
+
+### 17.5 Input and reference-label separation
+Only `findings`, `conclusions` and `recommendations` (the original radiologist report fields) reach the model, and the client rejects any payload with other keys. CaseID is local tracking only. `run_workflow_batch` passes only the cases to the batch runner; the reference labels are discarded there and are never written to predictions or the run manifest. Evaluation and comparison load reference labels separately with the per-workflow reference loaders.
+
+### 17.6 Batch execution, checkpoints, retry policy and error classification
+- Cases are processed sequentially. A case with a valid success record is skipped (checkpoint/resume). The first valid attempt appends a success record. If all attempts fail, one failure record is appended and the batch continues. A failed case is retried on a later run. The record schemas are exactly Week 4/5.
+- Transport: one SDK attempt per application attempt (fixed). Application: up to 2 attempts per case (`batch --max-attempts`).
+- Classification uses exception classes and the SDK `APIError.code` found by walking the exception's cause/context chain. Messages are never parsed.
+  - **Fatal:** HTTP 400/401/403/404 and configuration errors. Not retried; the batch stops (exit code 6 or 2) and the case stays pending.
+  - **Transient:** HTTP 408/429/500/502/503/504, network timeouts and network errors without an HTTP status (treated like 408). Bounded exponential backoff before the next attempt: `min(2 s × 2^(n−1), 30 s)`, which is 2 s with the default two attempts. `Retry-After` is not used.
+  - **Retryable:** everything else, including validation failures, malformed JSON and empty responses. Retried immediately, as in Week 5.
+- Run manifest: the identity (workflow, provider, model, temperature, MIME type, prompt version and digests, LLM input fields, input file name, SHA-256 and worksheet) is fixed for a predictions file, and a resumed run with a different identity is refused. Each run entry records UTC start/end, status, requested limit, cases selected, timeout, the full retry policy, package versions and summary counts. The manifest is written atomically and never contains the API key, report text or reference labels.
+
+### 17.7 Independent Matrix 1 and Matrix 2 workflows
+Matrix 1 (original Vetology reference; exactly 100 cases, no `--limit`) and Matrix 2 (Gold Standard reference; `--limit` accepted) keep their Week 5 inputs, case-count rules and evaluation workbook names. Outputs go to `outputs/week_07/matrix_1|matrix_2/` and comparison workbooks to `outputs/week_07/comparison/matrix_1|matrix_2/`. The isolation guard resolves paths (so symlinks and `..` cannot escape) and refuses writes outside `outputs/week_07/`, writes into `outputs/week_04/`, `outputs/week_05/`, `data/`, `src/` or `.git`, and writes into the other workflow's folders or the other output area.
+
+### 17.8 Evaluation metrics and undefined values
+The Week 5 metric engine is used unchanged (Section 10.7): per-condition TP/FN/TN/FP; accuracy, sensitivity, specificity, precision and F1; micro aggregation, plus macro for Matrix 1. A zero denominator gives an undefined value, shown as a blank cell and never as 0. F1 is undefined when precision or sensitivity is undefined or both are zero. Sensitivity is therefore blank for conditions with no positive reference cases. In the comparison, every difference is Gemini − OpenAI, and an undefined value on either side gives an undefined difference.
+
+### 17.9 OpenAI-versus-Gemini comparison
+`python -m week_07 compare --workflow <matrix>` runs offline. It reads the Week 5 OpenAI predictions and the Week 7 Gemini predictions with the strict Week 5 loader, inside a read-only guard (SHA-256 before and after). The Gemini file must have a same-workflow run manifest whose input digest equals the reference workbook's digest. A file with a Week 7 manifest is refused as an OpenAI source. Error logs are reconciled: a failure record with a later success for the same CaseID is *superseded* and reported for transparency; one without a success is *unresolved*, and the comparison refuses to run.
+
+Two analyses are kept separate:
+1. **Reference-based correctness:** each model against the workflow's reference labels (confusion counts and rates; both correct / only OpenAI / only Gemini / both wrong).
+2. **Model agreement:** OpenAI against Gemini, reference labels not used (both Positive, OpenAI-only Positive, Gemini-only Positive, both Negative; agreement rate).
+
+Workbook sheets: (1) Overall Comparison, (2) Condition Comparison (20 conditions + MICRO TOTAL), (3) Model Agreement, (4) Case Disagreements (every pair where the models differ, with the reference label and the model that matches it), (5) Execution Log (sources and digests, record counts, skipped lines, error-log reconciliation, provenance), (6) Metric Definitions.
+
+### 17.10 Results
+Each workflow covered 100 cases × 20 conditions (2,000 paired labels), with zero unresolved final failures. The OpenAI rows are the Week 5 live results (Section 11.6).
+
+| Workflow | Model | TP / FN / TN / FP | Accuracy | Sensitivity | Specificity | Precision | F1 |
+|---|---|---|---:|---:|---:|---:|---:|
+| Matrix 1 — Original Vetology | Gemini `gemini-3.8-flash` | 96 / 953 / 924 / 27 | 51.00% | 9.15% | 97.16% | 78.05% | 16.38% |
+| Matrix 1 — Original Vetology | OpenAI GPT-4.1 mini | 126 / 923 / 916 / 35 | 52.10% | 12.01% | 96.32% | 78.26% | 20.83% |
+| Matrix 2 — Gold Standard | Gemini `gemini-3.8-flash` | 102 / 56 / 1,822 / 20 | 96.20% | 64.56% | 98.91% | 83.61% | 72.86% |
+| Matrix 2 — Gold Standard | OpenAI GPT-4.1 mini | 126 / 32 / 1,806 / 36 | 96.60% | 79.75% | 98.05% | 77.78% | 78.75% |
+
+Model agreement: Matrix 1 1,940/2,000 (97.00%, 60 disagreements); Matrix 2 1,944/2,000 (97.20%, 56 disagreements).
+
+Workbooks: `outputs/week_07/comparison/matrix_1/matrix1_openai_vs_gemini_comparison.xlsx` and `outputs/week_07/comparison/matrix_2/matrix2_openai_vs_gemini_comparison.xlsx`. Both were inspected and their aggregates reconciled with the CLI results.
+
+**Interpretation.** In both matrices Gemini had higher specificity and fewer false positives. OpenAI had higher sensitivity, accuracy and F1. The roughly 97% agreement between the models does not imply accuracy against the reference labels: in Matrix 1 both models agree with each other far more often than with the original Vetology scores. Matrix 1 and Matrix 2 use different reference-label sets, so their results must not be combined or treated as interchangeable ground truth. These are pilot results, not evidence of clinical readiness.
+
+### 17.11 Test evidence
+- Week 7 suite (`python -m unittest discover -s src/week_07/tests -t src -v`): 288 run, 282 passed, 6 skipped (1 Windows symlink-privilege test, 5 opt-in local artifact tests), 0 failures and 0 errors. The Gemini SDK path is exercised offline through a mock transport.
+- Local artifact tests (`python -m unittest week_07.tests.test_local_artifacts -v`, opt-in): 6 run, 4 passed, 2 skipped. The real Matrix 1 error log (Week 5 OpenAI run) held 100 historical failure records, all superseded, with zero unresolved. The reference loaders agreed on the real inputs. The replay reproduced the Week 5 counts for both workflows.
+- Week 5 regression: 338 run, 329 passed, 9 skipped (baseline artifacts absent), 0 failures and 0 errors.
+- `python -m flake8 --max-line-length=100 src/week_07`: clean. `python -m week_07 --help` and `config` for both workflows: completed successfully.
+
+### 17.12 Limitations
+- One 100-case canine thorax sample per workflow; class imbalance affects aggregate accuracy; sensitivity is undefined for conditions with no positive reference cases.
+- The OpenAI side is the single Week 5 live run. Model outputs vary between runs (Section 13), and each model was run once per workflow in this comparison.
+- The Week 5 prediction files do not embed the model name. The OpenAI model record (`gpt-4.1-mini`) comes from the Week 5 configuration.
+- Disagreements and mismatches have not been veterinary-adjudicated.
+
+### 17.13 Security and repository hygiene
+Section 16 applies. Week 7 predictions, error logs, evaluation workbooks and comparison workbooks stay local (`*.jsonl` and `*.xlsx` are gitignored). The two `run_manifest.json` files are execution metadata and are the only generated Week 7 outputs intended for commit; check their contents before staging. `GOOGLE_API_KEY` belongs only in the local, gitignored `.env`.

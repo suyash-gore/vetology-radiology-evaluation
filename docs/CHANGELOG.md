@@ -155,3 +155,41 @@ Corrected statements found during the Week 5 documentation audit. Historical Wee
 ### Scope note
 - Detailed prediction-level error analysis and veterinary adjudication were not undertaken as part of this Week 5 closeout. The Matrix 1 and Matrix 2 evaluations use different reference-label sets and should be interpreted separately.
 - Flake8 was not rerun on the local Windows machine; the previously recorded clean result is from the Linux development environment.
+
+
+## Week 7 — Gemini model evaluation closeout (2026-11-21)
+
+An independent Google Gemini evaluation pipeline was built under `src/week_07/` on branch `week-07/gemini-model-evaluation`. `src/week_04/` and `src/week_05/` were not modified. Week 7 does not import `week_04` or `week_05` at runtime; only the parity tests do.
+
+### Added
+- **Independent implementation** (`src/week_07/`): configuration and workflow specs, a byte-identical V1.3 prompt and integrity-checked loader, a LangChain Gemini client, dataset loading, response validation, batch execution and JSONL checkpointing, the run manifest, output isolation, evaluation and comparison.
+- **Gemini integration:** `ChatGoogleGenerativeAI` from `langchain-google-genai`, on the Google GenAI SDK (`google-genai`). Settings: model `gemini-3.8-flash`, temperature 0, 90-second timeout, `application/json` response MIME type, no response schema. The settings come from `GEMINI_MODEL`, `GEMINI_TEMPERATURE` and `GEMINI_TIMEOUT_SECONDS`. `GOOGLE_API_KEY` must be set; the SDK reads it from the environment and Week 7 never stores or prints it. `GEMINI_MAX_RETRIES` is refused.
+- **Retry and error classification** (`error_policy.py`, `batch_runner.py`): one SDK transport attempt per application attempt and up to 2 application attempts per case (`batch --max-attempts`). Errors are classified by SDK exception class and HTTP status code; exception messages are never parsed:
+  - fatal (HTTP 400/401/403/404 and configuration errors): not retried, the batch stops, and the case stays pending;
+  - transient (HTTP 408/429/500/502/503/504 and network timeouts or network errors): bounded exponential backoff before the next attempt (base 2 s, factor 2, maximum 30 s; 2 s with the default two attempts);
+  - all other errors, including validation failures: retried immediately, as in Week 5.
+- **Separate Matrix 1 and Matrix 2 workflows:** each has its own input, reference labels, `outputs/week_07/matrix_1|matrix_2/` folder, run manifest, evaluation workbook and comparison folder. The isolation guard refuses writes outside `outputs/week_07/` and writes into `outputs/week_04/`, `outputs/week_05/`, `data/`, `src/`, `.git` or the other workflow's folders.
+- **Prompt integrity:** Canine Thorax Master Prompt V1.3 is used byte-for-byte. It is the same prompt as Weeks 4/5, with no Gemini-specific wording. Loading fails if the file SHA-256 or the stripped-text SHA-256 changes.
+- **Run manifest** (`run_manifest.json`, one per workflow): it records provenance without changing the Week 4/5 JSONL record schema. Contents: workflow, provider, model, temperature, prompt version and digests, input file name, digest and worksheet; and for each run, timestamps, status, retry policy, package versions and summary counts. A resumed run with a different identity is refused. The manifest never contains the API key, report text or reference labels.
+- **Evaluation** (`python -m week_07 evaluate`): the Week 5 metric engine, reference loaders and Matrix 1/Matrix 2 workbook layouts, applied to the Gemini predictions.
+- **OpenAI vs Gemini comparison** (`python -m week_07 compare`): reads the saved Week 5 OpenAI predictions and the Week 7 Gemini predictions as read-only sources (SHA-256-checked before and after) and writes a six-sheet workbook per workflow: Overall Comparison, Condition Comparison, Model Agreement, Case Disagreements, Execution Log, Metric Definitions. Error-log records are classified as superseded (a later success exists) or unresolved; any unresolved failure makes the comparison refuse.
+- CLI commands `config`, `validate-data`, `batch`, `evaluate`, `compare-references`, `compare` (`python -m week_07`).
+- 288 offline tests (Gemini SDK exercised through a mock transport), including opt-in local artifact tests.
+
+### Verified
+- Week 7 tests (local): 288 run; 282 passed, 6 skipped (1 Windows symlink-privilege test and 5 opt-in local artifact tests), 0 failures and 0 errors. Flake8 clean on `src/week_07`.
+- Local artifact tests (opt-in): 6 run; 4 passed, 2 skipped. The real Matrix 1 error log (Week 5 OpenAI run) held 100 historical failure records, all superseded by later successful predictions, with zero unresolved. The reference loaders agreed on the real inputs. The replay reproduced the Week 5 counts for both workflows.
+- Week 5 regression: 338 run; 329 passed, 9 skipped (baseline artifacts absent from the local test location), 0 failures and 0 errors.
+- `python -m week_07 --help` and `config` for both workflows completed successfully.
+- Live Gemini batches: 100 cases × 20 conditions (2,000 paired labels) per workflow, zero unresolved final failures.
+  - Matrix 1 (original Vetology reference): TP 96, FN 953, TN 924, FP 27; accuracy 51.00%, sensitivity 9.15%, specificity 97.16%, precision 78.05%, F1 16.38%. Agreement with Week 5 OpenAI: 1,940/2,000 (97.00%), 60 disagreements.
+  - Matrix 2 (Gold Standard reference): TP 102, FN 56, TN 1,822, FP 20; accuracy 96.20%, sensitivity 64.56%, specificity 98.91%, precision 83.61%, F1 72.86%. Agreement with Week 5 OpenAI: 1,944/2,000 (97.20%), 56 disagreements.
+- Both six-sheet comparison workbooks were generated and inspected, and their aggregates reconciled with the CLI results.
+- The two run manifests (`outputs/week_07/matrix_1/run_manifest.json`, `outputs/week_07/matrix_2/run_manifest.json`) are kept as execution-metadata artifacts. Predictions, error logs and workbooks stay local and gitignored.
+
+### Dependencies
+- Added `google-genai==2.31.0`, which `error_policy.py` and the offline tests import directly. This is the locally tested version, within the `langchain-google-genai==4.4.2` requirement (`>=2.20.0,<3`). Its `httpx>=0.28.1,<1` requirement is met by the existing `httpx==0.28.1` pin.
+- `langchain-google-genai==4.4.2` is now documented as a Week 7 dependency as well as a Week 2 one. No other version changed.
+
+### Scope note
+- These are pilot results on one 100-case sample. Matrix 1 and Matrix 2 use different reference-label sets and are reported separately. Veterinary adjudication was outside the scope of this closeout.

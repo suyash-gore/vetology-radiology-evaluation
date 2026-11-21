@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "workflow": "matrix2",
+    "workflow_title": "Matrix 2 — Gold Standard vs. LLM",
+    "reference_labels": "Gold Standard condition scores",
+    "provider": "Google Gemini via langchain-google-genai ChatGoogleGenerativeAI",
+    "model": "gemini-3.8-flash",
+    "temperature": 0.0,
+    "response_mime_type": "application/json",
+    "response_schema": null,
+    "prompt": {
+      "name": "Canine Thorax Master Prompt",
+      "version": "V1.3",
+      "file_sha256": "31a7dab6e535e6f0af6a54106cf449ecadfe3644c7b3c805710309f0e85ab7b1",
+      "text_sha256": "97ad5b74be0ebaa8655227e50e6fcc9cee1a96e7ba072c45ee6f822673d44d29"
+    },
+    "llm_input_fields": [
+      "Findings (original radiologist report)",
+      "Conclusions (original radiologist report)",
+      "Recommendations (original radiologist report)"
+    ],
+    "input_workbook": {
+      "file_name": "1_canine_thorax_gold_standard_score_draft.xlsx",
+      "sha256": "d1fab50ee938f0608d7487f87e6650a28846cc5253dd6f170dce3fa990896fa4",
+      "worksheet": "Sheet1"
+    }
+  },
+  "runs": [
+    {
+      "started_at_utc": "2026-11-20T15:00:39.315268+00:00",
+      "finished_at_utc": "2026-11-20T15:00:50.449024+00:00",
+      "status": "completed",
+      "requested_limit": 1,
+      "cases_selected": 1,
+      "timeout_seconds": 90.0,
+      "retry_policy": {
+        "transport_attempts_per_application_attempt": 1,
+        "transport_max_retries": 0,
+        "application_max_attempts": 2,
+        "transient_http_status_codes": [
+          408,
+          429,
+          500,
+          502,
+          503,
+          504
+        ],
+        "transient_handling": "bounded exponential backoff between application attempts",
+        "network_error_handling": "network timeouts and httpx/httpx2 NetworkError (connect/read/write/close) without an HTTP status: transient, same backoff as HTTP 408",
+        "rate_limit_handling": "HTTP 429 uses the same bounded backoff; Retry-After is not used",
+        "backoff_base_seconds": 2.0,
+        "backoff_factor": 2.0,
+        "backoff_max_seconds": 30.0,
+        "fatal_http_status_codes": [
+          400,
+          401,
+          403,
+          404
+        ],
+        "fatal_handling": "not retried; the batch stops and the case stays pending",
+        "validation_failure_handling": "retried immediately without backoff (Week 5)",
+        "other_error_handling": "retried immediately without backoff (Week 5)",
+        "classification_basis": "SDK exception class and HTTP status code attribute; exception messages are never parsed"
+      },
+      "package_versions": {
+        "python": "3.14.6",
+        "langchain-google-genai": "4.4.2",
+        "google-genai": "2.31.0",
+        "langchain-core": "1.7.7",
+        "httpx": "0.28.1",
+        "openpyxl": "3.1.5"
+      },
+      "summary": {
+        "total": 1,
+        "skipped": 0,
+        "succeeded": 0,
+        "failed": 1,
+        "transient_backoffs": 1
+      }
+    },
+    {
+      "started_at_utc": "2026-11-20T15:18:40.686606+00:00",
+      "finished_at_utc": "2026-11-20T15:20:13.456622+00:00",
+      "status": "completed",
+      "requested_limit": 1,
+      "cases_selected": 1,
+      "timeout_seconds": 90.0,
+      "retry_policy": {
+        "transport_attempts_per_application_attempt": 1,
+        "transport_max_retries": 0,
+        "application_max_attempts": 2,
+        "transient_http_status_codes": [
+          408,
+          429,
+          500,
+          502,
+          503,
+          504
+        ],
+        "transient_handling": "bounded exponential backoff between application attempts",
+        "network_error_handling": "network timeouts and httpx/httpx2 NetworkError (connect/read/write/close) without an HTTP status: transient, same backoff as HTTP 408",
+        "rate_limit_handling": "HTTP 429 uses the same bounded backoff; Retry-After is not used",
+        "backoff_base_seconds": 2.0,
+        "backoff_factor": 2.0,
+        "backoff_max_seconds": 30.0,
+        "fatal_http_status_codes": [
+          400,
+          401,
+          403,
+          404
+        ],
+        "fatal_handling": "not retried; the batch stops and the case stays pending",
+        "validation_failure_handling": "retried immediately without backoff (Week 5)",
+        "other_error_handling": "retried immediately without backoff (Week 5)",
+        "classification_basis": "SDK exception class and HTTP status code attribute; exception messages are never parsed"
+      },
+      "package_versions": {
+        "python": "3.14.6",
+        "langchain-google-genai": "4.4.2",
+        "google-genai": "2.31.0",
+        "langchain-core": "1.7.7",
+        "httpx": "0.28.1",
+        "openpyxl": "3.1.5"
+      },
+      "summary": {
+        "total": 1,
+        "skipped": 0,
+        "succeeded": 0,
+        "failed": 1,
+        "transient_backoffs": 1
+      }
+    },
+    {
+      "started_at_utc": "2026-11-20T15:27:02.202168+00:00",
+      "finished_at_utc": "2026-11-20T15:27:10.754383+00:00",
+      "status": "completed",
+      "requested_limit": 1,
+      "cases_selected": 1,
+      "timeout_seconds": 90.0,
+      "retry_policy": {
+        "transport_attempts_per_application_attempt": 1,
+        "transport_max_retries": 0,
+        "application_max_attempts": 2,
+        "transient_http_status_codes": [
+          408,
+          429,
+          500,
+          502,
+          503,
+          504
+        ],
+        "transient_handling": "bounded exponential backoff between application attempts",
+        "network_error_handling": "network timeouts and httpx/httpx2 NetworkError (connect/read/write/close) without an HTTP status: transient, same backoff as HTTP 408",
+        "rate_limit_handling": "HTTP 429 uses the same bounded backoff; Retry-After is not used",
+        "backoff_base_seconds": 2.0,
+        "backoff_factor": 2.0,
+        "backoff_max_seconds": 30.0,
+        "fatal_http_status_codes": [
+          400,
+          401,
+          403,
+          404
+        ],
+        "fatal_handling": "not retried; the batch stops and the case stays pending",
+        "validation_failure_handling": "retried immediately without backoff (Week 5)",
+        "other_error_handling": "retried immediately without backoff (Week 5)",
+        "classification_basis": "SDK exception class and HTTP status code attribute; exception messages are never parsed"
+      },
+      "package_versions": {
+        "python": "3.14.6",
+        "langchain-google-genai": "4.4.2",
+        "google-genai": "2.31.0",
+        "langchain-core": "1.7.7",
+        "httpx": "0.28.1",
+        "openpyxl": "3.1.5"
+      },
+      "summary": {
+        "total": 1,
+        "skipped": 0,
+        "succeeded": 0,
+        "failed": 1,
+        "transient_backoffs": 1
+      }
+    },
+    {
+      "started_at_utc": "2026-11-20T16:12:36.730579+00:00",
+      "finished_at_utc": "2026-11-20T16:12:52.008778+00:00",
+      "status": "completed",
+      "requested_limit": 1,
+      "cases_selected": 1,
+      "timeout_seconds": 90.0,
+      "retry_policy": {
+        "transport_attempts_per_application_attempt": 1,
+        "transport_max_retries": 0,
+        "application_max_attempts": 2,
+        "transient_http_status_codes": [
+          408,
+          429,
+          500,
+          502,
+          503,
+          504
+        ],
+        "transient_handling": "bounded exponential backoff between application attempts",
+        "network_error_handling": "network timeouts and httpx/httpx2 NetworkError (connect/read/write/close) without an HTTP status: transient, same backoff as HTTP 408",
+        "rate_limit_handling": "HTTP 429 uses the same bounded backoff; Retry-After is not used",
+        "backoff_base_seconds": 2.0,
+        "backoff_factor": 2.0,
+        "backoff_max_seconds": 30.0,
+        "fatal_http_status_codes": [
+          400,
+          401,
+          403,
+          404
+        ],
+        "fatal_handling": "not retried; the batch stops and the case stays pending",
+        "validation_failure_handling": "retried immediately without backoff (Week 5)",
+        "other_error_handling": "retried immediately without backoff (Week 5)",
+        "classification_basis": "SDK exception class and HTTP status code attribute; exception messages are never parsed"
+      },
+      "package_versions": {
+        "python": "3.14.6",
+        "langchain-google-genai": "4.4.2",
+        "google-genai": "2.31.0",
+        "langchain-core": "1.7.7",
+        "httpx": "0.28.1",
+        "openpyxl": "3.1.5"
+      },
+      "summary": {
+        "total": 1,
+        "skipped": 0,
+        "succeeded": 1,
+        "failed": 0,
+        "transient_backoffs": 0
+      }
+    },
+    {
+      "started_at_utc": "2026-11-20T16:16:36.259708+00:00",
+      "finished_at_utc": "2026-11-20T16:35:50.167052+00:00",
+      "status": "completed",
+      "requested_limit": 100,
+      "cases_selected": 100,
+      "timeout_seconds": 90.0,
+      "retry_policy": {
+        "transport_attempts_per_application_attempt": 1,
+        "transport_max_retries": 0,
+        "application_max_attempts": 2,
+        "transient_http_status_codes": [
+          408,
+          429,
+          500,
+          502,
+          503,
+          504
+        ],
+        "transient_handling": "bounded exponential backoff between application attempts",
+        "network_error_handling": "network timeouts and httpx/httpx2 NetworkError (connect/read/write/close) without an HTTP status: transient, same backoff as HTTP 408",
+        "rate_limit_handling": "HTTP 429 uses the same bounded backoff; Retry-After is not used",
+        "backoff_base_seconds": 2.0,
+        "backoff_factor": 2.0,
+        "backoff_max_seconds": 30.0,
+        "fatal_http_status_codes": [
+          400,
+          401,
+          403,
+          404
+        ],
+        "fatal_handling": "not retried; the batch stops and the case stays pending",
+        "validation_failure_handling": "retried immediately without backoff (Week 5)",
+        "other_error_handling": "retried immediately without backoff (Week 5)",
+        "classification_basis": "SDK exception class and HTTP status code attribute; exception messages are never parsed"
+      },
+      "package_versions": {
+        "python": "3.14.6",
+        "langchain-google-genai": "4.4.2",
+        "google-genai": "2.31.0",
+        "langchain-core": "1.7.7",
+        "httpx": "0.28.1",
+        "openpyxl": "3.1.5"
+      },
+      "summary": {
+        "total": 100,
+        "skipped": 1,
+        "succeeded": 99,
+        "failed": 0,
+        "transient_backoffs": 1
+      }
+    }
+  ]
+}

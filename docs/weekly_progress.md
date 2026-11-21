@@ -119,7 +119,29 @@
 
 Not yet documented as completed in this project record. Add implementation, tests, advisor feedback, decisions, and deliverables as each week's work is performed.
 
+*Update (2026-11-21):* Week 7 is completed and recorded in its own section below. Weeks 6 and 8–10 remain undocumented as completed.
+
 
 ## Week 4 closeout status — 2026-11-08
 
 The Week 4 application and optional JSON prompt-configuration task are implemented and tested. Documentation has been updated to reflect completed work. The remaining adjudication is a separate review dependency, not an unfinished coding task. Git commit/tag closeout is still to be performed.
+
+
+## Week 7 — Gemini model evaluation
+
+### Completed
+- Implemented an independent Google Gemini pipeline under `src/week_07/` (branch `week-07/gemini-model-evaluation`). Weeks 4 and 5 were unchanged, and there is no runtime dependency on either.
+- Integrated Gemini `gemini-3.8-flash` via LangChain (`langchain-google-genai`) and the Google GenAI SDK, at temperature 0, with the unchanged, SHA-256-protected Canine Thorax Master Prompt V1.3. Model input is limited to the original Findings, Conclusions and Recommendations; reference labels are held separately.
+- Added a bounded retry policy with fatal, transient and retryable error classification, and per-workflow run manifests recording provenance.
+- Kept Matrix 1 and Matrix 2 as separate workflows with isolated `outputs/week_07/` folders. The Week 5 OpenAI predictions were used as read-only comparison inputs.
+- Added evaluation and the six-sheet OpenAI-vs-Gemini comparison workbook (`python -m week_07 compare`).
+- Tests: 288 Week 7 tests run, 282 passed, 6 skipped, 0 failures and 0 errors. Opt-in local artifact tests: 6 run, 4 passed, 2 skipped. Week 5 regression: 338 run, 329 passed, 9 skipped. Flake8 clean.
+- Live Gemini execution: 100 cases × 20 conditions per matrix, zero unresolved final failures.
+  - Matrix 1 (original Vetology reference): Gemini TP 96, FN 953, TN 924, FP 27; accuracy 51.00%, sensitivity 9.15%, specificity 97.16%, precision 78.05%, F1 16.38%. Week 5 OpenAI: accuracy 52.10%, sensitivity 12.01%, specificity 96.32%, precision 78.26%, F1 20.83%. Agreement 97.00% (60 disagreements).
+  - Matrix 2 (Gold Standard reference): Gemini TP 102, FN 56, TN 1,822, FP 20; accuracy 96.20%, sensitivity 64.56%, specificity 98.91%, precision 83.61%, F1 72.86%. Week 5 OpenAI: accuracy 96.60%, sensitivity 79.75%, specificity 98.05%, precision 77.78%, F1 78.75%. Agreement 97.20% (56 disagreements).
+- Deliverables: `src/week_07/`; two comparison workbooks (local only); two run manifests; updated documentation and `requirements.txt` (`google-genai==2.31.0` pinned).
+
+### Limitations / open items
+- In both matrices Gemini was more specific (fewer false positives), and OpenAI was more sensitive with higher accuracy and F1. High agreement between the models does not imply accuracy against the reference labels.
+- Matrix 1 and Matrix 2 use different reference-label sets and must not be combined. These are pilot results, not evidence of clinical readiness.
+- Veterinary adjudication of the model disagreements and mismatches remains pending.

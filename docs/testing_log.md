@@ -170,3 +170,66 @@ Both generated evaluation workbooks were opened and visually reviewed. The gener
 - Matrix 2 evaluation workbook: `outputs/week_05/matrix_2/Evaluation Workbook v2.xlsx`.
 
 **Scope note:** This execution record documents batch completion, aggregate evaluation, reference-loader consistency and workbook review. Detailed prediction error analysis and veterinary adjudication were outside the scope of this Week 5 closeout.
+
+## Week 7 — Gemini model evaluation: verification record (closeout 2026-11-21)
+
+**Environment:** local Windows machine, project virtual environment, `google-genai` 2.31.0 with `langchain-google-genai` 4.4.2. The automated tests, local artifact tests, lint and configuration checks are offline. Only the live `batch` runs made Gemini API requests, and they were billable.
+
+### Automated tests
+
+| Check | Command | Result |
+|---|---|---|
+| Week 7 unit and integration tests | `python -m unittest discover -s src/week_07/tests -t src -v` | **288 tests run: 282 passed, 6 skipped**, 0 failures, 0 errors |
+| Skipped tests (6) | — | 1 symlink-escape isolation test (symlink creation needs privileges on Windows). 5 opt-in local artifact tests (`test_local_artifacts.py`), which skip unless `WEEK07_RUN_LOCAL_ARTIFACTS=1` is set. These are skips, not failures. |
+| Week 7 local artifact tests (opt-in) | `python -m unittest week_07.tests.test_local_artifacts -v` | **6 tests run: 4 passed, 2 skipped**, 0 failures, 0 errors. The 2 skips are conditional tests whose preconditions were not met in that run, not failures. |
+| Week 5 regression | Week 5 test suite | 338 tests run: 329 passed, 9 skipped, 0 failures, 0 errors. The 9 skips require baseline artifacts absent from the local test location. |
+| Lint | `python -m flake8 --max-line-length=100 src/week_07` | Clean (no output) |
+| CLI help | `python -m week_07 --help` | Completed successfully |
+| Configuration | `python -m week_07 config --workflow matrix1`; `python -m week_07 config --workflow matrix2` | Completed successfully (no API request) |
+
+Local artifact test findings (real confidential files, read-only and SHA-256-checked; nothing written; no API request):
+- Matrix 1 real error log (Week 5 OpenAI run): 100 historical failure records, all superseded by a later successful prediction for the same CaseID. Zero unresolved failures.
+- The batch and evaluation reference loaders agreed on the real inputs.
+- The Week 7 evaluation stack replayed the Week 5 OpenAI predictions and reproduced the recorded Week 5 counts for both workflows (Matrix 1 TP 126, FN 923, TN 916, FP 35; Matrix 2 TP 126, FN 32, TN 1,806, FP 36).
+
+### Live Gemini execution and evaluation
+
+Each matrix processed 100 cases × 20 conditions (2,000 paired labels). Historical failed attempts in the error logs were superseded by later successful predictions. Neither matrix had an unresolved final failure. Reference labels were not sent to the model; model input was restricted to the original Findings, Conclusions and Recommendations.
+
+| Workflow (reference labels) | Model | TP | FN | TN | FP | Accuracy | Sensitivity | Specificity | Precision | F1 |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Matrix 1 — Original Vetology | Gemini (`gemini-3.8-flash`) | 96 | 953 | 924 | 27 | 51.00% | 9.15% | 97.16% | 78.05% | 16.38% |
+| Matrix 1 — Original Vetology | OpenAI GPT-4.1 mini (Week 5) | 126 | 923 | 916 | 35 | 52.10% | 12.01% | 96.32% | 78.26% | 20.83% |
+| Matrix 2 — Gold Standard | Gemini (`gemini-3.8-flash`) | 102 | 56 | 1,822 | 20 | 96.20% | 64.56% | 98.91% | 83.61% | 72.86% |
+| Matrix 2 — Gold Standard | OpenAI GPT-4.1 mini (Week 5) | 126 | 32 | 1,806 | 36 | 96.60% | 79.75% | 98.05% | 77.78% | 78.75% |
+
+| Workflow | Model agreement (OpenAI vs Gemini; reference not used) | Disagreements |
+|---|---|---:|
+| Matrix 1 | 1,940 / 2,000 = 97.00% | 60 |
+| Matrix 2 | 1,944 / 2,000 = 97.20% | 56 |
+
+**Interpretation:**
+- In both matrices Gemini had higher specificity and fewer false positives. OpenAI had higher sensitivity, accuracy and F1.
+- High model agreement does not imply high accuracy against the reference labels.
+- Matrix 1 and Matrix 2 use different reference-label sets. Their results must never be combined or presented as interchangeable ground truth.
+- These are pilot results, not evidence of clinical readiness.
+
+### Comparison workbooks
+
+- `outputs/week_07/comparison/matrix_1/matrix1_openai_vs_gemini_comparison.xlsx`
+- `outputs/week_07/comparison/matrix_2/matrix2_openai_vs_gemini_comparison.xlsx`
+
+Each workbook has six sheets: (1) Overall Comparison, (2) Condition Comparison, (3) Model Agreement, (4) Case Disagreements, (5) Execution Log, (6) Metric Definitions.
+
+Both workbooks were opened and inspected, and their aggregates reconciled with the CLI results:
+- Condition Comparison lists the 20 conditions plus a MICRO TOTAL row.
+- Case Disagreements lists 60 case-condition pairs for Matrix 1 and 56 for Matrix 2.
+- Sensitivity is blank, not 0, where the reference has zero positive cases.
+- The Execution Log reports zero unresolved final failures in either matrix.
+
+### Generated artifacts
+
+- Run manifests (execution metadata; intended for commit after review): `outputs/week_07/matrix_1/run_manifest.json`, `outputs/week_07/matrix_2/run_manifest.json`.
+- Predictions, error logs and workbooks under `outputs/week_07/` are local-only and gitignored.
+
+**Limitations:** single 100-case sample per workflow; class imbalance affects aggregate accuracy; no veterinary adjudication of the disagreements was undertaken in this closeout.

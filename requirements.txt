@@ -22,7 +22,15 @@ python-dotenv==1.2.4
 # Code quality / linting
 flake8==7.4.1
 
-# Week 2 demonstration integrations retained in the project.
-# Keep these only while the corresponding demo scripts are part of the repository.
+# Google Gemini integration: used by the Week 7 application (src/week_07/llm_client.py)
+# and by the retained Week 2 Gemini demonstration.
 langchain-google-genai==4.4.2
+
+# Imported directly by Week 7 (src/week_07/error_policy.py and its offline tests:
+# google.genai.errors). Locally tested version; within langchain-google-genai 4.4.2's
+# range (>=2.20.0,<3). Its httpx requirement (>=0.28.1,<1) is met by the httpx pin above.
+google-genai==2.31.0
+
+# Week 2 demonstration integration retained in the project.
+# Keep this only while the corresponding demo script is part of the repository.
 langchain-huggingface==1.2.3
