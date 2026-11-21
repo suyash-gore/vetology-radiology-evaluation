@@ -76,49 +76,132 @@ class TestCanineThoraxPromptUnchanged(OfflineTestCase):
         self.assertEqual(prompt_identity(CANINE_THORAX_PROMPT), expected)
 
 
-class TestPendingPrompts(OfflineTestCase):
-    def test_new_prompts_registered_as_pending(self):
-        self.assertEqual((FELINE_THORAX_PROMPT.name, FELINE_THORAX_PROMPT.version,
-                          FELINE_THORAX_PROMPT.filename),
-                         ("Feline Thorax Master Prompt", "V1.1",
-                          "feline_thorax_master_prompt_v1_1.txt"))
-        self.assertEqual((CANINE_ABDOMEN_PROMPT.name, CANINE_ABDOMEN_PROMPT.version,
-                          CANINE_ABDOMEN_PROMPT.filename),
-                         ("Canine Abdomen Master Prompt", "V1.2",
-                          "canine_abdomen_master_prompt_v1_2.txt"))
-        for spec in (FELINE_THORAX_PROMPT, CANINE_ABDOMEN_PROMPT):
-            with self.subTest(prompt=spec.label):
-                self.assertTrue(spec.is_pending)
-                self.assertIsNone(spec.file_sha256)
-                self.assertIsNone(spec.text_sha256)
-                self.assertIsNone(spec.text_length)
+APPROVED = {
+    "feline_thorax": ("Feline Thorax Master Prompt", "V1.1",
+                      "feline_thorax_master_prompt_v1_1.txt", 26060,
+                      "7696598eda2faa39ef44df3e9c260ca7870d487094df40ae6e05c4b0c2665d27",
+                      "bf9142f7b753e3bfdf67d64869332672082796859e02aaafac0c11e202eeb103", 25833),
+    "canine_abdomen": ("Canine Abdomen Master Prompt", "V1.2",
+                       "canine_abdomen_master_prompt_v1_2.txt", 17216,
+                       "f25b56fb0fbd2a7e697be287ef51357a8e911243523464d860eff7726a5e17aa",
+                       "1156c72a6ceaed5f466a77e5490add36ec25214bd3ccb1b785a0bef205402305", 17081),
+}
+
+
+class TestApprovedPrompts(OfflineTestCase):
+    def test_registered_identity_and_pins(self):
+        for app in (FELINE_THORAX, CANINE_ABDOMEN):
+            name, version, filename, size, file_sha, text_sha, length = APPROVED[app.key]
+            spec = app.prompt
+            with self.subTest(app=app.key):
+                self.assertEqual((spec.name, spec.version, spec.filename),
+                                 (name, version, filename))
+                self.assertEqual((spec.file_sha256, spec.text_sha256, spec.text_length),
+                                 (file_sha, text_sha, length))
+                self.assertFalse(spec.is_pending)
                 self.assertEqual(spec.directory, prompt_loader.PROMPT_PATH.parent)
+                self.assertEqual(spec.path.stat().st_size, size)
         self.assertIs(FELINE_THORAX.prompt, FELINE_THORAX_PROMPT)
         self.assertIs(CANINE_ABDOMEN.prompt, CANINE_ABDOMEN_PROMPT)
 
-    def test_pending_prompts_cannot_be_loaded_or_identified(self):
-        for spec in (FELINE_THORAX_PROMPT, CANINE_ABDOMEN_PROMPT):
+    def test_files_are_stored_exactly(self):
+        for app in (FELINE_THORAX, CANINE_ABDOMEN):
+            data = app.prompt.path.read_bytes()
+            with self.subTest(app=app.key):
+                self.assertEqual(hashlib.sha256(data).hexdigest(), APPROVED[app.key][4])
+                self.assertFalse(data.startswith(b"\xef\xbb\xbf"))   # no BOM
+                self.assertNotIn(b"\r", data)                       # LF line endings
+                data.decode("utf-8")                                # valid UTF-8
+
+    def test_prompts_load_and_identify(self):
+        for app in (FELINE_THORAX, CANINE_ABDOMEN):
+            with self.subTest(app=app.key):
+                text = load_prompt(app.prompt)
+                self.assertEqual(text, verify_prompt(app.prompt))
+                self.assertEqual(len(text), APPROVED[app.key][6])
+                self.assertEqual(text, app.prompt.path.read_text(encoding="utf-8").strip())
+                self.assertEqual(prompt_identity(app.prompt), {
+                    "name": APPROVED[app.key][0], "version": APPROVED[app.key][1],
+                    "file_sha256": APPROVED[app.key][4],
+                    "text_sha256": APPROVED[app.key][5]})
+        self.assertIn("FELINE THORAX MASTER PROMPT", load_prompt(FELINE_THORAX_PROMPT))
+        self.assertTrue(load_prompt(CANINE_ABDOMEN_PROMPT).startswith(
+            "Canine Abdomen Master Prompt V1.2"))
+
+    def test_output_contract_lists_exactly_the_application_keys_in_order(self):
+        import re
+
+        for app in (FELINE_THORAX, CANINE_ABDOMEN):
+            text = load_prompt(app.prompt)
+            contract = text[text.rindex("{"):text.rindex("}") + 1]
+            keys = tuple(re.findall(r'["\u201c]([A-Za-z_]+)["\u201d]\s*:', contract))
+            with self.subTest(app=app.key):
+                self.assertEqual(keys, app.condition_keys)
+
+    def test_any_modification_fails_integrity_verification(self):
+        for app in (FELINE_THORAX, CANINE_ABDOMEN):
+            original = app.prompt.path.read_bytes()
+            edits = {
+                "trailing whitespace": original + b" ",
+                "extra newline": original + b"\n",
+                "one character changed": original.replace(b"Positive", b"positive", 1),
+                "CRLF line endings": original.replace(b"\n", b"\r\n"),
+                "BOM added": b"\xef\xbb\xbf" + original,
+                "truncated": original[:-200],
+            }
+            for label, content in edits.items():
+                with self.subTest(app=app.key, edit=label), tempfile.TemporaryDirectory() as tmp:
+                    (Path(tmp) / app.prompt.filename).write_bytes(content)
+                    copy = replace(app.prompt, directory=Path(tmp))
+                    with self.assertRaisesRegex(PromptIntegrityError, "does not match the pinned"):
+                        verify_prompt(copy)
+                    with self.assertRaises(PromptIntegrityError):
+                        prompt_identity(copy)
+            with self.subTest(app=app.key, edit="unchanged copy"), \
+                    tempfile.TemporaryDirectory() as tmp:
+                (Path(tmp) / app.prompt.filename).write_bytes(original)
+                self.assertEqual(verify_prompt(replace(app.prompt, directory=Path(tmp))),
+                                 load_prompt(app.prompt))
+
+    def test_wrong_text_pins_rejected(self):
+        for app in (FELINE_THORAX, CANINE_ABDOMEN):
+            with self.subTest(app=app.key):
+                with self.assertRaisesRegex(PromptIntegrityError, "Loaded prompt text"):
+                    verify_prompt(replace(app.prompt, text_sha256="0" * 64))
+                with self.assertRaisesRegex(PromptIntegrityError, "Loaded prompt text"):
+                    verify_prompt(replace(app.prompt, text_length=app.prompt.text_length - 1))
+
+    def test_prompts_are_distinct(self):
+        texts = {load_prompt(app.prompt) for app in APPLICATIONS.values()}
+        self.assertEqual(len(texts), 3)
+
+
+class TestPendingMechanism(OfflineTestCase):
+    """The pending state still blocks loading for any prompt registered without pins."""
+
+    def pending(self, base=FELINE_THORAX_PROMPT, **kwargs):
+        return replace(base, file_sha256=None, text_sha256=None, text_length=None, **kwargs)
+
+    def test_pending_prompt_cannot_be_loaded_or_identified(self):
+        for base in (FELINE_THORAX_PROMPT, CANINE_ABDOMEN_PROMPT):
+            spec = self.pending(base)
+            self.assertTrue(spec.is_pending)
             for function in (load_prompt, verify_prompt, prompt_identity):
                 with self.subTest(prompt=spec.label, function=function.__name__):
                     with self.assertRaisesRegex(PromptIntegrityError, "pending approval"):
                         function(spec)
 
-    def test_pending_refused_even_if_a_file_is_present(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            (Path(tmp) / FELINE_THORAX_PROMPT.filename).write_text("anything", encoding="utf-8")
-            spec = replace(FELINE_THORAX_PROMPT, directory=Path(tmp))
-            with self.assertRaisesRegex(PromptIntegrityError, "pending approval"):
-                load_prompt(spec)
-
-    def test_no_placeholder_prompt_files_were_created(self):
-        for spec in (FELINE_THORAX_PROMPT, CANINE_ABDOMEN_PROMPT):
-            self.assertFalse(spec.path.exists(), spec.path)
+    def test_pending_refused_even_if_the_approved_file_is_present(self):
+        spec = self.pending()
+        self.assertTrue(spec.path.is_file())
+        with self.assertRaisesRegex(PromptIntegrityError, "pending approval"):
+            load_prompt(spec)
 
     def test_partial_pins_rejected(self):
         with self.assertRaises(ValueError):
-            replace(FELINE_THORAX_PROMPT, file_sha256="a" * 64)
+            replace(self.pending(), file_sha256="a" * 64)
         with self.assertRaises(ValueError):
-            replace(FELINE_THORAX_PROMPT, file_sha256="a" * 64, text_sha256="b" * 64)
+            replace(self.pending(), file_sha256="a" * 64, text_sha256="b" * 64)
 
 
 class TestPinnedPromptVerification(TempDirCase):

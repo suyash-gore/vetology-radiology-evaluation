@@ -267,3 +267,16 @@ Branch `week-07/feline-thorax-and-canine-abdomen`. The Week 7 engine is now appl
 
 ### Dependencies
 - None changed. `langchain-openai==1.7.2`, `openai==3.49.0`, `langchain-core`, `httpx` and `openpyxl` were already pinned.
+
+## Week 7 extension — approved prompts registered (2026-11-21)
+
+- **Added:** the owner-approved `feline_thorax_master_prompt_v1_1.txt` and `canine_abdomen_master_prompt_v1_2.txt` to `src/week_07/prompts/`, byte-for-byte as supplied (contents not edited).
+- **Pinned values** in `prompts/registry.py`, which ends the pending status:
+
+| Prompt | File SHA-256 | Stripped-text SHA-256 | Text length |
+|---|---|---|---:|
+| Feline V1.1 | `7696598eda2faa39ef44df3e9c260ca7870d487094df40ae6e05c4b0c2665d27` | `bf9142f7b753e3bfdf67d64869332672082796859e02aaafac0c11e202eeb103` | 25,833 |
+| Abdomen V1.2 | `f25b56fb0fbd2a7e697be287ef51357a8e911243523464d860eff7726a5e17aa` | `1156c72a6ceaed5f466a77e5490add36ec25214bd3ccb1b785a0bef205402305` | 17,081 |
+
+- **Tests:** approved-prompt loading and tamper detection, output-contract key order, and the real OpenAI execution path with a fake chat model. Pending-state tests now use a synthetic pending spec. Week 7: 492 run, 487 passed, 5 skipped; Week 5: 338 run, 329 passed, 9 skipped; parity and flake8 clean.
+- **Not executed:** live OpenAI runs. They are to be run locally with `OPENAI_API_KEY` in `.env`.

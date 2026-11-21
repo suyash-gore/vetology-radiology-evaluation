@@ -14,11 +14,10 @@ Canine Thorax V1.3 is NOT re-implemented here: ``load_prompt`` delegates to
 constants pinned in ``prompt_loader``, so its behaviour and digests are
 unchanged.
 
-Feline Thorax V1.1 and Canine Abdomen V1.2 are registered as PENDING: their
-approved texts have not been supplied yet, so no prompt file exists and no
-digest is pinned. A pending prompt cannot be loaded and has no run identity;
-both raise ``PromptIntegrityError``. Activating one requires adding the
-approved file to this directory and pinning its three values below.
+Feline Thorax V1.1 and Canine Abdomen V1.2 are the approved files supplied by
+the project owner, stored byte-for-byte and pinned below. A prompt whose pins
+are ``None`` is PENDING: it cannot be loaded and has no run identity (both raise
+``PromptIntegrityError``); that mechanism remains for any future prompt.
 """
 from __future__ import annotations
 
@@ -90,24 +89,26 @@ CANINE_THORAX_PROMPT: Final[PromptSpec] = PromptSpec(
     directory=prompt_loader.PROMPT_PATH.parent,
 )
 
-# PENDING: approved text not yet supplied by the project owner (do not invent it).
+# Approved file supplied by the project owner, stored byte-for-byte
+# (26,060 bytes, UTF-8, LF, no BOM; 25,833 characters after strip()).
 FELINE_THORAX_PROMPT: Final[PromptSpec] = PromptSpec(
     name="Feline Thorax Master Prompt",
     version="V1.1",
     filename="feline_thorax_master_prompt_v1_1.txt",
-    file_sha256=None,
-    text_sha256=None,
-    text_length=None,
+    file_sha256="7696598eda2faa39ef44df3e9c260ca7870d487094df40ae6e05c4b0c2665d27",
+    text_sha256="bf9142f7b753e3bfdf67d64869332672082796859e02aaafac0c11e202eeb103",
+    text_length=25833,
 )
 
-# PENDING: approved text not yet supplied by the project owner (do not invent it).
+# Approved file supplied by the project owner, stored byte-for-byte
+# (17,216 bytes, UTF-8, LF, no BOM; 17,081 characters after strip()).
 CANINE_ABDOMEN_PROMPT: Final[PromptSpec] = PromptSpec(
     name="Canine Abdomen Master Prompt",
     version="V1.2",
     filename="canine_abdomen_master_prompt_v1_2.txt",
-    file_sha256=None,
-    text_sha256=None,
-    text_length=None,
+    file_sha256="f25b56fb0fbd2a7e697be287ef51357a8e911243523464d860eff7726a5e17aa",
+    text_sha256="1156c72a6ceaed5f466a77e5490add36ec25214bd3ccb1b785a0bef205402305",
+    text_length=17081,
 )
 
 

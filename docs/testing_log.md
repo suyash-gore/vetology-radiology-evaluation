@@ -293,4 +293,34 @@ Results:
 These numbers measure the pipeline, not model quality.
 
 ### Not executed
-- **Live OpenAI batch runs for Feline Thorax and Canine Abdomen:** the approved prompts are pending, so the CLI refuses with exit 2 before writing anything, as verified. No `OPENAI_API_KEY` was available in the container either.
+- **Live OpenAI batch runs for Feline Thorax and Canine Abdomen:** at the time of this record the approved prompts were pending, so the CLI refused with exit 2 before writing anything, as verified. No `OPENAI_API_KEY` was available in the container either. (The prompts were registered later the same day; see the next record.)
+
+## Week 7 extension — approved prompt registration: verification record (2026-11-21)
+
+**Environment:** Linux development container, offline (no API key, no model request).
+
+### Prompt integrity
+The owner-supplied files were copied byte-for-byte into `src/week_07/prompts/`, and `cmp` confirmed they are identical to the uploads. They are UTF-8 with LF line endings and no BOM.
+
+| Prompt | Bytes | File SHA-256 | Stripped-text SHA-256 | Text length |
+|---|---:|---|---|---:|
+| Feline Thorax Master Prompt V1.1 | 26,060 | `7696598eda2faa39ef44df3e9c260ca7870d487094df40ae6e05c4b0c2665d27` | `bf9142f7b753e3bfdf67d64869332672082796859e02aaafac0c11e202eeb103` | 25,833 |
+| Canine Abdomen Master Prompt V1.2 | 17,216 | `f25b56fb0fbd2a7e697be287ef51357a8e911243523464d860eff7726a5e17aa` | `1156c72a6ceaed5f466a77e5490add36ec25214bd3ccb1b785a0bef205402305` | 17,081 |
+
+### Tests
+
+| Check | Result |
+|---|---|
+| Week 7 suite | **492 run: 487 passed, 5 skipped** (opt-in local artifact tests), 0 failures, 0 errors |
+| Prompt, provider, batch, CLI, isolation and evaluation modules | 181 run, all passed |
+| `test_week05_parity` | 16 run, all passed |
+| Week 5 suite | 338 run: 329 passed, 9 skipped, 0 failures, 0 errors |
+| flake8 `src/week_07`, `git diff --check` | clean |
+
+New and updated tests:
+- **Loading:** both approved prompts load, and their pins, identity and stored bytes match.
+- **Tampering:** trailing whitespace, an extra newline, a one-character change, CRLF, an added BOM and truncation each make verification and identity fail; an unchanged copy still loads.
+- **Output contract:** each prompt lists exactly its application's keys, in order.
+- **Pending mechanism:** still enforced, tested on a synthetic pending spec.
+- **Execution path:** the real `OpenAIClassifier` (chat model faked) sends each application's own approved prompt and region instruction. Its predictions carry the application's keys, and the run manifest records the approved prompt digests.
+- **Without `OPENAI_API_KEY`:** a CLI batch for the real application stops before any write.

@@ -3,9 +3,10 @@
 Contains NO real Vetology data and makes NO network request. ``SyntheticAppRepo``
 builds a throwaway ``data/`` + ``outputs/week_07`` tree with:
 
-* the real application registered with a TEMPORARY pinned stand-in prompt (the
-  approved prompts are still pending; the stand-in text is not clinical), its
-  workflows rebased into the temporary tree;
+* the real application with, by default, a TEMPORARY pinned stand-in prompt
+  (not clinical; keeps the synthetic tests independent of the approved text),
+  or the real approved prompt, or a pending prompt; its workflows rebased into
+  the temporary tree;
 * an isolation policy holding all six workflows (Canine Thorax rebased too)
   and both application roots, exactly like ``DEFAULT_POLICY``;
 * Matrix 1 / Matrix 2 workbooks in the real column layout (CaseID, original
@@ -112,7 +113,11 @@ def pinned_prompt(base: ApplicationSpec, directory: Path, text: str = STAND_IN_P
 class SyntheticAppRepo:
     """Temporary tree with one application ready to run offline."""
 
-    def __init__(self, key: str, *, pin_prompt: bool = True) -> None:
+    def __init__(self, key: str, *, prompt: str = "stand-in") -> None:
+        """``prompt``: "stand-in" (temporary pinned test prompt, default), "approved"
+        (the real registered prompt, read-only) or "pending" (no pins: refused)."""
+        if prompt not in ("stand-in", "approved", "pending"):
+            raise ValueError(f"unknown prompt mode {prompt!r}")
         self.root = Path(tempfile.mkdtemp(prefix=f"week07_{key}_")).resolve()
         self.inputs = self.root / "data" / "week_07_inputs"
         self.week7 = self.root / "outputs" / "week_07"
@@ -135,8 +140,13 @@ class SyntheticAppRepo:
         self.specs = {name: move(spec) for name, spec in config.ALL_WORKFLOWS.items()}
         workflows = MappingProxyType({name: self.specs[f"{key}/{name}"]
                                       for name in base.workflows})
-        prompt = pinned_prompt(base, self.prompts) if pin_prompt else base.prompt
-        self.app = replace(base, prompt=prompt, workflows=workflows)
+        if prompt == "stand-in":
+            spec = pinned_prompt(base, self.prompts)
+        elif prompt == "approved":
+            spec = base.prompt
+        else:
+            spec = replace(base.prompt, file_sha256=None, text_sha256=None, text_length=None)
+        self.app = replace(base, prompt=spec, workflows=workflows)
         self.base = base
         self.policy = IsolationPolicy(
             output_root=self.week7,

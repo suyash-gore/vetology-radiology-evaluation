@@ -153,12 +153,35 @@ class TestMessages(OfflineTestCase):
                 build_messages(self.app, bad)
 
     def test_pending_prompt_blocks_message_building(self):
+        pending = SyntheticAppRepo("canine_abdomen", prompt="pending")
+        self.addCleanup(pending.cleanup)
         with self.assertRaisesRegex(PromptIntegrityError, "pending approval"):
-            build_messages(FELINE_THORAX, REPORT)
+            build_messages(pending.app, REPORT)
         chat = FakeChatModel()
         with self.assertRaises(PromptIntegrityError):
-            OpenAIClassifier(CANINE_ABDOMEN, chat_model=chat)(REPORT)
+            OpenAIClassifier(pending.app, chat_model=chat)(REPORT)
         self.assertEqual(chat.calls, [])
+
+    def test_registered_applications_send_their_own_approved_prompt(self):
+        from week_07.prompts.registry import load_prompt
+
+        for app, region in ((FELINE_THORAX, "feline thorax"),
+                            (CANINE_ABDOMEN, "canine abdomen")):
+            chat = FakeChatModel()
+            OpenAIClassifier(app, OpenAIModelConfig(), chat_model=chat)(REPORT)
+            system, human = chat.calls[0]
+            with self.subTest(app=app.key):
+                self.assertEqual(system.content, load_prompt(app.prompt))
+                self.assertEqual(len(system.content), app.prompt.text_length)
+                self.assertTrue(human.content.startswith(
+                    f"Classify the following {region} radiology report according to the "
+                    "system instructions."))
+        feline_system = FakeChatModel()
+        OpenAIClassifier(FELINE_THORAX, chat_model=feline_system)(REPORT)
+        abdomen_system = FakeChatModel()
+        OpenAIClassifier(CANINE_ABDOMEN, chat_model=abdomen_system)(REPORT)
+        self.assertNotEqual(feline_system.calls[0][0].content,
+                            abdomen_system.calls[0][0].content)
 
     def test_canine_thorax_refused_by_openai_client(self):
         with self.assertRaises(ConfigurationError):

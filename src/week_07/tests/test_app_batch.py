@@ -199,13 +199,13 @@ class TestExplicitSpecificationRequired(BatchCase):
         self.assertEqual(self.repo.run_batch(provider="openai")["succeeded"], 100)
 
     def test_pending_prompt_refused_before_any_write(self):
-        pending = SyntheticAppRepo("canine_abdomen", pin_prompt=False)
+        pending = SyntheticAppRepo("canine_abdomen", prompt="pending")
         self.addCleanup(pending.cleanup)
         pending.write_inputs()
         with self.assertRaisesRegex(ConfigurationError, "pending approval"):
             pending.run_batch()
         self.assertFalse(pending.week7.exists())
-        self.assertTrue(FELINE_THORAX.prompt.is_pending)
+        self.assertFalse(FELINE_THORAX.prompt.is_pending)  # the registered prompt is approved
 
 
 class TestCredentials(BatchCase):
@@ -287,3 +287,50 @@ class TestCanineAbdomenBatch(BatchCase):
         self.assertEqual(len(record["predictions"]), 10)
         self.assertEqual(read_manifest(self.repo.m1.manifest_path)["identity"]
                          ["source_label_normalization"], {})
+
+
+class TestOpenAIExecutionPathWithApprovedPrompts(OfflineTestCase):
+    """The real OpenAIClassifier (only the chat model is faked) with the approved prompts."""
+
+    def test_each_application_sends_its_prompt_and_gets_its_keys(self):
+        from types import SimpleNamespace
+
+        from week_07.openai_client import OpenAIClassifier
+        from week_07.prompts.registry import load_prompt
+        from week_07.tests.app_fixtures import app_reference
+        from week_07.tests.fixtures import case_from_payload
+
+        logging.getLogger("week_07").setLevel(logging.CRITICAL)
+        self.addCleanup(logging.getLogger("week_07").setLevel, logging.NOTSET)
+        for key, region in (("feline_thorax", "feline thorax"),
+                            ("canine_abdomen", "canine abdomen")):
+            repo = SyntheticAppRepo(key, prompt="approved")
+            self.addCleanup(repo.cleanup)
+            repo.write_inputs()
+            app = repo.app
+            sent = []
+
+            class Chat:
+                def invoke(self, messages, app=app, sent=sent):
+                    sent.append(messages)
+                    case_id = case_from_payload({"findings": messages[1].content.split(
+                        "FINDINGS:\n")[1].split("\n\nCONCLUSIONS:")[0]})
+                    return SimpleNamespace(content=json.dumps(app_reference(app, case_id, 0)))
+
+            classifier = OpenAIClassifier(app, OpenAIModelConfig(), chat_model=Chat())
+            counts = repo.run_batch(classifier)
+            with self.subTest(app=key):
+                self.assertEqual(counts["succeeded"], 100)
+                self.assertEqual(len(sent), 100)
+                for system, human in sent:
+                    self.assertEqual(system.content, load_prompt(app.prompt))
+                    self.assertTrue(human.content.startswith(
+                        f"Classify the following {region} radiology report"))
+                    self.assertNotIn(LEAK_MARKER, human.content)
+                record = json.loads(repo.m1.predictions_path.read_text().splitlines()[0])
+                self.assertEqual(tuple(record["predictions"]), app.condition_keys)
+                identity = read_manifest(repo.m1.manifest_path)["identity"]
+                self.assertEqual(identity["prompt"]["file_sha256"], app.prompt.file_sha256)
+                self.assertEqual(identity["prompt"]["text_sha256"], app.prompt.text_sha256)
+                self.assertEqual(identity["prompt"]["version"], app.prompt.version)
+                self.assertEqual(identity["condition_keys"], list(app.condition_keys))

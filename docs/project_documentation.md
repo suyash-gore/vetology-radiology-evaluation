@@ -446,9 +446,16 @@ The Feline keys are the 20 Canine Thorax keys plus `Fe_Alveolar`, in a different
 ### 18.4 Prompts
 `prompts/registry.py` gives each application a `PromptSpec` (name, version, file name, file SHA-256, stripped-text SHA-256, length).
 - **Canine Thorax:** delegates to the original `load_system_prompt()`; its digests are unchanged.
-- **Feline Thorax V1.1 and Canine Abdomen V1.2:** registered as **pending**, because the approved texts have not been supplied.
-  - A pending prompt cannot be loaded or included in a run identity, so live batch runs are refused before any write.
-  - To activate a prompt: add the approved file to `src/week_07/prompts/` and pin its three values in the registry.
+- **Feline Thorax V1.1 and Canine Abdomen V1.2:** the owner-approved files, stored byte-for-byte in `src/week_07/prompts/` (UTF-8, LF, no BOM) and pinned:
+
+| Prompt | File | Bytes | File SHA-256 | Stripped-text SHA-256 | Text length |
+|---|---|---:|---|---|---:|
+| Feline Thorax Master Prompt V1.1 | `feline_thorax_master_prompt_v1_1.txt` | 26,060 | `7696598eda2faa39ef44df3e9c260ca7870d487094df40ae6e05c4b0c2665d27` | `bf9142f7b753e3bfdf67d64869332672082796859e02aaafac0c11e202eeb103` | 25,833 |
+| Canine Abdomen Master Prompt V1.2 | `canine_abdomen_master_prompt_v1_2.txt` | 17,216 | `f25b56fb0fbd2a7e697be287ef51357a8e911243523464d860eff7726a5e17aa` | `1156c72a6ceaed5f466a77e5490add36ec25214bd3ccb1b785a0bef205402305` | 17,081 |
+
+- **Integrity:** any change to a file (one character, whitespace, line endings, a BOM) makes loading and run-identity creation fail.
+- **Contracts:** each prompt's output contract lists exactly its application's condition keys, in order (tested).
+- **Pending prompts:** a prompt registered without pins is pending and blocks any run.
 
 ### 18.5 Inputs, references and normalisation
 - **Loader rules:** the Week 5 rules, per application.
@@ -484,7 +491,7 @@ Workflows are identified as `<application>/<workflow>`. The default policy holds
 
 ### 18.9 Real-data validation and status
 - **The four supplied workbooks validate cleanly** (details in `testing_log.md`): `Sheet1`, 100 unique CaseIDs each, blank Gold Standard rows skipped, loaders in agreement, correct normalisation counts, and identical cases and report text across the matrices.
-- **Live model runs are pending:**
-  - they need the approved prompt files and digests, plus `OPENAI_API_KEY`;
+- **Live model runs have not been executed yet:**
+  - the approved prompts are now registered; the runs need `OPENAI_API_KEY` in the local `.env`;
   - no Feline Thorax or Canine Abdomen model results exist yet;
   - the offline end-to-end run used a fake classifier and stand-in prompt, so it demonstrates the pipeline only.

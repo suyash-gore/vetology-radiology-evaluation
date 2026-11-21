@@ -6,27 +6,27 @@ Python project for the Vetology training assignments. The project processes vete
 
 ## Current status
 
-### Week 7 extension — Feline Thorax and Canine Abdomen (implemented; live runs pending approved prompts)
+### Week 7 extension — Feline Thorax and Canine Abdomen (implemented; approved prompts registered; live runs to be executed locally)
 
 Week 7 (branch `week-07/feline-thorax-and-canine-abdomen`) now runs three applications on one shared engine, chosen with `--application`. Canine Thorax is still the default.
 
 | Application | Provider / model | Conditions | Prompt | Status |
 |---|---|---:|---|---|
 | `canine_thorax` | Google Gemini `gemini-3.8-flash` | 20 | Canine Thorax Master Prompt V1.3 (SHA-256 pinned) | Unchanged, existing results kept |
-| `feline_thorax` | OpenAI `gpt-4.1-mini` | 21 | Feline Thorax Master Prompt V1.1 | **Pending**: approved prompt file not yet supplied |
-| `canine_abdomen` | OpenAI `gpt-4.1-mini` | 10 | Canine Abdomen Master Prompt V1.2 | **Pending**: approved prompt file not yet supplied |
+| `feline_thorax` | OpenAI `gpt-4.1-mini` | 21 | Feline Thorax Master Prompt V1.1 (SHA-256 pinned) | Ready; live run not yet executed |
+| `canine_abdomen` | OpenAI `gpt-4.1-mini` | 10 | Canine Abdomen Master Prompt V1.2 (SHA-256 pinned) | Ready; live run not yet executed |
 
 - **Predictions:** each new application generates its predictions **once**, from the Matrix 1 workbook, and reuses them for **both** evaluations. Matrix 1 uses the Vetology reference labels, Matrix 2 the Gold Standard labels, and the two reference tracks stay separate.
 - **Workbook check:** before the shared predictions serve Matrix 2, the Matrix 2 workbook must hold the same 100 unique CaseIDs, in the same order, with identical report text.
 - **Feline Matrix 1 normalisation:** only the columns `pulmonary_nodules`, `esophagitis` and `pneumonia` are mapped (`Normal`→`Negative`, `Abnormal`→`Positive`) before strict validation. Nothing else is ever normalised: no other column, not Feline Matrix 2, not Canine Abdomen.
 - **Isolation:** workflows are identified as `<application>/<workflow>`. Each application writes and reads only inside its own `outputs/week_07/<application>/`, and Canine Thorax paths are unchanged.
-- **Prompts:** the Feline and Abdomen prompts are registered as **pending**. Until the approved files and their SHA-256 digests are added, they cannot be loaded and every live `batch` run is refused before anything is written. No prompt text has been invented.
+- **Prompts:** the approved Feline Thorax V1.1 and Canine Abdomen V1.2 files are stored byte-for-byte in `src/week_07/prompts/`. Their file SHA-256, stripped-text SHA-256 and text length are pinned, so any modification makes loading fail. A prompt registered without pins is pending and blocks every batch run.
 - **Real input workbooks (validated offline, unmodified):**
   - All four workbooks have the expected headers, worksheet `Sheet1`, and exactly 100 unique integer CaseIDs (1–100).
   - The Gold Standard drafts have trailing blank rows, which are skipped.
   - The batch loader and the evaluation loader agree on every workbook, including the Matrix 2 ambiguity guardrail.
   - Matrix 1 and Matrix 2 have identical cases and report text for both applications.
-- **Tests:** 484 Week 7 tests (479 passed, 5 opt-in local tests skipped) and 338 Week 5 tests (329 passed, 9 skipped), with 0 failures and 0 errors; flake8 clean. All run offline with fake model responses.
+- **Tests:** 492 Week 7 tests (487 passed, 5 opt-in local tests skipped) and 338 Week 5 tests (329 passed, 9 skipped), with 0 failures and 0 errors; flake8 clean. All run offline with fake model responses.
 
 Details: `docs/project_documentation.md` §18.
 
@@ -303,7 +303,7 @@ The same commands work with `--application canine_abdomen`. Notes:
   - `--limit` is not available.
   - `--provider` must match the application.
   - `--matrix2-input` checks the Matrix 2 workbook against the Matrix 1 input before the run.
-  - **Live runs are blocked while the application's prompt is pending.**
+  - Live runs need `OPENAI_API_KEY` in the local `.env`. A prompt that fails its integrity check, or a pending prompt, blocks the run before anything is written.
 - **Evaluate:**
   - Reads the shared `outputs/week_07/<application>/predictions/predictions.jsonl` and requires its run manifest. The manifest's application, provider, condition keys and prompt must match, and its input digest must equal the Matrix 1 workbook's.
   - For Matrix 2 it also checks the Matrix 1 workbook (`--prediction-source-input`) against the Gold Standard workbook.
@@ -384,7 +384,7 @@ python -m unittest week_07.tests.test_local_artifacts -v
 
 In the local Week 7 run, 288 tests ran: 282 passed and 6 were skipped, with 0 failures and 0 errors. One skip is a symlink test that needs privileges on Windows. Five are the opt-in local artifact tests, which skip when the opt-in is not set.
 
-After the Feline Thorax / Canine Abdomen extension, the Week 7 suite has 484 tests. In the Linux development container 479 passed and 5 were skipped (the opt-in local artifact tests), with 0 failures and 0 errors. The new tests use synthetic workbooks and fake model responses; they make no API request.
+After the Feline Thorax / Canine Abdomen extension and prompt registration, the Week 7 suite has 492 tests. In the Linux development container 487 passed and 5 were skipped (the opt-in local artifact tests), with 0 failures and 0 errors. The new tests use synthetic workbooks and fake model responses; they make no API request.
 
 Week 4 (unchanged; the top-level Week 4 tests are standalone scripts, so `unittest discover` on `src/week_04` finds no tests):
 

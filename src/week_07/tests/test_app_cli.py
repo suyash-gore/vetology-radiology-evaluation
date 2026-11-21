@@ -128,9 +128,9 @@ class TestRefusals(AppCliCase):
                                    "matrix1", "--model-record", "x")
             self.assertEqual(code, 4)
 
-    def test_pending_prompt_blocks_real_batch(self):
-        # The REAL registered application (pending prompt) and the real default policy:
-        # paths are only checked, and the run stops before anything is written.
+    def test_real_batch_without_openai_key_stops_before_writing(self):
+        # The REAL registered application (approved prompt) and the real default policy:
+        # with no OPENAI_API_KEY the run stops after the prompt check, before any write.
         abdomen = SyntheticAppRepo("canine_abdomen")
         self.addCleanup(abdomen.cleanup)
         abdomen.write_inputs()
@@ -139,8 +139,28 @@ class TestRefusals(AppCliCase):
         code, text = self.run_cli("batch", "--application", "canine_abdomen", "--workflow",
                                   "matrix1", "--input", str(abdomen.m1.default_input_path))
         self.assertEqual(code, 2)
-        self.assertIn("pending approval", text)
+        self.assertIn("OPENAI_API_KEY was not found", text)
+        self.assertIn("Canine Abdomen Master Prompt V1.2 (sha256 f25b56fb", text)
+        self.assertNotIn("GOOGLE_API_KEY", text)
         self.assertEqual(real_tree.exists(), existed)
+
+    def test_pending_prompt_still_blocks_a_batch(self):
+        pending = SyntheticAppRepo("canine_abdomen", prompt="pending")
+        self.addCleanup(pending.cleanup)
+        pending.write_inputs()
+        real = cli.get_application
+        with mock.patch.object(cli, "get_application",
+                               lambda key: pending.app if key == "canine_abdomen" else real(key)), \
+                mock.patch.object(batch_runner, "resolve_application_outputs", functools.partial(
+                    batch_runner.resolve_application_outputs, isolation=pending.policy)), \
+                mock.patch.object(batch_runner, "run_application_batch", functools.partial(
+                    batch_runner.run_application_batch, isolation=pending.policy)):
+            code, text = self.run_cli("batch", "--application", "canine_abdomen", "--workflow",
+                                      "matrix1", "--input", str(pending.m1.default_input_path))
+        self.assertEqual(code, 2)
+        self.assertIn("Configuration error: Canine Abdomen Master Prompt V1.2 is pending approval",
+                      text)
+        self.assertFalse(pending.week7.exists())
 
     def test_wrong_application_workbook_is_an_input_error(self):
         code, _ = self.run_cli("validate-data", "--application", "canine_abdomen",
@@ -171,7 +191,8 @@ class TestConfigCommand(AppCliCase):
         self.assertEqual(code, 0)
         for expected in ("Application: feline_thorax", "Conditions: 21", "Model: gpt-4.1-mini",
                          "OpenAI via langchain-openai", "SDK transport retries: 0",
-                         "PENDING approval", "OPENAI_API_KEY: set",
+                         "Prompt: Feline Thorax Master Prompt V1.1 (sha256 7696598e",
+                         "OPENAI_API_KEY: set",
                          "OPENAI_MAX_RETRIES: set but IGNORED",
                          "pulmonary_nodules: Normal->Negative, Abnormal->Positive",
                          "outputs/week_07/feline_thorax/predictions"):
