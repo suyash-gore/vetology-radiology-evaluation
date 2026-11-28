@@ -505,3 +505,10 @@ Workflows are identified as `<application>/<workflow>`. The default policy holds
   - the approved prompts are now registered; the runs need `OPENAI_API_KEY` in the local `.env`;
   - no Feline Thorax or Canine Abdomen model results exist yet;
   - the offline end-to-end run used a fake classifier and stand-in prompt, so it demonstrates the pipeline only.
+
+
+## 19. Week 8 — research paper (summary)
+
+The research knowledge base (`Vetology_Research_Knowledge_Base/`), the statistical analysis (`analysis/week08_statistics.py`, with aggregate outputs in `Vetology_Research_Knowledge_Base/04_Evidence_and_Artifacts/07_*`) and the manuscript drafts (`paper/`, current v0.3) are on `week-08/research-paper-development`.
+
+The Matrix 2 Gold Standard was produced by three research-team reviewers through independent annotation and majority vote (≥ 2 of 3). The individual files were deleted, so inter-reviewer reliability cannot be computed (`docs/DECISION_LOG.md` D-074). No application code changed in Week 8.

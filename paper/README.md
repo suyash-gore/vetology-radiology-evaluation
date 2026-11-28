@@ -1,6 +1,11 @@
 # Manuscript workspace
 
-`Research_Paper_Draft_v0.2.md` is the current draft. `Research_Paper_Draft_v0.1.md` is the first full draft, retained unchanged. Both were written on 2026-11-28 on branch `week-08/research-paper-development`. **Not for submission.**
+`Research_Paper_Draft_v0.3.md` is the current complete draft, for owner review; it is **not submission-ready**. v0.1 (first draft) and v0.2 are retained unchanged. All were written on 2026-11-28 on branch `week-08/research-paper-development`.
+
+v0.3 changes:
+- confirmed three-reviewer majority-vote Gold Standard methodology (D-074), with the deleted individual files and the resulting lack of inter-reviewer reliability disclosed;
+- full paper structure: background, objectives, implications, acknowledgements, Supplementary Table S1;
+- negative-label prevalence added to the reference-agreement table.
 
 v0.2 changes:
 - finalized, owner-approved statistical settings, distinguished from pre-specified ones;
@@ -35,7 +40,14 @@ python -m unittest analysis/test_week08_statistics.py
 
 ## Author confirmations required before submission
 
-1. **Gold Standard process:** reviewers, roles and qualifications; whether scoring was independent and blinded; disagreement resolution; any agreement data; whether the Feline Thorax and Canine Abdomen "draft" files are final.
+1. **Gold Standard details still open.** The process itself is confirmed: three independent reviewers, majority vote, individual files deleted (D-074). Still open:
+   - reviewer qualifications;
+   - the exact columns provided, in particular whether the original Vetology labels were visible;
+   - blinding to model outputs;
+   - any annotation guidance;
+   - whether the Feline Thorax and Canine Abdomen "draft" files are final;
+   - how the earlier 21-difference Canine Thorax record relates to this process;
+   - permission to name or acknowledge Zach and Akshay.
 2. **Matrix 1 labels:** origin and encoding history of the original Vetology labels.
 3. **Evaluation overlap:** whether any script inspected reference labels during the Canine Abdomen hedged-language analysis (currently unresolved).
 4. **D-A:** select the CT primary batch (RUN-03 or RUN-04) and record the reason; this is still open. The statistical settings were approved on 2026-11-28 (plan §13.1).

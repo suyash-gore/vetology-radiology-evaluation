@@ -221,3 +221,6 @@ This strengthens 2.4 as the best-supported potential contribution. It does **not
 
 
 **Week 8 v0.2 correction to the wording above.** The disagreement between workflows is described with positive agreement (CT 19.7%, FT 12.0%, CA 23.8%), negative agreement (65.3%, 83.9%, 83.2%), the directional counts and prevalence, together with κ. κ alone is not used, because it is prevalence-dependent. The finding supports the reference-dependence observation (2.4). It does not show that either reference is clinically correct or incorrect.
+
+
+**v0.3 note (2.4).** Matrix 2 is now confirmed as a three-reviewer, independently generated, majority-vote research-team reference. Its individual annotation files were deleted, so inter-reviewer reliability is unavailable. The reference-dependence observation stands, but it remains a contrast between two non-validated labelling workflows.

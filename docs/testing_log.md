@@ -406,3 +406,14 @@ Status correction: the Feline Thorax and Canine Abdomen live OpenAI runs **were 
 | flake8 on `analysis/` | Clean except E501 | — |
 
 The Week 5 and Week 7 suites were not rerun, because no application code changed.
+
+### Week 8 v0.3 manuscript (2026-11-28)
+
+| Check | Result |
+|---|---|
+| `python -m unittest analysis/test_week08_statistics.py` | 9 tests OK |
+| Manuscript v0.3 Tables 3, 4, 5, 7 and 8 vs `07_statistical_results.json` (automated) | 0 numerical mismatches (one minus-sign typography difference in the checker only) |
+| Ten confusion matrices | Unchanged (Table 3 matches the registered counts) |
+| Supplementary Table S1 | Generated directly from the JSON |
+
+No Python code changed. Week 5/7 suites not rerun.

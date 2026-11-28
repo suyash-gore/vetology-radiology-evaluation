@@ -125,3 +125,19 @@ Notable rejected or deferred engineering options:
 | L-W8-5 | **Statistical settings** (B, seed, interval rule) executed without prior owner approval | Disclosed; approval pending | `08_…` §13 |
 | L-W8-6 | **Reference-label agreement** between Matrix 1 and Matrix 2 is low (κ CT 0.069, FT 0.031, CA 0.129); reason unresolved | New finding; interpretation open | `07_…Results.md` §4 |
 | L-W8-7 | **FLAIR Appendix S1** not retrieved (publisher access challenge) | Open | `11_…` |
+
+
+## 5. Gold Standard methodology confirmed (Week 8, manuscript v0.3)
+
+- **Confirmed by the owner (2026-11-28):** for each dataset, three research-team members (the project owner, Zach and Akshay) each received the same original raw dataset, independently examined the same selected source-data columns (excluding AI-generated report columns), and assigned Positive/Negative labels for every condition in the first 100 records in their own file. The three files were consolidated, and a label supported by at least two of the three reviewers became the final Gold Standard label at each record–condition combination.
+- **Consequence:** Matrix 2 is a three-reviewer, independently generated, majority-vote research-team reference. It is not veterinary-radiologist adjudication, expert consensus or clinically validated ground truth.
+- **Individual annotation files deleted:** only the consolidated files remain. Inter-reviewer agreement (pairwise or Fleiss' κ) **cannot be calculated retrospectively** and must not be reconstructed from the majority-vote files.
+- **OQ-2 / GS-1–GS-3:** now resolved in part (participants, independent annotation, majority vote).
+- **Still open:**
+  - reviewer qualifications;
+  - the exact columns provided, in particular whether the original Vetology label columns were visible;
+  - whether reviewers were blinded to model outputs;
+  - whether any annotation guidance existed;
+  - final status of the FT/CA "draft" files;
+  - how the earlier record of 21 CT manual-draft-vs-approved differences (KB_06) relates to this process.
+- **Note:** the project owner was both a Gold Standard reviewer and the prompt developer. This is disclosed in the manuscript.

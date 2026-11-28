@@ -626,3 +626,7 @@ The owner approved the following **finalized analysis settings**:
 Intervals use the same 2,000 report-level resamples as κ. These statistics describe disagreement between workflows, not reference quality.
 
 D-A remains open. The Canine Thorax common-batch rescoring stays exploratory, and no batch is designated primary.
+
+### 13.2 Gold Standard process confirmed (v0.3)
+
+GS-1 to GS-3 in §4.2 are now answered in part: three research-team reviewers annotated independently, with majority vote (2 of 3) at each record–condition combination. The individual files were deleted, so GS-4 (inter-rater agreement) **cannot be addressed**. Reviewer qualifications (part of GS-1), blinding and column visibility (GS-2), GS-6 and GS-7 remain open. The plan's §4.2 text is preserved as written at approval.

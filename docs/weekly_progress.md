@@ -198,3 +198,7 @@ The Week 4 application and optional JSON prompt-configuration task are implement
 - Statistical settings approved and documented as finalized during analysis (plan §13.1).
 - Reference-label agreement extended with positive and negative agreement and prevalence; the manuscript interpretation revised accordingly.
 - Manuscript v0.2 written (v0.1 retained). D-A remains open.
+
+### Week 8 — manuscript v0.3 (2026-11-28)
+- Gold Standard methodology confirmed (three-reviewer independent annotation, majority vote) and documented. Individual files deleted, so no inter-reviewer reliability is available.
+- Complete manuscript draft v0.3 written. It is not submission-ready: author, ethics, data-permission, reference and venue details remain open.

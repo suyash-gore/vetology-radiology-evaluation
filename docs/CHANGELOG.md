@@ -339,3 +339,16 @@ Owner-approved corrections (D-065, D-066). The supplied originals are kept byte-
 
 ### Verified
 - All ten confusion matrices and all previously reported statistics are unchanged (JSON compared field by field).
+
+## Week 8 — Manuscript v0.3 (2026-11-28)
+
+### Added
+- `paper/Research_Paper_Draft_v0.3.md`: complete draft with background, objectives and questions, full methods, results, discussion, limitations, implications, conclusion, references, appendices and Supplementary Table S1 (generated from the statistics JSON). v0.1 and v0.2 are unchanged.
+
+### Changed
+- Matrix 2 is now described as a three-reviewer, independently generated, majority-vote research-team reference (D-074). The deleted individual files and the resulting lack of inter-reviewer reliability are disclosed.
+- The negative-label prevalence of both matrices is added to the reference-agreement table (derived from the verified counts).
+- Updated `paper/README.md`, plan §13.2, `05_…` §5, gap note, inventory, `testing_log`, `weekly_progress` and `project_documentation`.
+
+### Verified
+- All ten confusion matrices are unchanged. The manuscript tables match `07_statistical_results.json`.
