@@ -29,6 +29,15 @@ The source package is `Vetology_Research_Knowledge_Base.zip`, attached to the We
 
 All of them are recorded as *referenced but not supplied* in `../04_Evidence_and_Artifacts/05_Evidence_Gaps_and_Provenance.md`.
 
+### 1.1 Week 8 evidence reconciliation (second update)
+
+`files-bundle-01.zip` (42 files) was supplied after consolidation commit `ea92818`. It contains the source and reference workbooks, all evaluation workbooks, prediction records, run manifests, two comparison workbooks, three prompt files and five Week 4/5 technical reports. It was extracted to a temporary location only and is **not committed** (gitignored data types; confidential case-level content). Hashes of all 42 files are recorded in `../04_Evidence_and_Artifacts/01_Evidence_Inventory.csv` (rows EV-B01 to EV-B42).
+
+Outcome:
+- All 10 reference-based evaluations and both agreement analyses are now **Verified against the actual workbooks** and **cross-checked against prediction records**. No aggregate value changed.
+- C-01 (Feline/Abdomen results) and C-02 (F1 rounding) are resolved.
+- The Gold Standard provenance is corrected to the owner's clarification (§4).
+
 ## 2. Documents in this folder
 
 | File | Purpose |
@@ -44,6 +53,20 @@ All of them are recorded as *referenced but not supplied* in `../04_Evidence_and
 The evidence registers live in `../04_Evidence_and_Artifacts/`.
 
 ## 3. Status vocabulary (used in every document)
+
+Evidence statuses added in the reconciliation (used for numerical results):
+
+| Status | Meaning |
+|---|---|
+| **Verified against actual workbook** | Value read from a named workbook sheet/cell in `files-bundle-01.zip` |
+| **Cross-checked against prediction records** | Confusion counts independently recomputed from `predictions.jsonl` plus the source reference workbook, and equal to the workbook |
+| **Supported by manifest** | Batch identity and outcome confirmed by a committed `run_manifest.json` |
+| **Documented but not independently verified** | Stated in docs or extractions only |
+| **Referenced but unavailable** | Known artifact not supplied |
+| **Conflicting** | Sources disagree (07 §3) |
+| **Missing** | No evidence located |
+
+Original vocabulary:
 
 | Label | Meaning |
 |---|---|
@@ -61,7 +84,8 @@ The evidence registers live in `../04_Evidence_and_Artifacts/`.
 
 ## 4. Integrity rules applied
 
-1. Matrix 1 (original Vetology reference labels) and Matrix 2 (Gold Standard reference labels) are never pooled, averaged or compared as if they were one benchmark.
+1. **Gold Standard provenance (owner clarification, 2026-11-28):** the Gold Standard dataset is *peer-reviewed and agreed upon after discussion*. It is not formal independent expert adjudication, and it is not described as independently assigned by a veterinary radiologist.
+1. Matrix 1 (original Vetology reference labels; the workbooks' "GS" wording is legacy terminology only, see 02 §2.2) and Matrix 2 (peer-reviewed Gold Standard reference labels) are never pooled, averaged or compared as if they were one benchmark.
 2. Canine Thorax, Feline Thorax and Canine Abdomen are recorded separately.
 3. Model-to-model agreement (OpenAI vs Gemini) is never presented as accuracy.
 4. Passing tests, HTTP 200 responses and completed batches show that the software ran. They are not evidence of clinical validity. All results are 100-case pilot results.

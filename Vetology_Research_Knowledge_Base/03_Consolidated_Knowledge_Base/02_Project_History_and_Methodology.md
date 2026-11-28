@@ -20,9 +20,14 @@ Repository verification: branch `week-08/research-paper-development` at `ceb3f42
 | 2026-11-21 13:07 +05:30 | 7 | Gemini documentation closeout `67f133c` with two run manifests | Verified (W8) | KB_08 |
 | 2026-11-21 15:34–16:00 UTC | 7 | Feline Thorax / Canine Abdomen extension and prompt registration (`92a2d3d`, `4044403`, `ec63636`, `65274d6`) | Verified (W8) commits | KB_07 Table 5 |
 | 2026-11-21 16:22–16:44 UTC | 7 | Shared OpenAI prediction batches for Feline Thorax and Canine Abdomen | Verified (W8): manifests | KB_07 §8.2 |
-| 2026-11-21 (evening, local) | 7 | Feline / Abdomen Matrix 1 and Matrix 2 evaluations (Abdomen Matrix 2 log stamped 22:21:19; time zone not stated) | Recorded (KB_02 only); **not in repository** | KB_02 §4 |
+| 2026-11-21 16:35–16:51 UTC | 7 | Feline / Abdomen Matrix 1 and Matrix 2 evaluations. The Abdomen Matrix 2 terminal log stamp 22:21:19 in KB_02 is unverified; a +05:30 offset is assumed | **Verified (W8)** against the actual workbooks (generated outputs are gitignored, not in the repository) | KB_02 §4; workbook Execution Logs |
 | 2026-11-21 22:31 +05:30 | 7 | Feline / Abdomen manifests committed: `ceb3f42` | Verified (W8) | KB_02 §4; KB_07 |
-| 2026-11-28 | 8 | Ten knowledge extractions produced; this consolidation | — | All |
+| 2026-11-28 | 8 | Ten knowledge extractions produced; consolidation commit `ea92818` | — | All |
+| 2026-11-28 | 8 | Evidence reconciliation against `files-bundle-01.zip` (42 files: source workbooks, evaluation workbooks, predictions, manifests, prompts, reports); all 10 reference evaluations and both agreement analyses verified | Verified (W8) | `../04_Evidence_and_Artifacts/` |
+
+Week 8 timing evidence from the actual artifacts (prediction-record timestamps and workbook Execution Logs):
+- Week 5 Matrix 1 live batch: an earlier attempt at 09:54–09:55 UTC on 12 Nov failed for all 100 cases with an authentication error (HTTP 401, expired API key; `outputs/week_05/matrix_1/errors.jsonl`). The successful batch ran 09:57–10:01 UTC; evaluation 10:04:10 UTC.
+- Feline Matrix 1 evaluation 16:35:36 UTC and Canine Abdomen Matrix 1 evaluation 16:50:16 UTC on 21 Nov. The Matrix 2 workbooks carry no generation timestamp.
 
 Branch lineage (Verified W8): `main` holds Weeks 2–4 only (`4031615`). The remote Week 5, Week 7 and Week 8 branches all descend from `bdb9952`. Week 5 and Week 7 work has **not** been merged into `main` (KB_07, KB_08 D-01, KB_10).
 
@@ -58,7 +63,15 @@ Week 3 workbook names (`1_canine_thorax_scoring_data.xlsx`, `2_feline_thorax_sco
 | Track | Reference labels | Interpretation | Caveats |
 |---|---|---|---|
 | Matrix 1 | Original Vetology condition labels in the raw encoded workbook | Agreement with the original Vetology labels | Clinical provenance and encoding history are not fully established (KB_05 §7.1, KB_03 §5.4). The Matrix 1 workbook layout labels them "Gold Standard" for legacy reasons (D-041 / KB_09 TD13) |
-| Matrix 2 | Manually scored / Gold Standard workbook (filenames end `_draft`) | Agreement with the manual / Gold Standard labels | **Conflict about its nature:** "peer-agreed rather than expert" (KB_01, KB_03, KB_02) vs "assigned by a veterinary radiologist" (user statement in KB_05 §8.1). See 07 §3, C-03 |
+| Matrix 2 | Peer-reviewed Gold Standard workbook (filenames end `_draft`) | Agreement with the peer-reviewed Gold Standard labels | **Owner clarification (Week 8 reconciliation, 2026-11-28): the Gold Standard dataset is peer-reviewed and agreed upon after discussion.** This is not formal, independent expert adjudication. The earlier KB_05 §8.1 wording ("assigned by a veterinary radiologist") is superseded and is kept only as a historical record. See 07 §3, C-03 |
+
+**Matrix 1 terminology (verified in Week 8).** Matrix 1 evaluation workbooks label counts "GS Positive / GS Negative" and use "Gold Standard" wording. This is **legacy terminology only**, not a second reference source:
+- The Matrix 1 reference is the Vetology encoded workbook. The Execution Log `Ground-truth workbook` field names `Vetology_Matrix1_First100_Encoded.xlsx` (SHA-256 `3f1a17b7…`), which is byte-identical to the supplied `Vetology_Matrix1_First100Raw_EncodedPositveNegative_Canine_Thorax_Records.xlsx`; for Feline and Abdomen it names the `*_raw_data_encoded.xlsx` files.
+- The reference prevalence (CT 1,049 / FT 534 / CA 280 positives) matches those workbooks and differs from the Gold Standard workbooks (158 / 117 / 81).
+- The wording is deliberately preserved for parity with the delivered Week 4 workbook: decision D-041 (`docs/DECISION_LOG.md`) and the module docstring at `src/week_07/evaluation/matrix1_workbook.py` line 22.
+- The Matrix 1 loader is `load_matrix1_reference` in `src/week_07/evaluation/reference_loader.py`, a reproduction of the Week 4 `load_matrix1_inputs`.
+
+The definition of Matrix 1 is unchanged.
 
 Feline Thorax Matrix 1 only: three columns (`pulmonary_nodules`, `esophagitis`, `pneumonia`) held `Normal`/`Abnormal` and were mapped Normal → Negative and Abnormal → Positive. No other column, workflow or application is normalised (KB_07 §5.4; manifest `source_label_normalization`, Verified W8). For Canine Thorax, legacy Abnormal/Normal values were *not* accepted as ground truth (KB_06 §12; KB_04 §3.1).
 
@@ -91,6 +104,14 @@ Feline Thorax Matrix 1 only: three columns (`pulmonary_nodules`, `esophagitis`, 
 | Canine Abdomen | V1.4 (active) | Section 4.1 item 3 only: differential-only mention → Negative unless independently established or explicitly elevated in Conclusions/Impression | Live batch 2026-11-21 | KB_07; manifest (Verified W8) |
 
 **Version-lineage conflict (Unresolved):** KB_06 says V1.3 prompts were created for all three datasets in Week 3, yet the Week 7 registry starts Feline at V1.1 and Abdomen at V1.2 as "owner originals". No V1.2 rationale exists in the Week 3 record. See 07 §3, C-04.
+
+**Supplied prompt files vs the prompts actually run (Week 8).**
+- `files-bundle-01/Feline_Thorax_Master_Prompt_V1.1.txt` (SHA-256 `7696598e…`) and `Canine_Abdomen_Master_Prompt_V1.2.txt` (`f25b56fb…`) are byte-identical to the **superseded** owner originals in `src/week_07/prompts/`.
+- The live runs used **Feline V1.2** (`9bbd36c4…`) and **Abdomen V1.4** (`9336be3f…`), per the manifest `identity.prompt` fields and the workbook Execution Logs (Matrix 1). Those exact files are in the repository (`src/week_07/prompts/feline_thorax_master_prompt_v1_2.txt`, `canine_abdomen_master_prompt_v1_4.txt`) and their hashes equal the manifest pins.
+- So the run prompts are **not missing**. The supplied older files were **not** used in the runs.
+- The supplied `Canine_Thorax_Master_Prompts_V1.3.docx` is the Word source and cannot be byte-compared with the pinned `.txt` (`31a7dab6…`). The `.txt` is the version recorded in the manifests.
+
+See C-21.
 
 ### 3.4 Uncertainty policies differ across the active prompts (Observed (prior), KB_07 Table 22)
 

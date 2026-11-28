@@ -18,6 +18,16 @@ Prompt *text* is not copied here; the files are referenced by path and hash. Fil
 
 Byte and character counts for the FT/CA prompts are from KB_07 Table 20. Week 8 confirmed the byte sizes with `wc -c`.
 
+## 1a. Prompt files supplied in `files-bundle-01.zip` vs the prompts actually run (Week 8 reconciliation)
+
+| Dataset | Supplied file (EV-B) | Supplied SHA-256 | Manifest `identity.prompt` (run) | Manifest file SHA-256 | Match? | Conclusion |
+|---|---|---|---|---|---|---|
+| Canine Thorax | `Canine_Thorax_Master_Prompts_V1.3.docx` (B07) | `87425a5e…eba25` (Word document) | V1.3 (RUN-05, RUN-06) | `31a7dab6…7ab7b1` | Not byte-comparable (.docx vs .txt) | Version label agrees. The run used the pinned `.txt` (EV-P01, present in the repository). The `.docx` is the Word source only |
+| Feline Thorax | `Feline_Thorax_Master_Prompt_V1.1.txt` (B08) | `7696598e…c2665d27` | **V1.2** (RUN-07) | `9bbd36c4…1c418f25` | **No** | The supplied file equals the **superseded** V1.1 (EV-P04) and was **not** used in the run. The exact run prompt V1.2 is present at `src/week_07/prompts/feline_thorax_master_prompt_v1_2.txt` (hash equals the manifest) |
+| Canine Abdomen | `Canine_Abdomen_Master_Prompt_V1.2.txt` (B06) | `f25b56fb…e5aa17aa` | **V1.4** (RUN-08) | `9336be3f…7b2a254c` | **No** | The supplied file equals the **superseded** V1.2 (EV-P06) and was **not** used in the run. The exact run prompt V1.4 is present at `src/week_07/prompts/canine_abdomen_master_prompt_v1_4.txt` (hash equals the manifest) |
+
+The Matrix 1 evaluation workbooks also record the prompt version (`Execution Log` B13): V1.3 / V1.2 / V1.4. This agrees with the manifests. The pinned run prompts are therefore **not missing evidence**; they are version-controlled in the repository. No document should claim that the supplied V1.1 or V1.2 files produced the Feline or Abdomen results.
+
 ## 2. Prompt versions not in the repository
 
 | Prompt | Where it is recorded | Status |

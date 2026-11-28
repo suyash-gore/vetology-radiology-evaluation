@@ -41,6 +41,8 @@ Status labels follow `00_README.md` §3.
 | Conclusion | 0.5 page | What should happen next; key reader takeaway | 0.25 page |
 | Appendix | No limit | Final prompts, repository link, output filenames | No limit |
 
+Note: the Limitations wording "peer-agreed rather than expert ground truth" is quoted from the Vetology requirement. The owner later clarified that the Gold Standard is *peer-reviewed and agreed upon after discussion* (see `00_README.md` §4 and 07 C-03).
+
 Source: KB_01 Tables 3 and 7; repeated in KB_03 §12. KB_03 adds that the update is dated 28 November 2026 and should not be presented as the original Week 6 wording.
 
 ### 1.4 Formatting and visual requirements (user instruction, KB_01 §3.4)

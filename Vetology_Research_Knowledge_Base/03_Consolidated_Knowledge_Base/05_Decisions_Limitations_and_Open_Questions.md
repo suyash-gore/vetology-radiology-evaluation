@@ -27,7 +27,7 @@
 | M-5 | Treating every differential as Positive | — | **Rejected** | KB_06 §14 |
 | M-6 | Treating recommendations alone as evidence of disease | — | **Rejected** | KB_06 §14 |
 | M-7 | Legacy Abnormal/Normal as ground truth (Canine Thorax) | — | **Rejected** | KB_06 §12 |
-| M-8 | Approved Gold Standard (not the manual draft) as the evaluation reference | Project | Adopted; adjudicator and rubric **not documented** | KB_06 §12 |
+| M-8 | Approved Gold Standard (not the manual draft) as the evaluation reference; described by the owner as peer-reviewed and agreed upon after discussion | Project / owner clarification (W8) | Adopted; participants and procedure **not documented** | KB_06 §12; owner clarification 2026-11-28 |
 | M-9 | Keep Matrix 1 and Matrix 2 separate; never pool | Project | Implemented | all |
 | M-10 | Pause prompt iteration after Week 4 until mismatch/error analysis is done | User | Adopted (no CT V1.4) | KB_05 §5.1 |
 | M-11 | No balanced accuracy | Developer | Implemented (not computed) | KB_04 T19 |
@@ -67,7 +67,7 @@ Notable rejected or deferred engineering options:
 
 ### 2.1 Required by Vetology (KB_01 §3.3)
 - The Gold Standard covers 100 reports per file.
-- The ground truth is peer-agreed rather than expert. (The KB_05 user statement conflicts with this; see C-03.)
+- The ground truth is not expert ground truth. **Owner clarification (2026-11-28): the Gold Standard dataset is peer-reviewed and agreed upon after discussion.** This is not formal, independent expert adjudication. The earlier KB_05 wording ("assigned by a veterinary radiologist") is superseded (C-03).
 - Model outputs vary between runs.
 
 ### 2.2 Evidenced by the project
@@ -86,7 +86,9 @@ Notable rejected or deferred engineering options:
 | Text-only classification; no images | KB_05 §11.1 |
 | No confidence intervals, significance tests or inter-rater statistics | KB_02 §18 |
 | No timing, cost or token measurements; no development-time comparison | KB_03 §13; KB_04 §13 |
-| FT/CA evaluation workbooks and all prediction files are inaccessible; FT/CA metrics have a single source | KB_07; Week 8 |
+| ~~FT/CA evaluation workbooks and all prediction files are inaccessible~~. **Resolved in the Week 8 reconciliation:** the workbooks and predictions were supplied and verified. They remain outside version control (gitignored) | KB_07; Week 8 |
+| Run-to-run variation is present in every model family: 8, 11 and 13 of 2,000 pairs differ between separate CT batches on identical report text | Week 8 cross-check |
+| Sparse or absent positives: Feline Matrix 2 has 10 of 21 conditions with zero positives; Feline predictions contain no positives for 10 conditions | Week 8 workbooks |
 | Comparison package is CT-only; no second model for FT/CA | KB_09 TD7; KB_02 §11.3 |
 | Documentation drift: the repository still says FT/CA live runs were not executed | KB_07 §17.2 #1; `README.md` L9, L16–17 (Verified W8) |
 
@@ -94,12 +96,12 @@ Notable rejected or deferred engineering options:
 
 | # | Question | Owner (per source) |
 |---|---|---|
-| OQ-1 | Were the FT/CA Matrix 1/2 evaluations actually run, and do the workbooks contain the KB_02 values? (C-01) | User |
-| OQ-2 | Was the Gold Standard veterinary-radiologist-assigned or peer-agreed? Who adjudicated the 21 draft-vs-approved differences? (C-03) | User / Vetology |
+| ~~OQ-1~~ | **Resolved (W8):** the FT/CA evaluations were run (Matrix 1 workbooks generated 16:35:36 and 16:50:16 UTC on 21 Nov) and contain exactly the KB_02 values (C-01) | — |
+| OQ-2 | Gold Standard nature: **resolved by owner clarification** (peer-reviewed, agreed after discussion). Still open: who took part in the review, the procedure, and how the 21 draft-vs-approved Canine Thorax differences were settled (C-03) | User / Vetology |
 | OQ-3 | Are the FT/CA "draft" Gold Standards final? | Vetology |
 | OQ-4 | What is the lineage between the Week 3 "V1.3" Feline/Abdomen prompts and the registry's V1.1/V1.2 originals? (C-04) | User |
 | OQ-5 | Should the uncertainty policies be harmonised before any cross-application analysis? | User / Vetology |
-| OQ-6 | Should the Matrix 2 F1 be reported as 78.40% or 78.39%, and with what rounding convention? (C-02) | User |
+| ~~OQ-6~~ | **Resolved (W8):** the workbook stores 0.78395 and displays 78.40%; the 78.39% in the Week 4 report is a truncated derived value (C-02). Recommended convention: round half-up to 2 d.p., matching the workbooks | — |
 | OQ-7 | What exact Springer template applies? | User |
 | OQ-8 | What does `Fe_Alveolar` mean in the dataset? | Advisor |
 | OQ-9 | What feedback did Vetology and the Tech Advisors give in Week 6, and was it implemented? | User |

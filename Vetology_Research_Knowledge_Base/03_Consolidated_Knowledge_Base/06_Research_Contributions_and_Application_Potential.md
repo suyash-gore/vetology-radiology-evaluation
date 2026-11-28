@@ -6,8 +6,8 @@
 
 | # | Candidate contribution | Evidence basis | Evidence status | Sources |
 |---|---|---|---|---|
-| CC-1 | **Dual-reference evaluation design**: one fixed prediction set scored separately against two independent reference sets (Vetology labels vs Gold Standard) | Shared-prediction architecture, cross-matrix identity check; FT/CA manifests | Method Demonstrated (software); FT/CA results Recorded, unverified | KB_07 T36; KB_02 §16.2 |
-| CC-2 | **Reference-set choice dominates apparent performance** (e.g. CT accuracy ~52% vs ~96%; sensitivity far higher against Matrix 2 in all three datasets) | Recorded counts; prevalence asymmetry observed in all three datasets | Recorded; needs statistical analysis and adjudication | KB_07 T36; 03 §4 |
+| CC-1 | **Dual-reference evaluation design**: one fixed prediction set scored separately against two independent reference sets (Vetology labels vs Gold Standard) | Shared-prediction architecture, cross-matrix identity check; FT/CA manifests | Method Demonstrated (software); FT/CA results **Verified against workbooks** (Week 8 reconciliation) | KB_07 T36; KB_02 §16.2 |
+| CC-2 | **Reference-set choice dominates apparent performance** (e.g. CT accuracy ~52% vs ~96%; sensitivity far higher against Matrix 2 in all three datasets) | Recorded counts; prevalence asymmetry observed in all three datasets | **Verified** counts (all three datasets); needs statistical analysis and adjudication | KB_07 T36; 03 §4 |
 | CC-3 | **Provenance-pinned, reproducible evaluation framework** for report-based LLM classification across species and body regions (prompt and input SHA-256, run identity, refusal on mismatch, read-only guards) | Code; manifests (Verified W8) | Demonstrated (engineering) | KB_07; KB_09 T19 |
 | CC-4 | **Prompt-as-artifact quality control**: integrity pinning, exact-diff tests, contradiction detection, version retention | FT V1.1→V1.2; CA V1.2→V1.3→V1.4 | Demonstrated | KB_07 T36 |
 | CC-5 | **Artifact-anchored parity protocol** for an AI-assisted rebuild (request-body parity, JSONL byte parity, cell-level workbook comparison, mutation checks), including reconstruction of a missing evaluator from its delivered output | Week 5 replay reproduced both Week 4 matrices exactly | Demonstrated on one pipeline (Observed (prior)) | KB_10 T22; KB_04 §7.2 |
@@ -34,7 +34,7 @@ Candidates that must **not** be claimed:
 |---|---|
 | Batch classification of 100 report texts per dataset into 20/21/10 binary condition labels with strict JSON validation | Demonstrated: 100/100 batches (manifests Verified W8 for Weeks 7 FT/CA/CT) |
 | Checkpoint/resume, typed error handling and bounded retries | Demonstrated (tests; manifests) |
-| Evaluation workbooks per dataset and matrix with confusion counts and rates | Demonstrated for CT (parity Observed (prior)); FT/CA workbooks Recorded but inaccessible |
+| Evaluation workbooks per dataset and matrix with confusion counts and rates | Demonstrated: workbooks for all three datasets and both matrices verified, and reproduced from predictions (Week 8) |
 | Provider abstraction (OpenAI, Gemini) | Demonstrated (offline tests; live manifests) |
 | Isolation of applications/workflows and read-only source guards | Demonstrated (tests) |
 | Leakage control: labels and IDs never reach the model | Demonstrated (tests; code inspection by earlier sessions) |

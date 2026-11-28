@@ -7,12 +7,12 @@ A **run** is one live prediction batch, the only stage that calls a model. Evalu
 | Run ID | Dataset | Workflow | Model (identifier as recorded) | Prompt | Date (UTC) | Cases | Outcome | Manifest | Status |
 |---|---|---|---|---|---|---|---|---|---|
 | RUN-00 | Canine Thorax | Matrix 1 single-case test | gpt-4.1-mini (record field) | V1.3 (record field) | Week 4 | 1 | status success (record); HTTP 200 (KB_05) | `outputs/week_04/matrix_1/single_case_test.json` (EV-R05) | Verified (W8) present; not a metric run |
-| RUN-01 | Canine Thorax | Matrix 2 batch (Week 4) | gpt-4.1-mini | V1.3 | 2026-11-03 14:51–14:55 | 100 | 100 succeeded; 1 case needed a second attempt | None (predictions A4, sha `70fe9391…`) | Observed (prior) KB_10; Recorded KB_04 |
-| RUN-02 | Canine Thorax | Matrix 1 batch (Week 4) | gpt-4.1-mini | V1.3 | 2026-11-07 05:29–05:32 (10:59–11:02 local) | 100 | 100 × HTTP 200; 0 retries / failures / skips | None (predictions A3, sha `78814024…`) | Observed (prior) KB_10; Recorded KB_05 |
-| RUN-03 | Canine Thorax | Matrix 1 live (Week 5) | gpt-4.1-mini | V1.3 | 2026-11-12 | 100 | 100 succeeded, 0 failed; `errors.jsonl` holds 100 superseded attempt lines | None | Recorded (KB_04 T14; commit `f20c240`) |
-| RUN-04 | Canine Thorax | Matrix 2 live (Week 5) | gpt-4.1-mini | V1.3 | 2026-11-12 | 100 | 100 succeeded, 0 failed | None | Recorded |
+| RUN-01 | Canine Thorax | Matrix 2 batch (Week 4) | gpt-4.1-mini | V1.3 | 2026-11-03 14:51–14:55 | 100 | 100 succeeded; 1 case needed a second attempt | None. Predictions A4 supplied: `files-bundle-01/outputs/week_04/canine_thorax/predictions.jsonl` (EV-B17, sha `70fe9391…`) | **Verified (W8)**: 100 success records; attempts 99 × 1, 1 × 2; 14:51:29–14:55:49 UTC |
+| RUN-02 | Canine Thorax | Matrix 1 batch (Week 4) | gpt-4.1-mini | V1.3 | 2026-11-07 05:29–05:32 (10:59–11:02 local) | 100 | 100 × HTTP 200; 0 retries / failures / skips | None. Predictions A3 supplied: `files-bundle-01/outputs/week_04/matrix_1/predictions.jsonl` (EV-B19, sha `78814024…`) | **Verified (W8)**: 100 success, all attempts = 1; 05:29:38–05:32:50 UTC |
+| RUN-03 | Canine Thorax | Matrix 1 live (Week 5) | gpt-4.1-mini | V1.3 | 2026-11-12 | 100 | 100 succeeded (09:57:11–10:01:07 UTC). `errors.jsonl` holds 100 failures (HTTP 401, expired API key, 09:54:40–09:55:35 UTC) from an aborted earlier attempt, all superseded | None; predictions EV-B23 (sha `c50d9d97…`), errors EV-B21 | **Verified (W8)** from prediction and error records |
+| RUN-04 | Canine Thorax | Matrix 2 live (Week 5) | gpt-4.1-mini | V1.3 | 2026-11-12 | 100 | 100 succeeded, 0 failed (10:06:55–10:10:40 UTC) | None; predictions EV-B25 (sha `5b14a3ad…`) | **Verified (W8)** from prediction records |
 | RUN-05 | Canine Thorax | Matrix 1 (Week 7) | gemini-3.8-flash | V1.3 | 2026-11-20 16:41:45–17:02:06 | 100 | 100 succeeded, 0 failed, 0 backoffs | `outputs/week_07/matrix_1/run_manifest.json` (EV-R01) | **Verified (W8)** |
-| RUN-06a–c | Canine Thorax | Matrix 2 (Week 7) trial runs | gemini-3.8-flash | V1.3 | 2026-11-20 15:00, 15:18, 15:27 | 1 each | Each: 0 succeeded, 1 failed, 1 transient backoff | `outputs/week_07/matrix_2/run_manifest.json` runs[0–2] (EV-R02) | **Verified (W8)**; error text Inaccessible |
+| RUN-06a–c | Canine Thorax | Matrix 2 (Week 7) trial runs | gemini-3.8-flash | V1.3 | 2026-11-20 15:00, 15:18, 15:27 | 1 each | Each: 0 succeeded, 1 failed, 1 transient backoff | `outputs/week_07/matrix_2/run_manifest.json` runs[0–2] (EV-R02) | **Verified (W8)**; errors.jsonl (EV-B40): CaseID 1 failed twice with HTTP 503 UNAVAILABLE and once with 504 DEADLINE_EXCEEDED |
 | RUN-06d | Canine Thorax | Matrix 2 (Week 7) trial | gemini-3.8-flash | V1.3 | 2026-11-20 16:12:36–16:12:52 | 1 | 1 succeeded | runs[3] | **Verified (W8)** |
 | RUN-06 | Canine Thorax | Matrix 2 (Week 7) main run | gemini-3.8-flash | V1.3 | 2026-11-20 16:16:36–16:35:50 | 100 selected | 99 succeeded, 1 skipped (already checkpointed by RUN-06d), 0 failed, 1 backoff → 100 final predictions | runs[4] | **Verified (W8)** |
 | RUN-07 | Feline Thorax | Shared batch from Matrix 1 (reused by Matrix 2) | gpt-4.1-mini | V1.2 | 2026-11-21 16:22:06–16:26:24 | 100 | 100 succeeded, 0 failed / skipped / backoffs | `outputs/week_07/feline_thorax/predictions/run_manifest.json` (EV-R03) | **Verified (W8)** |
@@ -45,4 +45,12 @@ Not runs:
 | Python / key packages | 3.14.6; langchain-google-genai 4.4.2; google-genai 2.31.0; langchain-core 1.7.7; httpx 0.28.1; openpyxl 3.1.5 | same | 3.14.6; langchain-openai 1.7.2; openai 3.49.0; langchain-core 1.7.7; httpx 0.28.1; openpyxl 3.1.5 | same |
 | Metrics in manifest | None | None | None | None |
 
-**Manifests record batch provenance and outcomes only. None contains evaluation metrics.** That FT/CA prediction batches completed (RUN-07, RUN-08) is verified. That their evaluations completed is **not** verified (see EVAL-11 to EVAL-14).
+**Manifests record batch provenance and outcomes only. None contains evaluation metrics.**
+
+## Week 8 reconciliation: manifests and predictions vs workbooks
+
+- All four bundle manifests are **byte-identical** to the committed manifests (same SHA-256).
+- Every prediction file has 100 unique CaseIDs (1–100), status `success`, and the application's exact key count (20 / 21 / 10). Prediction timestamps fall inside the manifest run windows (RUN-05: 16:42–17:02 UTC; RUN-06: 16:12 [checkpointed trial case] and 16:16–16:35; RUN-07: 16:22–16:26; RUN-08: 16:42–16:44).
+- Each evaluation workbook's Execution Log names the same model, temperature and prompt version as the manifest: Gemini V1.3; FT V1.2; CA V1.4 (Matrix 1 Execution Log B12:B13; Matrix 2 logs record the model only).
+- Every workbook's counts were reproduced exactly from these prediction files (see `03_…Register.md`). **The batches are therefore linked to the verified evaluations.** For FT/CA, the completed evaluations are now demonstrated by the workbooks themselves, not inferred from the batches.
+- Run-to-run variation between separate batches on identical report text (cross-checked): RUN-01 vs RUN-02 differ on 8/2,000 pairs; RUN-03 vs RUN-04 on 11/2,000; RUN-05 vs RUN-06 on 13/2,000. That FT/CA prediction batches completed (RUN-07, RUN-08) is verified. That their evaluations completed is **not** verified (see EVAL-11 to EVAL-14).

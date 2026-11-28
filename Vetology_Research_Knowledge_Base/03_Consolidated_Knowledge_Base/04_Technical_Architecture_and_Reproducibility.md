@@ -54,19 +54,25 @@ Module catalogue and layering: see KB_09 Tables 7 and 10. Prompt and model integ
 |---|---|---|---|
 | Same prompt | File and stripped-text SHA-256 pinned; recorded in every manifest | All four manifests list the prompt digests; the Week 8 recomputed file SHA-256 of all six prompt files equals the registry pins | **Verified (W8)** |
 | Prompt identical across weeks | Canine Thorax V1.3 byte-identical in `src/week_04`, `src/week_05`, `src/week_07` | SHA-256 `31a7dab6…7ab7b1` (8,715 bytes) for all three | **Verified (W8)** |
-| Same input | Input workbook SHA-256 in run identity; evaluation refuses a mismatch | Manifest digests (inputs themselves Inaccessible) | Verified (W8) for the manifests; Observed (prior) that they equal the uploaded workbooks (KB_07 §8.2) |
+| Same input | Input workbook SHA-256 in run identity; evaluation refuses a mismatch | Manifest digests equal the SHA-256 of the supplied bundle workbooks | **Verified (W8 reconciliation)** |
 | Same configuration | Model, temperature, transport retries, keys and instruction in identity; resume refused if any changes | `test_app_batch` (KB_07) | Recorded (tests) |
 | Deterministic setting | Temperature 0 | Manifests | Verified (W8) |
 | Environment record | Package versions per run | Manifests: Python 3.14.6; langchain-openai 1.7.2; openai 3.49.0; langchain-google-genai 4.4.2; google-genai 2.31.0; langchain-core 1.7.7; httpx 0.28.1; openpyxl 3.1.5 | Verified (W8) |
 | Unchanged sources during evaluation | ReadOnlyGuard digests | Tests; KB_02 reports evaluation terminal output saying no API call was made and sources were unchanged | Recorded |
 | Single retry layer | SDK transport attempts fixed; application owns retries | Manifests: `transport_attempts_per_application_attempt: 1` | Verified (W8) |
 | Shared predictions across references (FT/CA) | One batch, cross-matrix CaseID/report-text identity check | Manifest `predictions_reused_by_workflows`; real-data check showed 0 differences (Observed (prior), KB_07 §8.4) | Verified (W8) / Observed (prior) |
-| Known non-determinism | Model output varies even at temperature 0 | 8/2,000 pairs (Week 4) | Observed (prior) |
+| Known non-determinism | Model output varies even at temperature 0 | Separate CT batches on identical text: Week 4 8/2,000 pairs; Week 5 11/2,000; Week 7 Gemini 13/2,000 | **Cross-checked against prediction records** (W8) |
+
+**Week 8 reproducibility check against the supplied artifacts (`files-bundle-01.zip`):**
+- The bundle manifests are byte-identical to the committed manifests (EV-R01 to EV-R04).
+- The bundle input workbooks match the manifest `input_workbook.sha256` values. The CT Matrix 1 input was supplied under the name `Vetology_Matrix1_First100Raw_EncodedPositveNegative_Canine_Thorax_Records.xlsx`, but its hash is `3f1a17b7…`, the manifest's `Vetology_Matrix1_First100_Encoded.xlsx`.
+- The FT/CA prediction-file hashes equal the KB_02 records. The comparison workbooks' Execution Logs list prediction and error-log hashes that equal the bundle files.
+- Independent recomputation from predictions and references reproduced every workbook confusion count. This means the evaluation stack is reproducible **from retained artifacts**. It does **not** mean model outputs are reproducible: separate batches on identical text differ in 8–13 of 2,000 pairs.
 
 **Gaps in reproducibility:**
 - Exact model snapshot identifiers are not recorded.
 - API request IDs are not recorded.
-- Prediction, evaluation and comparison artifacts are gitignored and inaccessible (their hashes are recorded only for FT/CA predictions, in KB_02 Table 14).
+- Prediction, evaluation and comparison artifacts are gitignored. They are now available as the owner-supplied bundle (hashes in the inventory) but are not version-controlled.
 - Only one live run per model and application (except the incidental Week 4 pair).
 - `google-genai` docstrings cite 2.34.0, while 2.31.0 was pinned and executed (KB_08 D-02; KB_09 TD4).
 

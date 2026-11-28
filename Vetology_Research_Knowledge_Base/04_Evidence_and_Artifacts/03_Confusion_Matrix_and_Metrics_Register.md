@@ -1,108 +1,103 @@
 # 03 — Confusion Matrix and Metrics Register
 
-One record per distinct evaluation. Datasets, reference tracks (Matrix 1 = original Vetology labels; Matrix 2 = Gold Standard labels), models, prompts and runs are **never combined**. Agreement records (AGR) are kept separate from reference-based evaluations.
+One record per distinct evaluation. Datasets, reference tracks, models, prompts and runs are **never combined**:
+- **Matrix 1** = original Vetology reference labels.
+- **Matrix 2** = Gold Standard reference labels, peer-reviewed and agreed upon after discussion (owner clarification).
 
-> **No workbook was accessible in Week 8. Every count below is *documented but unverified* in this session.** Where an earlier Claude session read the artifact directly, the status says *Observed (prior)*. Rates were recomputed from the recorded counts (*Derived* check) and match to 2 d.p. unless a conflict is noted. No missing value has been filled in.
+Agreement records (AGR) are kept separate from reference-based evaluations. **Per-condition tables for every evaluation are in `06_Per_Condition_Results.md`.**
 
-## Canine Thorax: 100 cases × 20 conditions
+> **Week 8 reconciliation status.** Every record below was checked against the actual workbook from `files-bundle-01.zip`. Paths are relative to the bundle root `files-bundle-01/`; inventory IDs EV-Bxx; the bundle is not committed. For each workbook:
+> 1. Aggregate and condition counts and rates were read.
+> 2. TP+FN+TN+FP was checked against cases × conditions (every condition row = 100).
+> 3. Every rate was recomputed from the counts (all match, tolerance 1e-9).
+> 4. The `Condition Summary` and `Confusion Matrix` sheets were compared (identical counts).
+> 5. Every count was **independently recomputed from `predictions.jsonl` and the source reference workbook** (exact match).
+>
+> **Rounding convention:** workbooks store full-precision ratios with number format `0.00%`, i.e. round half-up to 2 d.p. Undefined ratios are blank cells, never 0.
+>
+> **Status key:** VW = Verified against actual workbook; XP = Cross-checked against prediction records; MF = Supported by manifest; DOC = Documented but not independently verified.
 
-### EVAL-01 — Canine Thorax · Matrix 1 (Vetology) · Week 4 original application
-- **Model:** gpt-4.1-mini (OpenAI via LangChain ChatOpenAI). **Prompt:** Canine Thorax V1.3, file `31a7dab6…7ab7b1`. **Run:** RUN-02 (7 Nov 2026). No manifest.
-- **Counts:** TP 128 · FN 921 · TN 913 · FP 38 (N = 2,000; reference + 1,049 / − 951).
-- **Rates:** Acc 52.05% · Sens 12.20% · Spec 96.00% · Prec 77.11% · F1 21.07%. Macro (from the A5 replay): Acc 52.05, Sens 13.01, Spec 95.68, Prec 80.51, F1 22.71.
-- **Evidence:** delivered workbook A5 `Evaluation_Workbook_v1.xlsx` (sha `7237d3cf…`, Inaccessible); `docs/testing_log.md`; KB_05 T5–6, KB_04 T6, KB_03 §6.1, KB_10 T12.
-- **Status:** Recorded; Observed (prior) via the Week 5 replay. **Unverified in Week 8.**
+## Cell-reference conventions
 
-### EVAL-02 — Canine Thorax · Matrix 2 (Gold Standard) · Week 4 original application
-- **Model / prompt:** as EVAL-01. **Run:** RUN-01 (3 Nov 2026).
-- **Counts:** TP 127 · FN 31 · TN 1,803 · FP 39 (N = 2,000; reference + 158 / − 1,842).
-- **Rates:** Acc 96.50% · Sens 80.38% · Spec 97.88% · Prec 76.51% · **F1 78.40% (workbook/docs) vs 78.39% (Week 4 report): Conflict C-02**. Derived F1 = 78.3951%. The delivered workbook also shows Balanced Accuracy 89.13% (not part of the methodology).
-- **Evidence:** A6 `Evaluation Workbook v2.xlsx` (sha `2ff2bffa…`, Inaccessible); `docs/testing_log.md` L35; KB_05 T8–9; KB_10 T12.
-- **Status:** Recorded; Observed (prior) via replay. **Unverified in Week 8.** Matrix 2 evaluator source never existed in the repository.
+| Layout | Used by | Aggregate cells |
+|---|---|---|
+| Matrix 1 (A5) | EVAL-01, 01b, 05, 07, 11, 13 | `Overall Summary` B6:B9 = TP, FN, TN, FP; B10:B14 = micro Acc, Sens, Spec, Prec, F1; B15:B19 = macro. `Condition Summary` TOTAL row = n+2 |
+| Matrix 2 (A6), Week 4 | EVAL-02 | `Overall Summary` B3:B7 = Acc, Sens, Spec, Prec, F1; B8 = Balanced Accuracy; B11:B14 = TP, FN, TN, FP. `Condition Summary` MICRO TOTAL row 22 |
+| Matrix 2 (A6), Weeks 5 and 7 | EVAL-06, 08, 12, 14 | `Overall Summary` B3:B7 = rates; B10:B13 = TP, FN, TN, FP (no Balanced Accuracy row). `Condition Summary` MICRO TOTAL row = n+2 |
 
-### EVAL-03 / EVAL-04 — Canine Thorax · Matrix 1 / Matrix 2 · Week 5 evaluator replay of Week 4 predictions (parity check)
-- Same predictions as EVAL-01/02 (A3, A4), evaluated by `src/week_05` at `874aaea`/`a938cde`.
-- **Counts identical** to EVAL-01 / EVAL-02. Workbooks matched A5 exactly (excluding dynamic cells) and A6 except two approved differences: no Balanced Accuracy row, and Execution Log C8 note.
-- **Status:** Observed (prior) (KB_10 §8.1–8.2). This verifies the **software**, not the model.
+## Canine Thorax: 100 cases × 20 conditions (N = 2,000 per matrix)
 
-### EVAL-05 — Canine Thorax · Matrix 1 (Vetology) · Week 5 live
-- **Model:** gpt-4.1-mini · **Prompt:** V1.3 · **Run:** RUN-03 (12 Nov 2026).
-- **Counts:** TP 126 · FN 923 · TN 916 · FP 35. **Rates:** Acc 52.10% · Sens 12.01% · Spec 96.32% · Prec 78.26% · F1 20.83%.
-- **Evidence:** `outputs/week_05/matrix_1/matrix1_evaluation_workbook.xlsx` (Inaccessible); `docs/project_documentation.md` §11.6; KB_04 T13; KB_03 §6.2; KB_10 T14.
-- **Status:** Recorded. **Unverified.**
+| ID | Experiment | Ref. | Model / prompt | Run | TP | FN | TN | FP | Acc | Sens | Spec | Prec | F1 | Workbook (EV-B) | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| EVAL-01 | Week 4 original (delivered A5) | M1 (+1,049 / −951) | gpt-4.1-mini / V1.3 | RUN-02 | 128 | 921 | 913 | 38 | 52.05% | 12.20% | 96.00% | 77.11% | 21.07% | `Week 4 1st Application (using canine thorax) Evaluation Workbook Confusion Matrix 1.xlsx` (B10) | VW, XP (predictions B19) |
+| EVAL-01b | Week 4 committed-evaluator variant (same predictions) | M1 | same | RUN-02 | 128 | 921 | 913 | 38 | identical to EVAL-01 (micro and macro) | | | | | `outputs/week_04/matrix_1/matrix1_evaluation_workbook.xlsx` (B18) | VW, XP. Not a separate experiment |
+| EVAL-02 | Week 4 original (delivered A6) | M2 (+158 / −1,842) | gpt-4.1-mini / V1.3 | RUN-01 | 127 | 31 | 1,803 | 39 | 96.50% | 80.38% | 97.88% | 76.51% | **78.40%** (B7 = 0.7839506; Week 4 report: 78.39%) | `…Confusion Matrix 2.xlsx` (B11) | VW, XP (predictions B17). Balanced Accuracy 89.13% (B8) |
+| EVAL-03 / 04 | Week 5 replay of Week 4 predictions | M1 / M2 | — | — | as EVAL-01 / 02 | | | | | | | | | Replay workbooks not supplied | Observed (prior), KB_10; consistent |
+| EVAL-05 | Week 5 live | M1 | gpt-4.1-mini / V1.3 | RUN-03 | 126 | 923 | 916 | 35 | 52.10% | 12.01% | 96.32% | 78.26% | 20.83% | `outputs/week_05/matrix_1/matrix1_evaluation_workbook.xlsx` (B22) | VW, XP (B23) |
+| EVAL-06 | Week 5 live | M2 | gpt-4.1-mini / V1.3 | RUN-04 | 126 | 32 | 1,806 | 36 | 96.60% | 79.75% | 98.05% | 77.78% | 78.75% | `outputs/week_05/matrix_2/Evaluation Workbook v2.xlsx` (B24) | VW, XP (B25) |
+| EVAL-07 | Week 7 Gemini | M1 | gemini-3.8-flash / V1.3 | RUN-05 | 96 | 953 | 924 | 27 | 51.00% | 9.15% | 97.16% | 78.05% | 16.38% | `outputs/week_07/week 5 rebuild with different llm (gemini flash)/matrix_1/matrix1_evaluation_workbook.xlsx` (B36) | VW, XP (B37), MF (B38 = EV-R01) |
+| EVAL-08 | Week 7 Gemini | M2 | gemini-3.8-flash / V1.3 | RUN-06 | 102 | 56 | 1,822 | 20 | 96.20% | 64.56% | 98.91% | 83.61% | 72.86% | `…/matrix_2/Evaluation Workbook v2.xlsx` (B39) | VW, XP (B41), MF (B42 = EV-R02) |
 
-### EVAL-06 — Canine Thorax · Matrix 2 (Gold Standard) · Week 5 live
-- **Model / prompt:** as EVAL-05. **Run:** RUN-04 (12 Nov 2026).
-- **Counts:** TP 126 · FN 32 · TN 1,806 · FP 36. **Rates:** Acc 96.60% · Sens 79.75% · Spec 98.05% · Prec 77.78% · F1 78.75%.
-- **Evidence:** `outputs/week_05/matrix_2/Evaluation Workbook v2.xlsx` (Inaccessible); same documents.
-- **Status:** Recorded. **Unverified.**
+Matrix 1 macro (`Overall Summary` B15:B19; Acc / Sens / Spec / Prec / F1):
+- EVAL-01: 52.05 / 13.01 / 95.68 / 80.51 / 22.71%
+- EVAL-05: 52.10 / 12.72 / 96.06 / 80.87 / 22.21%
+- EVAL-07: 51.00 / 9.89 / 97.10 / 85.06 / 19.06%
 
-### EVAL-07 — Canine Thorax · Matrix 1 (Vetology) · Week 7 Gemini
-- **Model:** gemini-3.8-flash · **Prompt:** V1.3 (pins in the manifest) · **Run:** RUN-05, manifest EV-R01 (Verified W8).
-- **Counts:** TP 96 · FN 953 · TN 924 · FP 27. **Rates:** Acc 51.00% · Sens 9.15% · Spec 97.16% · Prec 78.05% · F1 16.38%.
-- **Evidence:** `outputs/week_07/matrix_1/matrix1_evaluation_workbook.xlsx` (Inaccessible); `README.md`; `docs/CHANGELOG.md` L185; `docs/testing_log.md`; KB_08 T9–10; KB_09 T14.
-- **Status:** Recorded (user-reported metrics, arithmetic re-derived by KB_08). Batch Verified (W8); **metrics unverified**.
+Undefined values and zero-positive conditions:
+- **Matrix 2:** 4 conditions have zero Gold Standard positives (hypo_plastic_trachea, pericardial_effusion, bronchiectasis, esophagitis), so sensitivity is undefined. Undefined F1: EVAL-02 6, EVAL-06 5, EVAL-08 5.
+- **Matrix 1:** no zero-positive conditions. Precision is undefined for 3 conditions (EVAL-01, 05) or 4 (EVAL-07) because those runs made no positive predictions for them.
 
-### EVAL-08 — Canine Thorax · Matrix 2 (Gold Standard) · Week 7 Gemini
-- **Model / prompt:** as EVAL-07 · **Run:** RUN-06 (main run plus checkpointed trial), manifest EV-R02 (Verified W8).
-- **Counts:** TP 102 · FN 56 · TN 1,822 · FP 20. **Rates:** Acc 96.20% · Sens 64.56% · Spec 98.91% · Prec 83.61% · F1 72.86%.
-- **Evidence:** `outputs/week_07/matrix_2/Evaluation Workbook v2.xlsx` (Inaccessible); `docs/CHANGELOG.md` L186.
-- **Status:** Recorded; batch Verified (W8); **metrics unverified**.
+Execution Log facts:
+- Evaluations generated at 2026-11-07 05:46:24 UTC (EVAL-01), 2026-11-12 10:04:10 (EVAL-05) and 2026-11-20 17:27:57 (EVAL-07). The Matrix 2 workbooks carry no timestamp.
+- First-attempt completions: EVAL-02 99/100 (1 case needed 2 attempts); EVAL-06 100/100; EVAL-08 99/100.
+- The Week 4 Matrix 2 workbook records "Radiologist agreement: Not calculated".
 
-### AGR-01 / AGR-02 — Canine Thorax · model-to-model agreement (NOT accuracy)
-- Week 7 Gemini (RUN-05/06) vs Week 5 OpenAI (RUN-03/04) predictions; **reference labels not used**.
-- AGR-01 (Matrix 1 inputs): 1,940/2,000 = 97.00%, 60 disagreements. AGR-02 (Matrix 2 inputs): 1,944/2,000 = 97.20%, 56 disagreements.
-- **Evidence:** comparison workbooks `outputs/week_07/comparison/matrix_1|2/…openai_vs_gemini_comparison.xlsx` (Inaccessible; inspected by the user only); `docs/testing_log.md` L208–209.
-- **Status:** Recorded. **Unverified.**
+### AGR-01 / AGR-02 — model-to-model agreement (NOT accuracy; reference not used)
 
-### Canine Thorax per-condition results
-**Missing in all accessible evidence.** Per-condition counts exist only inside the gitignored workbooks (KB_07 §5.14 note; KB_08 §16.2).
+| ID | Workflow inputs | Agreement | Disagreements | Cases with ≥1 disagreement | Workbook | Status |
+|---|---|---|---|---|---|---|
+| AGR-01 | Matrix 1 | 1,940 / 2,000 = 97.00% | 60 | 37 | `outputs/week_07/comparison between openai gpt 4.1 mini  vs. gemini flash/matrix_1/matrix1_openai_vs_gemini_comparison.xlsx` (B34), Model Agreement row 22; Case Disagreements 60 rows; generated 2026-11-20 17:29:21 UTC | VW, XP (B23 vs B37) |
+| AGR-02 | Matrix 2 | 1,944 / 2,000 = 97.20% | 56 | 33 | `…/matrix_2/matrix2_openai_vs_gemini_comparison.xlsx` (B35), Model Agreement row 22; Case Disagreements 56 rows; 17:29:29 UTC | VW, XP (B25 vs B41) |
 
-## Feline Thorax: 100 cases × 21 conditions
+The comparison workbooks' reference-based sections (Condition Comparison MICRO TOTAL, Overall Comparison) equal EVAL-05/07 (M1) and EVAL-06/08 (M2) exactly. Joint correctness:
+- M1: both correct 1,001; only OpenAI 41; only Gemini 19; both wrong 939.
+- M2: 1,900 / 32 / 24 / 44.
 
-### EVAL-11 — Feline Thorax · Matrix 1 (Vetology, three columns normalised) · Week 7 OpenAI
-- **Model:** gpt-4.1-mini · **Prompt:** Feline Thorax V1.2, file `9bbd36c4…1c418f25` · **Run:** RUN-07, manifest EV-R03 (Verified W8). Execution date of the evaluation: 2026-11-21 (KB_02; time not recorded).
-- **Counts:** TP 29 · FN 505 · TN 1,529 · FP 37 (N = 2,100; reference + 534 / − 1,566).
-- **Rates:** Acc 74.19% · Sens 5.43% · Spec 97.64% · Prec 43.94% · F1 9.67%.
-- **Evidence location (expected):** `outputs/week_07/feline_thorax/matrix_1/feline_thorax_matrix1_evaluation_workbook.xlsx` (**Inaccessible**). **Single source:** KB_02 T10 (retained ChatGPT conversation output).
-- **Status:** **Documented but unverified. Conflict C-01:** KB_07, KB_08, KB_09 and KB_10 record that no FT evaluation metrics exist in the repository. Derived checks are consistent: TP+FN matches KB_07's observed prevalence (534); predicted positives are 66 in both matrices.
+Comparison Execution Logs:
+- 0 API requests.
+- Read-only verification PASS.
+- Recorded source hashes equal the bundle files.
+- Week 5 OpenAI model identity "inferred from configuration, not embedded in prediction file".
 
-### EVAL-12 — Feline Thorax · Matrix 2 (Gold Standard) · Week 7 OpenAI
-- **Model / prompt / run:** as EVAL-11 (same shared predictions; no second batch).
-- **Counts:** TP 58 · FN 59 · TN 1,975 · FP 8 (N = 2,100; reference + 117 / − 1,983).
-- **Rates:** Acc 96.81% · Sens 49.57% · Spec 99.60% · Prec 87.88% · F1 63.39%.
-- **Evidence location (expected):** `outputs/week_07/feline_thorax/matrix_2/feline_thorax_matrix2_evaluation_workbook.xlsx` (**Inaccessible**). Single source: KB_02 T10.
-- **Status:** **Documented but unverified (C-01).** 10 of 21 conditions have zero Gold Standard positives, so per-condition sensitivity is undefined for them.
+## Feline Thorax: 100 cases × 21 conditions (N = 2,100 per matrix)
 
-### Feline Thorax per-condition results
-**Missing.** KB_02 §9.4 states that no reliable condition-level table was preserved.
+| ID | Ref. | Model / prompt | Run | TP | FN | TN | FP | Acc | Sens | Spec | Prec | F1 | Workbook (EV-B) | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| EVAL-11 | M1 Vetology (+534 / −1,566; 3 columns normalised) | gpt-4.1-mini / V1.2 (Execution Log B13) | RUN-07 | 29 | 505 | 1,529 | 37 | 74.19% | 5.43% | 97.64% | 43.94% | 9.67% | `outputs/week_07/2nd application/feline_thorax/matrix_1/feline_thorax_matrix1_evaluation_workbook.xlsx` (B26); generated 2026-11-21 16:35:36 UTC | VW, XP (B28), MF (B29 = EV-R03) |
+| EVAL-12 | M2 Gold Standard (+117 / −1,983) | same | RUN-07 (shared) | 58 | 59 | 1,975 | 8 | 96.81% | 49.57% | 99.60% | 87.88% | 63.39% | `…/matrix_2/feline_thorax_matrix2_evaluation_workbook.xlsx` (B27) | VW, XP, MF |
 
-## Canine Abdomen: 100 cases × 10 conditions
+- **Preliminary values (KB_02) confirmed exactly.**
+- EVAL-11 macro: Acc 74.19, Sens 10.80, Spec 97.83, Prec 53.30, F1 23.81%.
+- Undefined: precision for 10 conditions in both matrices (no positive predictions); F1 for 11. Matrix 2 also has 10 zero-positive conditions with undefined sensitivity (listed in 06).
+- The model made positive predictions for 11 of 21 conditions, 66 positive labels in total. Identical predictions underlie both matrices.
 
-### EVAL-13 — Canine Abdomen · Matrix 1 (Vetology) · Week 7 OpenAI
-- **Model:** gpt-4.1-mini · **Prompt:** Canine Abdomen V1.4, file `9336be3f…7b2a254c` · **Run:** RUN-08, manifest EV-R04 (Verified W8). Evaluation date 2026-11-21 (KB_02).
-- **Counts:** TP 34 · FN 246 · TN 697 · FP 23 (N = 1,000; reference + 280 / − 720).
-- **Rates:** Acc 73.10% · Sens 12.14% · Spec 96.81% · Prec 59.65% · F1 20.18%.
-- **Evidence location (expected):** `outputs/week_07/canine_abdomen/matrix_1/canine_abdomen_matrix1_evaluation_workbook.xlsx` (**Inaccessible**). Single source: KB_02 T11 (user-supplied terminal output).
-- **Status:** **Documented but unverified (C-01).** Derived checks are consistent (prevalence 280 matches KB_07 Table 27; predicted positives are 57 in both matrices).
+## Canine Abdomen: 100 cases × 10 conditions (N = 1,000 per matrix)
 
-### EVAL-14 — Canine Abdomen · Matrix 2 (Gold Standard) · Week 7 OpenAI
-- **Model / prompt / run:** as EVAL-13 (shared predictions).
-- **Counts:** TP 53 · FN 28 · TN 915 · FP 4 (N = 1,000; reference + 81 / − 919).
-- **Rates:** Acc 96.80% · Sens 65.43% · Spec 99.56% · Prec 92.98% · F1 76.81%.
-- **Evidence:** expected `outputs/week_07/canine_abdomen/matrix_2/canine_abdomen_matrix2_evaluation_workbook.xlsx` (**Inaccessible**). Terminal INFO log 2026-11-21 22:21:19 (KB_02 §1).
-- **Status:** **Documented but unverified (C-01).**
+| ID | Ref. | Model / prompt | Run | TP | FN | TN | FP | Acc | Sens | Spec | Prec | F1 | Workbook (EV-B) | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| EVAL-13 | M1 Vetology (+280 / −720) | gpt-4.1-mini / V1.4 (Execution Log B13) | RUN-08 | 34 | 246 | 697 | 23 | 73.10% | 12.14% | 96.81% | 59.65% | 20.18% | `outputs/week_07/3rd application/canine_abdomen/matrix_1/canine_abdomen_matrix1_evaluation_workbook.xlsx` (B30); generated 2026-11-21 16:50:16 UTC | VW, XP (B32), MF (B33 = EV-R04) |
+| EVAL-14 | M2 Gold Standard (+81 / −919) | same | RUN-08 (shared) | 53 | 28 | 915 | 4 | 96.80% | 65.43% | 99.56% | 92.98% | 76.81% | `…/matrix_2/canine_abdomen_matrix2_evaluation_workbook.xlsx` (B31) | VW, XP, MF |
 
-### Canine Abdomen per-condition results
-KB_02 Table 12 reports **positive-label count, sensitivity and F1 per condition only**, from an earlier ChatGPT review of the workbooks. Per-condition TP/FN/TN/FP and specificity were **not reported** and are **not derived here**. Status: Recorded (prior review); **re-verification against the workbooks is required**. Do not cite these values in the paper until that is done.
+- **Preliminary values (KB_02) confirmed exactly**, including all 60 per-condition values in KB_02 Table 12.
+- EVAL-13 macro: Acc 73.10, Sens 12.69, Spec 96.81, Prec 57.92, F1 20.18%.
+- No undefined metrics and no zero-positive conditions in either matrix.
 
 ## Summary count
 
-| Category | Records |
-|---|---|
-| Reference-based evaluations (distinct dataset × matrix × model × run) | 10: EVAL-01, 02, 05, 06, 07, 08, 11, 12, 13, 14 |
-| Software parity replays (same predictions as EVAL-01/02) | 2: EVAL-03, 04 |
-| Model-agreement analyses (not accuracy) | 2: AGR-01, 02 |
-| Evaluations with any count verified against a workbook in Week 8 | **0** |
-| Evaluations whose underlying prediction batch is verified by a committed manifest in Week 8 | 6: EVAL-07, 08, 11, 12, 13, 14 |
-| Completed prediction batches with **unverified** evaluation metrics | RUN-07 (EVAL-11/12), RUN-08 (EVAL-13/14): KB_02 reports metrics, but the repository has none |
+| Category | Records | Verified against workbook (W8) |
+|---|---|---|
+| Reference-based evaluations (distinct dataset × matrix × model × run) | 10: EVAL-01, 02, 05, 06, 07, 08, 11, 12, 13, 14 | **10 / 10** (+ cross-checked from predictions) |
+| Duplicate workbook of an existing evaluation | 1: EVAL-01b | Verified; identical |
+| Software parity replays | 2: EVAL-03, 04 | Workbooks not supplied; Observed (prior) |
+| Model-agreement analyses (not accuracy) | 2: AGR-01, 02 | **2 / 2** |
+| Aggregate values changed from the `ea92818` knowledge base | **0** (F1 78.40% vs 78.39% resolved as a rounding difference; historical value preserved) | — |

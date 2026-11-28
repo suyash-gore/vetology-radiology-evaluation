@@ -8,11 +8,19 @@ Prepared 2026-11-28 on `week-08/research-paper-development`. The repository base
 
 | File | Content |
 |---|---|
-| 01_Evidence_Inventory.csv | 86 rows: source extractions (EV-S), run manifests and records (EV-R), prompts and configuration (EV-P), code and tests (EV-C), documentation (EV-D), inaccessible or missing artifacts (EV-A). SHA-256 and size are computed in Week 8 for every file present in this environment |
+| 01_Evidence_Inventory.csv | 128 rows (86 original + 42 bundle rows EV-B): source extractions (EV-S), run manifests and records (EV-R), prompts and configuration (EV-P), code and tests (EV-C), documentation (EV-D), inaccessible or missing artifacts (EV-A). SHA-256 and size are computed in Week 8 for every file present in this environment |
 | 02_Experimental_Run_Register.md | Every identifiable prediction batch (RUN-xx), with manifest reference and verification status |
 | 03_Confusion_Matrix_and_Metrics_Register.md | One record per evaluation (EVAL-xx), separated by dataset, matrix, model and run; agreement records (AGR-xx) kept apart |
 | 04_Prompts_and_Configurations_Index.md | Prompt versions, hashes, model configurations and the run each was used in |
 | 05_Evidence_Gaps_and_Provenance.md | Missing, inaccessible, unverified and conflicting evidence, with actions needed |
+| 06_Per_Condition_Results.md | **Added in the Week 8 reconciliation.** Per-condition TP/FN/TN/FP and rates for all 10 reference evaluations (FT and CA Matrix 1/2; CT Week 4, 5 and 7 Matrix 1/2), generated from the actual workbooks with sheet and cell ranges |
+
+## Week 8 evidence reconciliation (`files-bundle-01.zip`)
+
+- 42 owner-supplied files were extracted to a temporary scratch directory only. They are **not committed** (gitignored types, confidential case-level content). Each is inventoried as EV-B01–EV-B42 with SHA-256, size and the evaluation it supports.
+- Inspected: 6 source/reference workbooks; 11 evaluation workbooks (Week 4 Matrix 1 ×2 and Matrix 2; Week 5 Matrix 1/2; Week 7 Gemini Matrix 1/2; Feline Matrix 1/2; Abdomen Matrix 1/2); 2 comparison workbooks; 8 prediction files; 2 error logs; 4 manifests; 3 prompt files. The Week 4 technical report was consulted for C-02 only; the other four reports were not re-analysed.
+- Result: every count and rate is verified and independently reproduced. The inventory rows EV-A01–A24 previously marked *Inaccessible* now point to their EV-B counterparts.
+- The inspection list below records the original `ea92818` pass.
 
 ## What was inspected in Week 8 (one consolidated pass)
 
