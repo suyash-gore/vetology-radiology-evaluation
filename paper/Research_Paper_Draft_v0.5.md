@@ -31,7 +31,7 @@ No statistical results or confusion counts changed.
 
 Each dataset contained 100 reports, and no images were used. Predictions were scored against two reference sets:
 - the original Vetology labels (Matrix 1);
-- a three-reviewer, independent manual, majority-vote reference set (Matrix 2; the project's "Gold Standard").
+- a three-reviewer manual majority-vote reference set (Matrix 2; the project's "Gold Standard"). Reviewers worked independently of one another and were blinded to model outputs, but could see the original Vetology labels.
 
 A Gemini model was compared on canine thorax only.
 
@@ -196,9 +196,9 @@ Two reference-label workflows were used. They are evaluated separately throughou
 3. Each reviewer assigned a binary Positive or Negative label for every relevant condition in the first 100 records, and kept a separate annotation file.
 4. The three files were consolidated, and majority voting was applied at each record–condition combination. A label supported by at least two of the three reviewers became the final Matrix 2 label.
 
-Matrix 2 is therefore a **three-reviewer, independently generated, majority-vote research-team reference**. The reviewers had access to the original Vetology label columns, were blinded to model outputs, and followed written annotation guidance. The Feline Thorax and Canine Abdomen files whose filenames end in "draft" were confirmed by the project owner as the final versions used for evaluation. The reviewers' professional qualifications were not supplied for this manuscript. Matrix 2 is **not** veterinary-radiologist adjudication, a formal expert consensus or clinically validated ground truth. The relationship between an earlier record of 21 differences between a Canine Thorax manual-scoring draft and the approved reference remains undocumented.
+Matrix 2 is therefore a **three-reviewer, independently generated, majority-vote research-team reference**. The reviewers worked independently of one another, had access to the original Vetology label columns, were blinded to model outputs, and followed written annotation guidance. Thus, Matrix 2 annotation was not blinded to Matrix 1; the two reference workflows are not fully independent. The Feline Thorax and Canine Abdomen files whose filenames end in "draft" were confirmed by the project owner as the final versions used for evaluation. The reviewers' professional qualifications were not supplied for this manuscript. Matrix 2 is **not** veterinary-radiologist adjudication, a formal expert consensus or clinically validated ground truth. The relationship between an earlier record of 21 differences between a Canine Thorax manual-scoring draft and the approved reference remains undocumented.
 
-The three individual annotation files were later deleted, and only the consolidated files remain. **Inter-reviewer agreement (for example pairwise κ or Fleiss' κ) cannot therefore be calculated retrospectively**, and it was not reconstructed from the majority-vote files. One reviewer also developed the prompts (Section 4.5).
+The three individual annotation files were later deleted, and only the consolidated files remain. **Inter-reviewer agreement (for example pairwise κ or Fleiss' κ) cannot therefore be calculated retrospectively**, and it was not reconstructed from the majority-vote files. One reviewer also developed the prompts (Section 4.5). In addition, reviewers could see the Matrix 1 labels while creating Matrix 2. These design features may have influenced alignment among the original labels, the majority-vote labels and model behaviour; the direction and magnitude of any such influence cannot be determined.
 
 **Comparison of the two reference sets.** On the same report–condition pairs, the following were computed:
 - the 2×2 counts: both Positive (n₁₁), both Negative (n₀₀) and each direction of disagreement (n₁₀ = Matrix 1 Positive/Matrix 2 Negative; n₀₁ = the reverse);
@@ -492,7 +492,7 @@ The reason is not established. Possible explanations include:
 - information available to one workflow but not present in the report text;
 - error in either set.
 
-Higher model sensitivity against Matrix 2 does **not** show that Matrix 2 is more accurate. It shows that the model's labelling behaviour is closer to that of the three-reviewer majority vote than to the original labels. One of the three reviewers also wrote the prompts, which may contribute to that alignment. Without inter-reviewer reliability data, independent adjudication or documentation of the Matrix 1 labelling process, neither reference can be regarded as clinical truth.
+Higher model sensitivity against Matrix 2 does **not** show that Matrix 2 is more accurate. It shows that the model's labelling behaviour is closer to the three-reviewer majority-vote labels than to the original Vetology labels. Interpretation is complicated by the fact that reviewers could see Matrix 1 labels while annotating Matrix 2, and one reviewer also developed the prompts. These factors may have influenced label alignment and model–reference agreement. Without retained individual annotations, independent adjudication or a documented Matrix 1 protocol, neither reference can be regarded as clinical truth.
 
 ### 6.2 Sensitivity, specificity and the limits of accuracy
 
@@ -529,9 +529,9 @@ On Canine Thorax, GPT-4.1 mini and gemini-3.8-flash agreed on about 97% of predi
 
 - **Sample.** Only the first 100 populated records per dataset were evaluated, from one source. The samples are not necessarily representative, and intervals do not imply population representativeness.
 - **Text only.** The models received report text only; no radiographic images were supplied. Reference labels may encode information that is absent from the text.
-- **Reference standards.** The two workflows differ substantially. The origin of Matrix 1 is undocumented. Matrix 2 is a three-reviewer majority-vote research-team reference, not clinically validated ground truth or veterinary-radiologist adjudication. Reviewer qualifications and annotation guidance are undocumented.
+- **Reference standards and incorporation risk.** The two workflows differ substantially. Matrix 1 was created by a Vetology radiologist, but the detailed labelling and encoding protocol is undocumented. Matrix 2 is a three-reviewer majority-vote research-team reference, not clinically validated ground truth or veterinary-radiologist adjudication. Although reviewers were blinded to model outputs and followed written guidance, they could see the original Matrix 1 labels. Matrix 2 is therefore not independent of Matrix 1, and incorporation or anchoring effects cannot be excluded. Reviewer qualifications were not available.
 - **No inter-reviewer reliability.** The individual Matrix 2 annotation files were deleted, so inter-reviewer reliability cannot be assessed retrospectively.
-- **Evaluation independence.** Prompt-development cases overlapped with evaluation cases, and one Matrix 2 reviewer developed the prompts. The manual prompt review used report text and predictions, not reference labels. However, a recorded Canine Abdomen keyword analysis involving reference-label columns has unresolved provenance, so reference-label exposure during development cannot be excluded.
+- **Evaluation independence.** Prompt-development cases overlapped with evaluation cases, and one Matrix 2 reviewer developed the prompts. The manual prompt review used report text and predictions, not reference labels. The Canine Abdomen keyword analysis used CaseID and the original Findings, Conclusions and Recommendations fields, not reference-label columns. However, the Matrix 2 reviewers could see Matrix 1 labels during annotation, so the two reference workflows are not independent.
 - **Confounding.** Condition sets, prevalence, prompt versions and uncertainty policies, and batch designs differ between datasets. Cross-dataset comparisons are descriptive, and no species, anatomical or prompt effect can be inferred.
 - **Model coverage and versioning.** The model comparison covers Canine Thorax only, with one run per model. Model snapshot identifiers were not recorded.
 - **Repeatability.** Temperature 0 did not guarantee identical outputs. Repeatability evidence is incidental and limited to Canine Thorax.
