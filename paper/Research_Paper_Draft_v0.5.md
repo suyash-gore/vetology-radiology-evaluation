@@ -11,7 +11,7 @@ No statistical results or confusion counts changed.
 
 **Author:** Suyash Kishor Gore
 
-**Affiliation:** `[Insert institutional/programme affiliation required by the submission format.]`
+**Affiliation:** The author's institutional affiliation was not supplied in the project record.
 **Context:** Vetology Free Training Program.
 
 **Scope statement.** This study evaluates **classification of written radiology reports**. The models received report text only. No radiographic images were analysed, and the work does not evaluate image interpretation, clinical diagnosis or clinical readiness.
@@ -98,7 +98,7 @@ For LLMs specifically:
 - **Scoping review.** LLM-based information extraction from radiology reports has been reviewed (Reichenpfader et al., 2024).
 - **Model size and prompting.** The effects of model size and prompting strategy on label extraction have been studied (Khosravi et al., 2026).
 
-`[SOURCE VERIFICATION REQUIRED: Reichenpfader et al. and Khosravi et al. were verified at metadata level only and are cited for their stated topic.]`
+Reichenpfader et al. and Khosravi et al. were verified at metadata level only and are cited here solely for their stated topic.
 
 ### 2.3 Image-based veterinary AI
 
@@ -253,7 +253,7 @@ Provider-specific settings were:
 - **OpenAI** runs used `gpt-4.1-mini` through LangChain `ChatOpenAI`.
 - The **Gemini** run used `gemini-3.8-flash` through `ChatGoogleGenerativeAI`, with JSON MIME output and no schema.
 
-Transport-retry settings differed between application versions (Appendix C). Model aliases were recorded, but **exact provider snapshot identifiers were not** `[AUTHOR CONFIRMATION REQUIRED: recover if possible]`.
+Transport-retry settings differed between application versions (Appendix C). Model aliases were recorded, but **exact provider snapshot identifiers were not**. The provider snapshot identifiers could not be recovered for this manuscript.
 
 Failed attempts never contributed predictions:
 - an aborted Week 5 attempt failed for all cases with an authentication error (expired key) before the successful batch;
@@ -342,9 +342,9 @@ Source workbooks, predictions and report text are confidential and are not publi
 
 **Data and code availability.** The analysis code, prompts and run manifests are maintained in the project repository. The underlying source workbooks, report text, prediction-level outputs and evaluation workbooks are confidential and are not publicly available. Access to those materials is subject to Vetology's permission.
 
-**Funding.** No separate funding information was supplied for this manuscript.
+**Funding.** No separate funding information was supplied for this manuscript; confirm whether the programme or institution requires a formal funding statement.
 
-**Conflicts of interest.** No conflict-of-interest declaration was supplied; the author should confirm the applicable institutional wording before external publication.
+**Conflicts of interest.** The author must confirm the applicable conflict-of-interest declaration before external publication; no declaration was available in the project record at the time this draft was prepared.
 
 **Use of AI tools.** General-purpose AI tools, including ChatGPT and NotebookLM, were used during prompt-development work as described in Section 4.5. ChatGPT was also used to assist with manuscript drafting and editing. The author reviewed and takes responsibility for the final content. The LLMs evaluated in the experiments were used for the report-text classification task described in this paper.
 
@@ -480,7 +480,7 @@ Both are close to the original evaluations. These analyses are exploratory. EVAL
 
 ### 6.1 Principal finding: dependence on the reference-label workflow
 
-The most consistent result across the three datasets is that measured performance depended on the reference workflow much more than on anything else examined. With identical predictions, switching from Matrix 1 to Matrix 2 raised sensitivity by:
+The most consistent result across the three datasets is that measured performance was strongly dependent on the reference-label workflow. With identical predictions, switching from Matrix 1 to Matrix 2 raised sensitivity by:
 - 44.1 percentage points in Feline Thorax;
 - 53.3 in Canine Abdomen;
 - 67.1 in the exploratory Canine Thorax rescoring.
@@ -577,7 +577,7 @@ The author thanks Zach Tungate and Akshay Rathod for their participation in the 
 
 ## References
 
-Chang Y, Chu CP. 2026. Applying artificial intelligence to automate clinical data extraction from veterinary electronic health records: A practical guidance and comparative scoping review. *Veterinary Pathology*. Advance online publication 16 July 2026. https://doi.org/10.1177/03009858261461761 `[SOURCE VERIFICATION REQUIRED: volume/pages not yet assigned; abstract-level verification]`
+Chang Y, Chu CP. 2026. Applying artificial intelligence to automate clinical data extraction from veterinary electronic health records: A practical guidance and comparative scoping review. *Veterinary Pathology*. Advance online publication 16 July 2026. https://doi.org/10.1177/03009858261461761. Abstract-level content was checked; final volume and page details were not available in the source record used.
 
 Farrell S, Radford A, Al Moubayed N, Noble PJ. 2025. PetEVAL: A veterinary free text electronic health records benchmark. In: *Proceedings of the 24th Workshop on Biomedical Language Processing*, pp. 341–353. https://doi.org/10.18653/v1/2025.bionlp-1.29
 
@@ -587,7 +587,7 @@ Hur B, Wang LL, Hardefeldt L, Yetisgen M. 2024. Is That the Right Dose? Investig
 
 Jiang Y, Irvin JA, Ng AY, Zou J. 2024. VetLLM: Large Language Model for Predicting Diagnosis from Veterinary Notes. In: *Biocomputing 2024: Proceedings of the Pacific Symposium*, pp. 120–133 (published online December 2023). https://doi.org/10.1142/9789811286421_0010
 
-Khosravi B, Dapamede T, Li F, Chisango Z, Bikmal A, Garg S, Owosela B, Khosravi A, Chavoshi M, Trivedi HM, Wyles CC, Purkayastha S, Erickson BJ, Gichoya JW. 2026. Role of Model Size and Prompting Strategies in Extracting Labels from Free-Text Radiology Reports with Open-Source Large Language Models. *Journal of Imaging Informatics in Medicine* 39(1): 995–1004 (published online 5 May 2025). https://doi.org/10.1007/s10278-025-01505-7 `[SOURCE VERIFICATION REQUIRED: metadata only]`
+Khosravi B, Dapamede T, Li F, Chisango Z, Bikmal A, Garg S, Owosela B, Khosravi A, Chavoshi M, Trivedi HM, Wyles CC, Purkayastha S, Erickson BJ, Gichoya JW. 2026. Role of Model Size and Prompting Strategies in Extracting Labels from Free-Text Radiology Reports with Open-Source Large Language Models. *Journal of Imaging Informatics in Medicine* 39(1): 995–1004 (published online 5 May 2025). https://doi.org/10.1007/s10278-025-01505-7 (metadata-level verification only)
 
 Kottlors J, Iuga AI, Bluethgen C, Bressem K, Kather JN, et al. 2026. Guidelines for Reporting Studies on Large Language Models in Radiology: An International Delphi Expert Survey. *Radiology* 318(2): e250913. https://doi.org/10.1148/radiol.250913
 
