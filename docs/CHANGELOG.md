@@ -352,3 +352,19 @@ Owner-approved corrections (D-065, D-066). The supplied originals are kept byte-
 
 ### Verified
 - All ten confusion matrices are unchanged. The manuscript tables match `07_statistical_results.json`.
+
+## Week 8 — Manuscript v0.4, supervisor-review corrections (2026-11-28)
+
+### Added
+- `paper/Research_Paper_Draft_v0.4.md`. v0.1–v0.3 are unchanged.
+- A pre-submission checklist in `paper/README.md`: corrections completed, author confirmations, external requirements.
+
+### Changed (manuscript)
+- Abstract: the CT reference comparison is no longer presented as a paired effect. It is reported as the separately batched Week 5 evaluations, with the exploratory common-batch rescoring alongside.
+- Paired-contrast statements are restricted to genuinely shared predictions.
+- Matrix 2 terminology harmonised ("three-reviewer, independent manual, majority-vote reference set"; "Gold Standard" as project name only).
+- Statistical-settings wording: plan-proposed candidates are separated from settings finalized during analysis.
+- References: online-first dates added, plus a source-verification-level table. Supplementary Table S1 has an F1-definition note.
+
+### Verified
+- All manuscript tables and the rescoring values match `07_statistical_results.json` (0 mismatches). The ten confusion matrices are unchanged. No statistics changed.

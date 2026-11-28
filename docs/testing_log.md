@@ -417,3 +417,11 @@ The Week 5 and Week 7 suites were not rerun, because no application code changed
 | Supplementary Table S1 | Generated directly from the JSON |
 
 No Python code changed. Week 5/7 suites not rerun.
+
+### Week 8 v0.4 manuscript review (2026-11-28)
+
+| Check | Result |
+|---|---|
+| `python -m unittest analysis/test_week08_statistics.py` | 9 tests OK |
+| Manuscript v0.4 Tables 3, 4, 5, 7 and 8, the rescoring values and the Supplementary S1 counts vs `07_statistical_results.json` | 0 mismatches |
+| v0.1–v0.3 drafts | Unchanged (git diff empty) |

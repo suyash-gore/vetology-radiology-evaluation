@@ -1,6 +1,15 @@
 # Manuscript workspace
 
-`Research_Paper_Draft_v0.3.md` is the current complete draft, for owner review; it is **not submission-ready**. v0.1 (first draft) and v0.2 are retained unchanged. All were written on 2026-11-28 on branch `week-08/research-paper-development`.
+`Research_Paper_Draft_v0.4.md` is the current complete draft, for **academic supervisor review**. It is **not journal-submission-ready**. v0.1, v0.2 and v0.3 are retained unchanged as historical versions. All were written on 2026-11-28 on branch `week-08/research-paper-development`.
+
+v0.4 changes:
+- the abstract separates the shared-prediction comparisons (FT, CA) from the separately batched CT evaluations and the exploratory CT rescoring;
+- Matrix 2 is defined consistently as the three-reviewer, independent manual, majority-vote reference set; "Gold Standard" is kept only as the project name;
+- the paired-contrast wording is restricted to genuinely shared predictions;
+- the timing of statistical settings is stated more precisely;
+- reference online dates and a source-verification table are added.
+
+No statistics changed.
 
 v0.3 changes:
 - confirmed three-reviewer majority-vote Gold Standard methodology (D-074), with the deleted individual files and the resulting lack of inter-reviewer reliability disclosed;
@@ -38,22 +47,35 @@ The script requires `numpy` and `openpyxl`. It aborts if any recomputed count di
 python -m unittest analysis/test_week08_statistics.py
 ```
 
-## Author confirmations required before submission
+## Pre-submission checklist (v0.4)
 
-1. **Gold Standard details still open.** The process itself is confirmed: three independent reviewers, majority vote, individual files deleted (D-074). Still open:
-   - reviewer qualifications;
-   - the exact columns provided, in particular whether the original Vetology labels were visible;
-   - blinding to model outputs;
-   - any annotation guidance;
-   - whether the Feline Thorax and Canine Abdomen "draft" files are final;
-   - how the earlier 21-difference Canine Thorax record relates to this process;
-   - permission to name or acknowledge Zach and Akshay.
-2. **Matrix 1 labels:** origin and encoding history of the original Vetology labels.
-3. **Evaluation overlap:** whether any script inspected reference labels during the Canine Abdomen hedged-language analysis (currently unresolved).
-4. **D-A:** select the CT primary batch (RUN-03 or RUN-04) and record the reason; this is still open. The statistical settings were approved on 2026-11-28 (plan §13.1).
-5. **Prompt provenance (P-1–P-6):** textbook editions; which sources informed the Feline and Abdomen prompts; the scope of Dr. Parin Candy's input; NotebookLM/ChatGPT notes.
-6. **Statements:** ethics/approval, Vetology data-use permission, data and code availability, conflicts of interest, funding, and disclosure of AI-tool use.
-7. **Model identity:** exact model snapshot identifiers, if recoverable.
-8. **Authorship:** author list, affiliations and target venue (Springer template still unresolved).
-9. **References:** full-text verification of Reichenpfader et al. (2024), Khosravi et al. (2026) and Chang and Chu (2026); screening of the 23 veterinary studies in Chang and Chu.
-10. **FLAIR:** supply Appendix S1 so the checklist can be completed item by item.
+### A. Corrections completed in the v0.4 review
+- [x] Abstract: the CT reference comparison now distinguishes the recorded separately batched evaluations (12.01% vs 79.75%) from the exploratory common-batch rescoring (12.01% vs 79.11%, +67.10 pp). FT and CA are presented as the shared-prediction comparisons.
+- [x] Every paired-comparison statement checked. Paired contrasts are claimed only for FT (RUN-07), CA (RUN-08), the exploratory CT RUN-03 rescoring, and the CT model comparison on the same cases. D-A is still open, and no primary batch is designated.
+- [x] Matrix 2 defined consistently as a three-reviewer, independent manual, majority-vote reference set; "Gold Standard" is kept as the project name only. No clinical ground truth, radiologist adjudication or expert consensus is implied.
+- [x] Annotation facts retained: same raw dataset to Suyash, Zach and Akshay; independent manual labelling; AI-generated columns excluded; majority vote per record–condition. No inter-reviewer statistics (individual files deleted).
+- [x] Statistical-settings wording corrected: B = 10,000 and Holm were proposed in the plan as candidates; the seed value, the percentile rule, the undefined-replicate rule and the 2,000-replicate agreement subset were finalized during analysis and approved afterwards.
+- [x] All numerical tables (Tables 3–5, 7, 8, rescoring values, Supplementary Table S1 counts) re-verified against `07_statistical_results.json`: 0 mismatches. The ten confusion matrices are unchanged.
+- [x] References: online-first dates added; verification level per source stated (4 full text, 4 abstract, 1 abstract and metadata, 2 metadata only).
+- [x] Supplementary Table S1: note added that F1 follows the manuscript definition and can differ from the workbook blanks.
+
+### B. Author confirmations still required
+1. Full names of Zach and Akshay, their permission to be named or acknowledged, and their professional backgrounds or qualifications.
+2. Exact source columns given to the Matrix 2 reviewers (in particular whether the original Vetology labels were visible); blinding to model outputs; any annotation guidance.
+3. Whether the FT/CA Matrix 2 files (named "draft") are final; how the earlier record of 21 CT manual-draft-vs-approved differences relates to the majority-vote process.
+4. Origin and encoding history of the Matrix 1 (original Vetology) labels.
+5. Provenance of the CA keyword analysis that involved reference-label columns.
+6. D-A: whether a CT primary batch (RUN-03 or RUN-04) is to be designated, with the rationale. It is currently left open.
+7. Origin of the records and rationale for the first-100 selection.
+8. Exact model snapshot identifiers, if recoverable.
+9. Prompt provenance: textbook editions; what informed the FT/CA prompts; scope of Dr. Parin Candy's input.
+10. Authorship, affiliations, ORCID, author contributions and acknowledgements.
+
+### C. External publication requirements outstanding
+1. Ethics approval or exemption, and Vetology data-use permission.
+2. Data and code availability statement (data are confidential; repository visibility and release tag).
+3. Conflict-of-interest, funding and AI-tool-use declarations.
+4. Target venue and its template (Springer template still unresolved) and the venue's length rules.
+5. Full-text verification of Chang and Chu (2026), Reichenpfader et al. (2024) and Khosravi et al. (2026); screening of the 23 veterinary studies in Chang and Chu; any further literature search the venue expects.
+6. FLAIR Appendix S1 retrieval and item-level completion (voluntary; compliance not claimed).
+7. Final figures (two placeholders remain) and permission to publish the full prompt texts.
