@@ -1,6 +1,11 @@
 # Manuscript workspace
 
-`Research_Paper_Draft_v0.1.md` is the first full draft (2026-11-28; branch `week-08/research-paper-development`). **Not for submission.**
+`Research_Paper_Draft_v0.2.md` is the current draft. `Research_Paper_Draft_v0.1.md` is the first full draft, retained unchanged. Both were written on 2026-11-28 on branch `week-08/research-paper-development`. **Not for submission.**
+
+v0.2 changes:
+- finalized, owner-approved statistical settings, distinguished from pre-specified ones;
+- reference-label agreement reported with positive and negative agreement, the directional counts and prevalence, alongside κ;
+- the Canine Thorax rescoring clarified as exploratory.
 
 ## Evidence behind the manuscript
 
@@ -22,14 +27,18 @@ The case-level inputs are confidential and must **never** be committed. Supply t
 python analysis/week08_statistics.py --bundle /path/to/files-bundle-01 --out-md Vetology_Research_Knowledge_Base/04_Evidence_and_Artifacts/07_Statistical_Analysis_Results.md --out-json Vetology_Research_Knowledge_Base/04_Evidence_and_Artifacts/07_statistical_results.json
 ```
 
-The script requires `numpy` and `openpyxl`. It aborts if any recomputed count differs from the registered value. Output is deterministic (seed 20261128).
+The script requires `numpy` and `openpyxl`. It aborts if any recomputed count differs from the registered value. Output is deterministic (seed 20261128). Run the unit tests (synthetic data) with:
+
+```bash
+python -m unittest analysis/test_week08_statistics.py
+```
 
 ## Author confirmations required before submission
 
 1. **Gold Standard process:** reviewers, roles and qualifications; whether scoring was independent and blinded; disagreement resolution; any agreement data; whether the Feline Thorax and Canine Abdomen "draft" files are final.
 2. **Matrix 1 labels:** origin and encoding history of the original Vetology labels.
 3. **Evaluation overlap:** whether any script inspected reference labels during the Canine Abdomen hedged-language analysis (currently unresolved).
-4. **D-A:** select the CT primary batch (RUN-03 or RUN-04) and record the reason. Approve or revise the statistical settings (B, seed, interval rule).
+4. **D-A:** select the CT primary batch (RUN-03 or RUN-04) and record the reason; this is still open. The statistical settings were approved on 2026-11-28 (plan §13.1).
 5. **Prompt provenance (P-1–P-6):** textbook editions; which sources informed the Feline and Abdomen prompts; the scope of Dr. Parin Candy's input; NotebookLM/ChatGPT notes.
 6. **Statements:** ethics/approval, Vetology data-use permission, data and code availability, conflicts of interest, funding, and disclosure of AI-tool use.
 7. **Model identity:** exact model snapshot identifiers, if recoverable.

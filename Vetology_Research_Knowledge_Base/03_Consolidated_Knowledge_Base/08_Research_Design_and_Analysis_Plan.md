@@ -602,3 +602,27 @@ Analyses executed 2026-11-28 with `analysis/week08_statistics.py`. Outputs: `04_
 | D-A | Compatibility verified (CaseIDs, order, report text, keys, prediction format). Both Week 5 batches rescored against the other reference (exploratory) | **No batch selected.** The owner must record the selected batch (RUN-03 or RUN-04) and the reason |
 | D-B balanced accuracy | Not reported | Unresolved |
 | §6.9 pre-specification | Settings fixed in the script before final results were written | Settings were not owner-approved before execution; disclosed |
+
+### 13.1 Owner approval of execution settings (2026-11-28)
+
+The owner approved the following **finalized analysis settings**:
+- report-level bootstrap with B = 10,000 resamples;
+- seed `20261128`;
+- 95% percentile bootstrap intervals;
+- whole-report resampling, which keeps all condition labels of a report together;
+- 95% Wilson score intervals for per-condition proportions;
+- Holm adjustment for the per-condition McNemar comparisons.
+
+**Distinction preserved:**
+- The original plan (§6) pre-specified the metrics, the report-level resampling unit, Wilson intervals for condition-level rates, paired comparisons only on shared predictions, and Holm as the proposed multiplicity method.
+- B, the seed, the percentile rule, the undefined-replicate handling and the 2,000-replicate subset used for κ and specific-agreement intervals were **finalized during analysis**. They were approved afterwards and are not described as pre-specified.
+
+**Added analysis (v0.2):** reference-label agreement now also reports:
+- positive agreement, PA = 2n11/(2n11+n10+n01);
+- negative agreement, NA = 2n00/(2n00+n10+n01);
+- both-positive and both-negative counts;
+- the positive prevalence of each matrix.
+
+Intervals use the same 2,000 report-level resamples as κ. These statistics describe disagreement between workflows, not reference quality.
+
+D-A remains open. The Canine Thorax common-batch rescoring stays exploratory, and no batch is designated primary.

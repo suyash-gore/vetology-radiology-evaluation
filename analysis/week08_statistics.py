@@ -177,6 +177,24 @@ def kappa(a, b):
     return None if pe >= 1 else (po - pe) / (1 - pe)
 
 
+def specific_agreement(a, b):
+    """2x2 agreement between two binary label sets on the same items.
+
+    Positive agreement PA = 2n11 / (2n11 + n10 + n01); negative agreement
+    NA = 2n00 / (2n00 + n10 + n01). Either is None when its denominator is 0.
+    """
+    a = np.asarray(a).ravel()
+    b = np.asarray(b).ravel()
+    n11 = int(((a == 1) & (b == 1)).sum())
+    n00 = int(((a == 0) & (b == 0)).sum())
+    n10 = int(((a == 1) & (b == 0)).sum())
+    n01 = int(((a == 0) & (b == 1)).sum())
+    dp, dn = 2 * n11 + n10 + n01, 2 * n00 + n10 + n01
+    return dict(both_pos=n11, both_neg=n00, a_pos_b_neg=n10, a_neg_b_pos=n01,
+                positive_agreement=(2 * n11 / dp) if dp else None,
+                negative_agreement=(2 * n00 / dn) if dn else None)
+
+
 def mcnemar_exact(bc, cb):
     n = bc + cb
     if n == 0:
@@ -233,6 +251,10 @@ def main():
         resampling_unit="report (case); all condition labels of a resampled report kept together",
         interval="percentile 95% over defined replicates; undefined-replicate count reported",
         wilson="95% Wilson score interval per condition (cases treated as independent)",
+        settings_status=("Execution settings (B = 10,000, seed 20261128, percentile 95% intervals, whole-report "
+                         "resampling, Wilson per-condition intervals, Holm adjustment) were finalized during "
+                         "analysis and approved by the owner on 2026-11-28; they were not all pre-specified "
+                         "(plan section 13)."),
         f1_definition="2TP/(2TP+FP+FN); undefined only when denominator is 0 (plan section 6.2)",
         inputs={},
     )
@@ -330,14 +352,30 @@ def main():
         y1, y2 = d1["y"], d2["y"]
         bk = [kappa(y1[i], y2[i]) for i in idx[:2000]]  # 2,000 replicates suffice for kappa CI
         bk = [x for x in bk if x is not None]
+        bsa = [specific_agreement(y1[i], y2[i]) for i in idx[:2000]]
+        sa = specific_agreement(y1, y2)
         per = []
         for j, k in enumerate(d1["keys"]):
+            sj = specific_agreement(y1[:, j], y2[:, j])
             per.append(dict(condition=k, agreement=r(float((y1[:, j] == y2[:, j]).mean())),
                             kappa=r(kappa(y1[:, j], y2[:, j])),
+                            positive_agreement=r(sj["positive_agreement"]),
+                            negative_agreement=r(sj["negative_agreement"]),
                             m1_pos=int(y1[:, j].sum()), m2_pos=int(y2[:, j].sum()),
                             m1_pos_m2_neg=int(((y1[:, j] == 1) & (y2[:, j] == 0)).sum()),
                             m1_neg_m2_pos=int(((y1[:, j] == 0) & (y2[:, j] == 1)).sum())))
+        pa_ci, pa_und = pct_interval([x["positive_agreement"] if x["positive_agreement"] is not None
+                                      else np.nan for x in bsa])
+        na_ci, na_und = pct_interval([x["negative_agreement"] if x["negative_agreement"] is not None
+                                      else np.nan for x in bsa])
         ref_agree[ds] = dict(pairs=int(y1.size), agreement=r(float((y1 == y2).mean())),
+                             m1_prevalence=r(float(y1.mean())), m2_prevalence=r(float(y2.mean())),
+                             both_pos=sa["both_pos"], both_neg=sa["both_neg"],
+                             positive_agreement=r(sa["positive_agreement"]),
+                             positive_agreement_ci95_cluster_bootstrap_2000=[r(v) for v in pa_ci],
+                             negative_agreement=r(sa["negative_agreement"]),
+                             negative_agreement_ci95_cluster_bootstrap_2000=[r(v) for v in na_ci],
+                             specific_agreement_undefined_replicates=dict(positive=pa_und, negative=na_und),
                              kappa=r(kappa(y1, y2)),
                              kappa_ci95_cluster_bootstrap_2000=[r(v) for v in np.percentile(bk, [2.5, 97.5])],
                              m1_pos_m2_neg=int(((y1 == 1) & (y2 == 0)).sum()),
@@ -447,6 +485,7 @@ def render_md(o):
     L = ["# 07 — Statistical Analysis Results (Week 8)", "",
          f"Generated {m['generated_utc']} by `{m['script']}` (seed {m['seed']}, B = {m['bootstrap_replicates']:,}).",
          "Plan: `../03_Consolidated_Knowledge_Base/08_Research_Design_and_Analysis_Plan.md` §6. Deviations: see plan §13.",
+         f"**Settings status:** {m['settings_status']}",
          "",
          "**Inputs:** owner-supplied, confidential case-level files (not committed). SHA-256 values are listed at the end. Only aggregate statistics are reported here.",
          "",
@@ -489,13 +528,24 @@ def render_md(o):
     for name, v in o["paired_reference_contrasts"].items():
         L.append(f"| {name} | " + " | ".join(D(v[k]) for k in ("accuracy", "sensitivity", "specificity", "precision", "f1")) + " |")
     L += ["", "## 4. Agreement between the two reference-label sets (Matrix 1 vs Matrix 2, same cases)", "",
-          "| Dataset | Pairs | Raw agreement | Cohen's κ (95% CI, 2,000 report-level resamples) | M1 Pos / M2 Neg | M1 Neg / M2 Pos |",
-          "|---|---:|---|---|---:|---:|"]
+          "Definitions, on the 2×2 table of M1 × M2 labels over all report–condition pairs (n11 = both Positive, n00 = both Negative, n10 = M1 Positive / M2 Negative, n01 = M1 Negative / M2 Positive):",
+          "- Raw agreement = (n11 + n00) / N.",
+          "- Positive agreement PA = 2·n11 / (2·n11 + n10 + n01).",
+          "- Negative agreement NA = 2·n00 / (2·n00 + n10 + n01).",
+          "- Cohen's κ = (pₒ − pₑ) / (1 − pₑ).",
+          "",
+          "Intervals: 2,000 report-level resamples (the first 2,000 of the shared index matrix). The statistics describe **disagreement between two labelling workflows**; they are not measures of either reference's clinical correctness. Because prevalence differs greatly between the matrices, κ is reported together with PA, NA and the directional counts rather than alone.", "",
+          "| Dataset | Pairs | M1 prevalence | M2 prevalence | Both Pos | Both Neg | M1 Pos / M2 Neg | M1 Neg / M2 Pos | Raw agreement | Positive agreement (95% CI) | Negative agreement (95% CI) | Cohen's κ (95% CI) |",
+          "|---|---:|---|---|---:|---:|---:|---:|---|---|---|---|"]
     for ds, v in o["reference_label_agreement"].items():
         if isinstance(v, str):
-            L.append(f"| {ds} | — | {v} | | | |")
+            L.append(f"| {ds} | — | {v} | | | | | | | | | |")
             continue
-        L.append(f"| {ds} | {v['pairs']:,} | {P(v['agreement'])} | {K(v['kappa'])} ({K(v['kappa_ci95_cluster_bootstrap_2000'][0])}–{K(v['kappa_ci95_cluster_bootstrap_2000'][1])}) | {v['m1_pos_m2_neg']} | {v['m1_neg_m2_pos']} |")
+        kc = v["kappa_ci95_cluster_bootstrap_2000"]
+        L.append(f"| {ds} | {v['pairs']:,} | {P(v['m1_prevalence'])} | {P(v['m2_prevalence'])} | {v['both_pos']} | {v['both_neg']:,} | {v['m1_pos_m2_neg']} | {v['m1_neg_m2_pos']} | {P(v['agreement'])} | {P(v['positive_agreement'])} ({CI(v['positive_agreement_ci95_cluster_bootstrap_2000'])}) | {P(v['negative_agreement'])} ({CI(v['negative_agreement_ci95_cluster_bootstrap_2000'])}) | {K(v['kappa'])} ({K(kc[0])}–{K(kc[1])}) |")
+    und = "; ".join(f"{ds}: PA {v['specific_agreement_undefined_replicates']['positive']}, NA {v['specific_agreement_undefined_replicates']['negative']}"
+                    for ds, v in o["reference_label_agreement"].items() if not isinstance(v, str))
+    L += ["", f"Undefined replicates (of 2,000): {und}.", ""]
     L += ["", "Per-condition reference agreement is in the JSON file (`reference_label_agreement.*.per_condition`).", ""]
     L += ["## 5. Canine Thorax model comparison (Week 5 gpt-4.1-mini vs Week 7 gemini-3.8-flash) — CT only", "",
           "Agreement is model–model concordance, **not accuracy**. McNemar tests use exact binomial tests of discordant **correctness** per condition across 100 cases, with Holm adjustment within each matrix; they are exploratory. Single run per model, and the confounders in plan §5.2 apply.", ""]

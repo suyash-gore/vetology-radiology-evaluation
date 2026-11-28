@@ -394,3 +394,15 @@ Live OpenAI runs were not executed.
 | flake8 on `analysis/week08_statistics.py` | Clean except E501 (line length > 100) | Analysis script; not part of the application packages |
 
 Status correction: the Feline Thorax and Canine Abdomen live OpenAI runs **were executed** on 2026-11-21 (committed manifests, `ceb3f42`) and evaluated locally. The statements above that they were "not executed" describe the state at the time.
+
+### Week 8 v0.2 revision (2026-11-28)
+
+| Check | Result | Notes |
+|---|---|---|
+| `python -m unittest analysis/test_week08_statistics.py` | 9 tests OK | Synthetic data only: metrics, F1 zero-positive cases, Wilson, PA/NA, κ, McNemar, Holm, percentile helper |
+| `analysis/week08_statistics.py` rerun | Registered counts reproduced. All previously reported sections identical to the prior output; only new fields added | Inputs: owner-supplied bundle (not committed) |
+| Independent PA/NA check | The 2×2 tables recomputed from the reference workbooks by separate code match the script for CT, FT and CA | — |
+| Manuscript v0.2 tables vs JSON | Table 3 and Table 4b: 0 mismatches | Automated comparison |
+| flake8 on `analysis/` | Clean except E501 | — |
+
+The Week 5 and Week 7 suites were not rerun, because no application code changed.

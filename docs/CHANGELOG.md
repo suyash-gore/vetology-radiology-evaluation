@@ -324,3 +324,18 @@ Owner-approved corrections (D-065, D-066). The supplied originals are kept byte-
 
 ### Corrected
 - The README status for Feline Thorax and Canine Abdomen now records the completed live runs and local evaluations of 2026-11-21. Earlier entries in this file that said "Not executed" describe the state at the time they were written.
+
+## Week 8 — Statistical settings finalized; manuscript v0.2 (2026-11-28)
+
+### Added
+- Reference-label agreement now also reports positive agreement, negative agreement, both-positive/both-negative counts and matrix prevalence, with intervals (`analysis/week08_statistics.py`; `07_*` regenerated).
+- `analysis/test_week08_statistics.py`: focused unit tests on synthetic data.
+- `paper/Research_Paper_Draft_v0.2.md`: revised manuscript. v0.1 is retained unchanged.
+
+### Changed
+- Finalized and owner-approved statistical settings documented (plan §13.1; D-072). Settings finalized during analysis are distinguished from pre-specified ones.
+- The manuscript's interpretation of reference disagreement now uses PA, NA, the directional counts and prevalence alongside κ (D-073). It makes no claim about which reference is correct.
+- The Canine Thorax common-batch rescoring is explicitly exploratory; D-A remains open.
+
+### Verified
+- All ten confusion matrices and all previously reported statistics are unchanged (JSON compared field by field).

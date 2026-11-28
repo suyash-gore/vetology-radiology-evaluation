@@ -218,3 +218,6 @@ The manuscript introduces this as a provisional observation from a targeted, non
 - The two label sets agreed only slightly beyond chance (κ 0.03–0.13).
 
 This strengthens 2.4 as the best-supported potential contribution. It does **not** establish novelty: §5.3 still applies.
+
+
+**Week 8 v0.2 correction to the wording above.** The disagreement between workflows is described with positive agreement (CT 19.7%, FT 12.0%, CA 23.8%), negative agreement (65.3%, 83.9%, 83.2%), the directional counts and prevalence, together with κ. κ alone is not used, because it is prevalence-dependent. The finding supports the reference-dependence observation (2.4). It does not show that either reference is clinically correct or incorrect.

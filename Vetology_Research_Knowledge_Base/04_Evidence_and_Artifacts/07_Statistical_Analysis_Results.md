@@ -1,7 +1,8 @@
 # 07 — Statistical Analysis Results (Week 8)
 
-Generated 2026-11-28 18:04:30 UTC by `analysis/week08_statistics.py` (seed 20261128, B = 10,000).
+Generated 2026-11-28 18:15:26 UTC by `analysis/week08_statistics.py` (seed 20261128, B = 10,000).
 Plan: `../03_Consolidated_Knowledge_Base/08_Research_Design_and_Analysis_Plan.md` §6. Deviations: see plan §13.
+**Settings status:** Execution settings (B = 10,000, seed 20261128, percentile 95% intervals, whole-report resampling, Wilson per-condition intervals, Holm adjustment) were finalized during analysis and approved by the owner on 2026-11-28; they were not all pre-specified (plan section 13).
 
 **Inputs:** owner-supplied, confidential case-level files (not committed). SHA-256 values are listed at the end. Only aggregate statistics are reported here.
 
@@ -93,11 +94,22 @@ Matrix 2 minus Matrix 1, same prediction set, same resampled reports. This is th
 
 ## 4. Agreement between the two reference-label sets (Matrix 1 vs Matrix 2, same cases)
 
-| Dataset | Pairs | Raw agreement | Cohen's κ (95% CI, 2,000 report-level resamples) | M1 Pos / M2 Neg | M1 Neg / M2 Pos |
-|---|---:|---|---|---:|---:|
-| CT | 2,000 | 51.55% | 0.069 (0.041–0.097) | 930 | 39 |
-| FT | 2,100 | 72.71% | 0.031 (-0.008–0.067) | 495 | 78 |
-| CA | 1,000 | 72.50% | 0.129 (0.077–0.183) | 237 | 38 |
+Definitions, on the 2×2 table of M1 × M2 labels over all report–condition pairs (n11 = both Positive, n00 = both Negative, n10 = M1 Positive / M2 Negative, n01 = M1 Negative / M2 Positive):
+- Raw agreement = (n11 + n00) / N.
+- Positive agreement PA = 2·n11 / (2·n11 + n10 + n01).
+- Negative agreement NA = 2·n00 / (2·n00 + n10 + n01).
+- Cohen's κ = (pₒ − pₑ) / (1 − pₑ).
+
+Intervals: 2,000 report-level resamples (the first 2,000 of the shared index matrix). The statistics describe **disagreement between two labelling workflows**; they are not measures of either reference's clinical correctness. Because prevalence differs greatly between the matrices, κ is reported together with PA, NA and the directional counts rather than alone.
+
+| Dataset | Pairs | M1 prevalence | M2 prevalence | Both Pos | Both Neg | M1 Pos / M2 Neg | M1 Neg / M2 Pos | Raw agreement | Positive agreement (95% CI) | Negative agreement (95% CI) | Cohen's κ (95% CI) |
+|---|---:|---|---|---:|---:|---:|---:|---|---|---|---|
+| CT | 2,000 | 52.45% | 7.90% | 119 | 912 | 930 | 39 | 51.55% | 19.72% (15.80–23.55%) | 65.31% (59.98–70.24%) | 0.069 (0.041–0.097) |
+| FT | 2,100 | 25.43% | 5.57% | 39 | 1,488 | 495 | 78 | 72.71% | 11.98% (7.82–15.91%) | 83.85% (81.09–86.29%) | 0.031 (-0.008–0.067) |
+| CA | 1,000 | 28.00% | 8.10% | 43 | 682 | 237 | 38 | 72.50% | 23.82% (17.98–29.47%) | 83.22% (80.75–85.50%) | 0.129 (0.077–0.183) |
+
+Undefined replicates (of 2,000): CT: PA 0, NA 0; FT: PA 0, NA 0; CA: PA 0, NA 0.
+
 
 Per-condition reference agreement is in the JSON file (`reference_label_agreement.*.per_condition`).
 

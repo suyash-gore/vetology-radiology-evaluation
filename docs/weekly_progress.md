@@ -193,3 +193,8 @@ The Week 4 application and optional JSON prompt-configuration task are implement
 
 ### Open
 - Owner confirmations on the Gold Standard process, ethics, model snapshots, D-A batch selection and FLAIR Appendix S1 (see `paper/README.md`).
+
+### Week 8 — v0.2 revision (2026-11-28)
+- Statistical settings approved and documented as finalized during analysis (plan §13.1).
+- Reference-label agreement extended with positive and negative agreement and prevalence; the manuscript interpretation revised accordingly.
+- Manuscript v0.2 written (v0.1 retained). D-A remains open.

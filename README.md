@@ -11,7 +11,7 @@ Python project for the Vetology training assignments. The project processes vete
 Branch `week-08/research-paper-development` adds:
 - the research knowledge base (`Vetology_Research_Knowledge_Base/`);
 - the statistical analysis script `analysis/week08_statistics.py`, whose aggregate outputs are in `Vetology_Research_Knowledge_Base/04_Evidence_and_Artifacts/07_*`;
-- the first manuscript draft, `paper/Research_Paper_Draft_v0.1.md`.
+- manuscript drafts in `paper/` (current: `Research_Paper_Draft_v0.2.md`; v0.1 retained).
 
 No application code, prompts or historical outputs were changed.
 
