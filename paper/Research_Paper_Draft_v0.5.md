@@ -591,7 +591,7 @@ Khosravi B, Dapamede T, Li F, Chisango Z, Bikmal A, Garg S, Owosela B, Khosravi 
 
 Kottlors J, Iuga AI, Bluethgen C, Bressem K, Kather JN, et al. 2026. Guidelines for Reporting Studies on Large Language Models in Radiology: An International Delphi Expert Survey. *Radiology* 318(2): e250913. https://doi.org/10.1148/radiol.250913
 
-Reichenpfader D, Müller H, Denecke K. 2024. A scoping review of large language model based approaches for information extraction from radiology reports. *npj Digital Medicine* 7: 222. https://doi.org/10.1038/s41746-024-01219-0 `[SOURCE VERIFICATION REQUIRED: metadata only]`
+Reichenpfader D, Müller H, Denecke K. 2024. A scoping review of large language model based approaches for information extraction from radiology reports. *npj Digital Medicine* 7: 222. https://doi.org/10.1038/s41746-024-01219-0 (metadata-level verification only)
 
 Sorin V, Collins JD, Bratt AK, Kusmirek JE, Mugu VK, Kline TL, Butler CL, Wood NG, Cook CJ, Korfiatis P. 2025. Evaluating prompt and data perturbation sensitivity in large language models for radiology reports classification. *JAMIA Open* 8(4): ooaf073. https://doi.org/10.1093/jamiaopen/ooaf073
 
@@ -629,7 +629,7 @@ User message: "Classify the following {canine thorax | feline thorax | canine ab
 - Weeks 5–8 are on feature branches and have not been merged into `main`.
 - Output files are confidential and are not in the repository: per-run `predictions.jsonl`, the Matrix 1/Matrix 2 evaluation workbooks, and the comparison workbooks. The Week 7 run manifests are committed.
 
-**A.3 Domain texts consulted for the Canine Thorax V1.3 prompt** (editions `[AUTHOR CONFIRMATION REQUIRED]`). These are domain references for prompt writing, not evidence for the results:
+**A.3 Domain texts consulted for the Canine Thorax V1.3 prompt.** The edition details were not recorded for most titles; the one recorded edition is shown where available. These are domain references for prompt writing, not evidence for the results:
 1. Thrall's Textbook of Veterinary Diagnostic Radiology (8th ed.).
 2. BSAVA Manual of Canine and Feline Radiography and Radiology.
 3. Practical Veterinary Diagnostic Imaging.
