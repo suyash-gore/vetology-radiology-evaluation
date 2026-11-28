@@ -1,0 +1,9522 @@
+{
+ "meta": {
+  "generated_utc": "2026-11-28 18:04:30 UTC",
+  "script": "analysis/week08_statistics.py",
+  "seed": 20261128,
+  "bootstrap_replicates": 10000,
+  "resampling_unit": "report (case); all condition labels of a resampled report kept together",
+  "interval": "percentile 95% over defined replicates; undefined-replicate count reported",
+  "wilson": "95% Wilson score interval per condition (cases treated as independent)",
+  "f1_definition": "2TP/(2TP+FP+FN); undefined only when denominator is 0 (plan section 6.2)",
+  "inputs": {
+   "Vetology_Matrix1_First100Raw_EncodedPositveNegative_Canine_Thorax_Records.xlsx": "3f1a17b7046b2e1ff7e7d857e24b2f421f56392040a624b90836818b1176ef25",
+   "outputs/week_04/matrix_1/predictions.jsonl": "78814024fade03cc1e0a673166efca8cfe473a6977d44f632b20d3583052c8c1",
+   "1_canine_thorax_gold_standard_score_draft.xlsx": "d1fab50ee938f0608d7487f87e6650a28846cc5253dd6f170dce3fa990896fa4",
+   "outputs/week_04/canine_thorax/predictions.jsonl": "70fe93918f2e941fec32fe065c17841ce325faa6fa40daafbf17b6f3ae092f70",
+   "outputs/week_05/matrix_1/predictions.jsonl": "c50d9d9799f8bab1ef16caa007cb6bda39bb91bf6f156d684e3e2700e97c781d",
+   "outputs/week_05/matrix_2/predictions.jsonl": "5b14a3ad77a3dec3d35490695a07dea1cbccd8c7cc1b338841c0fc0491de0038",
+   "outputs/week_07/week 5 rebuild with different llm (gemini flash)/matrix_1/predictions.jsonl": "7ebf010b673990ea47d09331f3bfe0cfdd20cf7f13c62324eae8e76fa5335e81",
+   "outputs/week_07/week 5 rebuild with different llm (gemini flash)/matrix_2/predictions.jsonl": "5d0a160b31584bde3da01832a5b93ca678e8bbd35659b8fc51aee1b335cf6603",
+   "2_feline_thorax_raw_data_encoded.xlsx": "ef8fcc979132b59d26f37ecae04c2331ad97b37247d123e72556a655a3815516",
+   "outputs/week_07/2nd application/feline_thorax/predictions/predictions.jsonl": "c103885357a3d22e6d4215c91238f5f5b3bd3c3b09b2c9733871de0274bf8df1",
+   "2_feline_thorax_gold_standard_score_draft.xlsx": "c01a6e4b67fb629929f873340bbf8626f57e50e975660a62a264a77614d55136",
+   "3_canine_abdomen_raw_data_encoded.xlsx": "583e7523abb30794cdabe745820a27c896ff0d8ddab5803c54511b8b747a5efe",
+   "outputs/week_07/3rd application/canine_abdomen/predictions/predictions.jsonl": "61e151c4cf0548df0483561e6a9a5e44ccbcb5cf4b1c244f475d2fff80e69f6e",
+   "3_canine_abdomen_gold_standard_score_draft.xlsx": "95e053a48e9a8bf15cbbf794c12bb026f499029ade5824dfdee161ce8d2bd054"
+  }
+ },
+ "evaluations": {
+  "EVAL-01": {
+   "label": "CT Week 4 OpenAI M1",
+   "dataset": "CT",
+   "matrix": "M1",
+   "run": "RUN-02",
+   "counts": {
+    "TP": 128,
+    "FN": 921,
+    "TN": 913,
+    "FP": 38
+   },
+   "micro": {
+    "accuracy": {
+     "point": 0.5205,
+     "ci95": [
+      0.4715,
+      0.5705
+     ],
+     "undefined_replicates": 0
+    },
+    "sensitivity": {
+     "point": 0.122021,
+     "ci95": [
+      0.094988,
+      0.148833
+     ],
+     "undefined_replicates": 0
+    },
+    "specificity": {
+     "point": 0.960042,
+     "ci95": [
+      0.941048,
+      0.976555
+     ],
+     "undefined_replicates": 0
+    },
+    "precision": {
+     "point": 0.771084,
+     "ci95": [
+      0.671137,
+      0.860612
+     ],
+     "undefined_replicates": 0
+    },
+    "f1": {
+     "point": 0.2107,
+     "ci95": [
+      0.167539,
+      0.251302
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "macro": {
+    "sensitivity": {
+     "point": 0.130124,
+     "included": 20,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.100914,
+      0.159145
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 20,
+      "median": 20.0,
+      "max": 20
+     }
+    },
+    "specificity": {
+     "point": 0.956798,
+     "included": 20,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.93741,
+      0.973982
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 20,
+      "median": 20.0,
+      "max": 20
+     }
+    },
+    "precision": {
+     "point": 0.805085,
+     "included": 17,
+     "excluded_undefined": 3,
+     "ci95": [
+      0.691338,
+      0.897978
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 11,
+      "median": 16.0,
+      "max": 17
+     }
+    },
+    "f1": {
+     "point": 0.193019,
+     "included": 20,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.154093,
+      0.225805
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 20,
+      "median": 20.0,
+      "max": 20
+     }
+    }
+   },
+   "conditions": [
+    {
+     "condition": "perihilar_infiltrate",
+     "TP": 1,
+     "FN": 56,
+     "TN": 42,
+     "FP": 1,
+     "ref_pos": 57,
+     "ref_neg": 43,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 0.017544,
+      "wilson95": [
+       0.003104,
+       0.092907
+      ],
+      "n": 57
+     },
+     "specificity": {
+      "point": 0.976744,
+      "wilson95": [
+       0.87941,
+       0.995883
+      ],
+      "n": 43
+     },
+     "precision": {
+      "point": 0.5,
+      "wilson95": [
+       0.094531,
+       0.905469
+      ],
+      "n": 2
+     },
+     "f1": 0.033898,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1343,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pneumonia",
+     "TP": 7,
+     "FN": 40,
+     "TN": 52,
+     "FP": 1,
+     "ref_pos": 47,
+     "ref_neg": 53,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 0.148936,
+      "wilson95": [
+       0.074067,
+       0.276856
+      ],
+      "n": 47
+     },
+     "specificity": {
+      "point": 0.981132,
+      "wilson95": [
+       0.900571,
+       0.996662
+      ],
+      "n": 53
+     },
+     "precision": {
+      "point": 0.875,
+      "wilson95": [
+       0.529112,
+       0.977583
+      ],
+      "n": 8
+     },
+     "f1": 0.254545,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 3,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "bronchitis",
+     "TP": 15,
+     "FN": 48,
+     "TN": 33,
+     "FP": 4,
+     "ref_pos": 63,
+     "ref_neg": 37,
+     "pred_pos": 19,
+     "sensitivity": {
+      "point": 0.238095,
+      "wilson95": [
+       0.149938,
+       0.356357
+      ],
+      "n": 63
+     },
+     "specificity": {
+      "point": 0.891892,
+      "wilson95": [
+       0.752915,
+       0.957148
+      ],
+      "n": 37
+     },
+     "precision": {
+      "point": 0.789474,
+      "wilson95": [
+       0.566657,
+       0.914923
+      ],
+      "n": 19
+     },
+     "f1": 0.365854,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "interstitial",
+     "TP": 19,
+     "FN": 40,
+     "TN": 30,
+     "FP": 11,
+     "ref_pos": 59,
+     "ref_neg": 41,
+     "pred_pos": 30,
+     "sensitivity": {
+      "point": 0.322034,
+      "wilson95": [
+       0.216876,
+       0.44895
+      ],
+      "n": 59
+     },
+     "specificity": {
+      "point": 0.731707,
+      "wilson95": [
+       0.580665,
+       0.84305
+      ],
+      "n": 41
+     },
+     "precision": {
+      "point": 0.633333,
+      "wilson95": [
+       0.455136,
+       0.781261
+      ],
+      "n": 30
+     },
+     "f1": 0.426966,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "diseased_lungs",
+     "TP": 26,
+     "FN": 37,
+     "TN": 30,
+     "FP": 7,
+     "ref_pos": 63,
+     "ref_neg": 37,
+     "pred_pos": 33,
+     "sensitivity": {
+      "point": 0.412698,
+      "wilson95": [
+       0.299585,
+       0.535847
+      ],
+      "n": 63
+     },
+     "specificity": {
+      "point": 0.810811,
+      "wilson95": [
+       0.657953,
+       0.9052
+      ],
+      "n": 37
+     },
+     "precision": {
+      "point": 0.787879,
+      "wilson95": [
+       0.622484,
+       0.89324
+      ],
+      "n": 33
+     },
+     "f1": 0.541667,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "hypo_plastic_trachea",
+     "TP": 0,
+     "FN": 35,
+     "TN": 65,
+     "FP": 0,
+     "ref_pos": 35,
+     "ref_neg": 65,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.098901
+      ],
+      "n": 35
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.944198,
+       1.0
+      ],
+      "n": 65
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "cardiomegaly",
+     "TP": 12,
+     "FN": 17,
+     "TN": 67,
+     "FP": 4,
+     "ref_pos": 29,
+     "ref_neg": 71,
+     "pred_pos": 16,
+     "sensitivity": {
+      "point": 0.413793,
+      "wilson95": [
+       0.255132,
+       0.592622
+      ],
+      "n": 29
+     },
+     "specificity": {
+      "point": 0.943662,
+      "wilson95": [
+       0.863904,
+       0.977875
+      ],
+      "n": 71
+     },
+     "precision": {
+      "point": 0.75,
+      "wilson95": [
+       0.505017,
+       0.898179
+      ],
+      "n": 16
+     },
+     "f1": 0.533333,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pulmonary_nodules",
+     "TP": 7,
+     "FN": 55,
+     "TN": 37,
+     "FP": 1,
+     "ref_pos": 62,
+     "ref_neg": 38,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 0.112903,
+      "wilson95": [
+       0.055779,
+       0.215197
+      ],
+      "n": 62
+     },
+     "specificity": {
+      "point": 0.973684,
+      "wilson95": [
+       0.865051,
+       0.995339
+      ],
+      "n": 38
+     },
+     "precision": {
+      "point": 0.875,
+      "wilson95": [
+       0.529112,
+       0.977583
+      ],
+      "n": 8
+     },
+     "f1": 0.2,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pleural_effusion",
+     "TP": 1,
+     "FN": 59,
+     "TN": 40,
+     "FP": 0,
+     "ref_pos": 60,
+     "ref_neg": 40,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 0.016667,
+      "wilson95": [
+       0.002948,
+       0.088551
+      ],
+      "n": 60
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.912378,
+       1.0
+      ],
+      "n": 40
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 0.032787,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 3675,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "rtm",
+     "TP": 4,
+     "FN": 51,
+     "TN": 43,
+     "FP": 2,
+     "ref_pos": 55,
+     "ref_neg": 45,
+     "pred_pos": 6,
+     "sensitivity": {
+      "point": 0.072727,
+      "wilson95": [
+       0.028644,
+       0.172599
+      ],
+      "n": 55
+     },
+     "specificity": {
+      "point": 0.955556,
+      "wilson95": [
+       0.851725,
+       0.987726
+      ],
+      "n": 45
+     },
+     "precision": {
+      "point": 0.666667,
+      "wilson95": [
+       0.299993,
+       0.903229
+      ],
+      "n": 6
+     },
+     "f1": 0.131148,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 22,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "focal_caudodorsal_lung",
+     "TP": 5,
+     "FN": 42,
+     "TN": 53,
+     "FP": 0,
+     "ref_pos": 47,
+     "ref_neg": 53,
+     "pred_pos": 5,
+     "sensitivity": {
+      "point": 0.106383,
+      "wilson95": [
+       0.046305,
+       0.225943
+      ],
+      "n": 47
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.932418,
+       1.0
+      ],
+      "n": 53
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.565518,
+       1.0
+      ],
+      "n": 5
+     },
+     "f1": 0.192308,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 68,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "focal_perihilar",
+     "TP": 0,
+     "FN": 58,
+     "TN": 42,
+     "FP": 0,
+     "ref_pos": 58,
+     "ref_neg": 42,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.062118
+      ],
+      "n": 58
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.916201,
+       1.0
+      ],
+      "n": 42
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pulmonary_hypoinflation",
+     "TP": 10,
+     "FN": 62,
+     "TN": 27,
+     "FP": 1,
+     "ref_pos": 72,
+     "ref_neg": 28,
+     "pred_pos": 11,
+     "sensitivity": {
+      "point": 0.138889,
+      "wilson95": [
+       0.077227,
+       0.237132
+      ],
+      "n": 72
+     },
+     "specificity": {
+      "point": 0.964286,
+      "wilson95": [
+       0.822878,
+       0.993667
+      ],
+      "n": 28
+     },
+     "precision": {
+      "point": 0.909091,
+      "wilson95": [
+       0.622642,
+       0.983768
+      ],
+      "n": 11
+     },
+     "f1": 0.240964,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "right_sided_cardiomegaly",
+     "TP": 2,
+     "FN": 30,
+     "TN": 67,
+     "FP": 1,
+     "ref_pos": 32,
+     "ref_neg": 68,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 0.0625,
+      "wilson95": [
+       0.017311,
+       0.201471
+      ],
+      "n": 32
+     },
+     "specificity": {
+      "point": 0.985294,
+      "wilson95": [
+       0.92129,
+       0.997399
+      ],
+      "n": 68
+     },
+     "precision": {
+      "point": 0.666667,
+      "wilson95": [
+       0.20766,
+       0.938508
+      ],
+      "n": 3
+     },
+     "f1": 0.114286,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 498,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pericardial_effusion",
+     "TP": 1,
+     "FN": 23,
+     "TN": 76,
+     "FP": 0,
+     "ref_pos": 24,
+     "ref_neg": 76,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 0.041667,
+      "wilson95": [
+       0.007393,
+       0.202418
+      ],
+      "n": 24
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.951886,
+       1.0
+      ],
+      "n": 76
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 0.08,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 3598,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "bronchiectasis",
+     "TP": 0,
+     "FN": 67,
+     "TN": 33,
+     "FP": 0,
+     "ref_pos": 67,
+     "ref_neg": 33,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.054226
+      ],
+      "n": 67
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.89573,
+       1.0
+      ],
+      "n": 33
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pulmonary_vessel_enlargement",
+     "TP": 2,
+     "FN": 50,
+     "TN": 48,
+     "FP": 0,
+     "ref_pos": 52,
+     "ref_neg": 48,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 0.038462,
+      "wilson95": [
+       0.010612,
+       0.129812
+      ],
+      "n": 52
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.9259,
+       1.0
+      ],
+      "n": 48
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "f1": 0.074074,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1364,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "left_sided_cardiomegaly",
+     "TP": 11,
+     "FN": 17,
+     "TN": 68,
+     "FP": 4,
+     "ref_pos": 28,
+     "ref_neg": 72,
+     "pred_pos": 15,
+     "sensitivity": {
+      "point": 0.392857,
+      "wilson95": [
+       0.235657,
+       0.57591
+      ],
+      "n": 28
+     },
+     "specificity": {
+      "point": 0.944444,
+      "wilson95": [
+       0.86568,
+       0.978186
+      ],
+      "n": 72
+     },
+     "precision": {
+      "point": 0.733333,
+      "wilson95": [
+       0.480496,
+       0.891025
+      ],
+      "n": 15
+     },
+     "f1": 0.511628,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "thoracic_lymphadenopathy",
+     "TP": 4,
+     "FN": 78,
+     "TN": 18,
+     "FP": 0,
+     "ref_pos": 82,
+     "ref_neg": 18,
+     "pred_pos": 4,
+     "sensitivity": {
+      "point": 0.04878,
+      "wilson95": [
+       0.019131,
+       0.118815
+      ],
+      "n": 82
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.824121,
+       1.0
+      ],
+      "n": 18
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.510109,
+       1.0
+      ],
+      "n": 4
+     },
+     "f1": 0.093023,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 159,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "esophagitis",
+     "TP": 1,
+     "FN": 56,
+     "TN": 42,
+     "FP": 1,
+     "ref_pos": 57,
+     "ref_neg": 43,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 0.017544,
+      "wilson95": [
+       0.003104,
+       0.092907
+      ],
+      "n": 57
+     },
+     "specificity": {
+      "point": 0.976744,
+      "wilson95": [
+       0.87941,
+       0.995883
+      ],
+      "n": 43
+     },
+     "precision": {
+      "point": 0.5,
+      "wilson95": [
+       0.094531,
+       0.905469
+      ],
+      "n": 2
+     },
+     "f1": 0.033898,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1344,
+      "f1": 0
+     }
+    }
+   ]
+  },
+  "EVAL-02": {
+   "label": "CT Week 4 OpenAI M2",
+   "dataset": "CT",
+   "matrix": "M2",
+   "run": "RUN-01",
+   "counts": {
+    "TP": 127,
+    "FN": 31,
+    "TN": 1803,
+    "FP": 39
+   },
+   "micro": {
+    "accuracy": {
+     "point": 0.965,
+     "ci95": [
+      0.9555,
+      0.974
+     ],
+     "undefined_replicates": 0
+    },
+    "sensitivity": {
+     "point": 0.803797,
+     "ci95": [
+      0.732394,
+      0.866675
+     ],
+     "undefined_replicates": 0
+    },
+    "specificity": {
+     "point": 0.978827,
+     "ci95": [
+      0.971207,
+      0.985683
+     ],
+     "undefined_replicates": 0
+    },
+    "precision": {
+     "point": 0.76506,
+     "ci95": [
+      0.70149,
+      0.823864
+     ],
+     "undefined_replicates": 0
+    },
+    "f1": {
+     "point": 0.783951,
+     "ci95": [
+      0.728394,
+      0.829725
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "macro": {
+    "sensitivity": {
+     "point": 0.801797,
+     "included": 16,
+     "excluded_undefined": 4,
+     "ci95": [
+      0.72065,
+      0.921513
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 9,
+      "median": 14.0,
+      "max": 16
+     }
+    },
+    "specificity": {
+     "point": 0.978565,
+     "included": 20,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.970873,
+      0.985496
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 20,
+      "median": 20.0,
+      "max": 20
+     }
+    },
+    "precision": {
+     "point": 0.548651,
+     "included": 17,
+     "excluded_undefined": 3,
+     "ci95": [
+      0.473623,
+      0.660178
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 11,
+      "median": 16.0,
+      "max": 17
+     }
+    },
+    "f1": {
+     "point": 0.570621,
+     "included": 18,
+     "excluded_undefined": 2,
+     "ci95": [
+      0.474678,
+      0.657703
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 11,
+      "median": 17.0,
+      "max": 18
+     }
+    }
+   },
+   "conditions": [
+    {
+     "condition": "perihilar_infiltrate",
+     "TP": 0,
+     "FN": 2,
+     "TN": 96,
+     "FP": 2,
+     "ref_pos": 2,
+     "ref_neg": 98,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.65762
+      ],
+      "n": 2
+     },
+     "specificity": {
+      "point": 0.979592,
+      "wilson95": [
+       0.928618,
+       0.994385
+      ],
+      "n": 98
+     },
+     "precision": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.65762
+      ],
+      "n": 2
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 1328,
+      "precision": 1343,
+      "f1": 182
+     }
+    },
+    {
+     "condition": "pneumonia",
+     "TP": 6,
+     "FN": 0,
+     "TN": 92,
+     "FP": 2,
+     "ref_pos": 6,
+     "ref_neg": 94,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.609666,
+       1.0
+      ],
+      "n": 6
+     },
+     "specificity": {
+      "point": 0.978723,
+      "wilson95": [
+       0.92571,
+       0.994146
+      ],
+      "n": 94
+     },
+     "precision": {
+      "point": 0.75,
+      "wilson95": [
+       0.409275,
+       0.928521
+      ],
+      "n": 8
+     },
+     "f1": 0.857143,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 16,
+      "precision": 3,
+      "f1": 3
+     }
+    },
+    {
+     "condition": "bronchitis",
+     "TP": 9,
+     "FN": 6,
+     "TN": 75,
+     "FP": 10,
+     "ref_pos": 15,
+     "ref_neg": 85,
+     "pred_pos": 19,
+     "sensitivity": {
+      "point": 0.6,
+      "wilson95": [
+       0.357468,
+       0.801755
+      ],
+      "n": 15
+     },
+     "specificity": {
+      "point": 0.882353,
+      "wilson95": [
+       0.796814,
+       0.934826
+      ],
+      "n": 85
+     },
+     "precision": {
+      "point": 0.473684,
+      "wilson95": [
+       0.273298,
+       0.682922
+      ],
+      "n": 19
+     },
+     "f1": 0.529412,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "interstitial",
+     "TP": 27,
+     "FN": 1,
+     "TN": 70,
+     "FP": 2,
+     "ref_pos": 28,
+     "ref_neg": 72,
+     "pred_pos": 29,
+     "sensitivity": {
+      "point": 0.964286,
+      "wilson95": [
+       0.822878,
+       0.993667
+      ],
+      "n": 28
+     },
+     "specificity": {
+      "point": 0.972222,
+      "wilson95": [
+       0.904258,
+       0.992349
+      ],
+      "n": 72
+     },
+     "precision": {
+      "point": 0.931034,
+      "wilson95": [
+       0.780354,
+       0.980879
+      ],
+      "n": 29
+     },
+     "f1": 0.947368,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "diseased_lungs",
+     "TP": 34,
+     "FN": 14,
+     "TN": 52,
+     "FP": 0,
+     "ref_pos": 48,
+     "ref_neg": 52,
+     "pred_pos": 34,
+     "sensitivity": {
+      "point": 0.708333,
+      "wilson95": [
+       0.568207,
+       0.817584
+      ],
+      "n": 48
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.931208,
+       1.0
+      ],
+      "n": 52
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.898485,
+       1.0
+      ],
+      "n": 34
+     },
+     "f1": 0.829268,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "hypo_plastic_trachea",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "cardiomegaly",
+     "TP": 15,
+     "FN": 4,
+     "TN": 80,
+     "FP": 1,
+     "ref_pos": 19,
+     "ref_neg": 81,
+     "pred_pos": 16,
+     "sensitivity": {
+      "point": 0.789474,
+      "wilson95": [
+       0.566657,
+       0.914923
+      ],
+      "n": 19
+     },
+     "specificity": {
+      "point": 0.987654,
+      "wilson95": [
+       0.933331,
+       0.997817
+      ],
+      "n": 81
+     },
+     "precision": {
+      "point": 0.9375,
+      "wilson95": [
+       0.716713,
+       0.988881
+      ],
+      "n": 16
+     },
+     "f1": 0.857143,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pulmonary_nodules",
+     "TP": 5,
+     "FN": 1,
+     "TN": 91,
+     "FP": 3,
+     "ref_pos": 6,
+     "ref_neg": 94,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 0.833333,
+      "wilson95": [
+       0.436497,
+       0.969947
+      ],
+      "n": 6
+     },
+     "specificity": {
+      "point": 0.968085,
+      "wilson95": [
+       0.910327,
+       0.989087
+      ],
+      "n": 94
+     },
+     "precision": {
+      "point": 0.625,
+      "wilson95": [
+       0.305742,
+       0.863156
+      ],
+      "n": 8
+     },
+     "f1": 0.714286,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 24,
+      "precision": 1,
+      "f1": 1
+     }
+    },
+    {
+     "condition": "pleural_effusion",
+     "TP": 1,
+     "FN": 0,
+     "TN": 99,
+     "FP": 0,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.962647,
+       1.0
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 1.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3675,
+      "precision": 3675,
+      "f1": 3675
+     }
+    },
+    {
+     "condition": "rtm",
+     "TP": 2,
+     "FN": 0,
+     "TN": 94,
+     "FP": 4,
+     "ref_pos": 2,
+     "ref_neg": 98,
+     "pred_pos": 6,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "specificity": {
+      "point": 0.959184,
+      "wilson95": [
+       0.899712,
+       0.984015
+      ],
+      "n": 98
+     },
+     "precision": {
+      "point": 0.333333,
+      "wilson95": [
+       0.096771,
+       0.700007
+      ],
+      "n": 6
+     },
+     "f1": 0.5,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 1286,
+      "precision": 22,
+      "f1": 22
+     }
+    },
+    {
+     "condition": "focal_caudodorsal_lung",
+     "TP": 1,
+     "FN": 0,
+     "TN": 96,
+     "FP": 3,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 4,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 0.969697,
+      "wilson95": [
+       0.914663,
+       0.989641
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 0.25,
+      "wilson95": [
+       0.045587,
+       0.699358
+      ],
+      "n": 4
+     },
+     "f1": 0.4,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3681,
+      "precision": 194,
+      "f1": 194
+     }
+    },
+    {
+     "condition": "focal_perihilar",
+     "TP": 0,
+     "FN": 2,
+     "TN": 98,
+     "FP": 0,
+     "ref_pos": 2,
+     "ref_neg": 98,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.65762
+      ],
+      "n": 2
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.96228,
+       1.0
+      ],
+      "n": 98
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 1328,
+      "precision": 10000,
+      "f1": 1328
+     }
+    },
+    {
+     "condition": "pulmonary_hypoinflation",
+     "TP": 9,
+     "FN": 0,
+     "TN": 89,
+     "FP": 2,
+     "ref_pos": 9,
+     "ref_neg": 91,
+     "pred_pos": 11,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.700855,
+       1.0
+      ],
+      "n": 9
+     },
+     "specificity": {
+      "point": 0.978022,
+      "wilson95": [
+       0.923368,
+       0.993952
+      ],
+      "n": 91
+     },
+     "precision": {
+      "point": 0.818182,
+      "wilson95": [
+       0.523019,
+       0.948632
+      ],
+      "n": 11
+     },
+     "f1": 0.9,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "right_sided_cardiomegaly",
+     "TP": 1,
+     "FN": 0,
+     "TN": 97,
+     "FP": 2,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 0.979798,
+      "wilson95": [
+       0.92931,
+       0.994442
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 0.333333,
+      "wilson95": [
+       0.061492,
+       0.79234
+      ],
+      "n": 3
+     },
+     "f1": 0.5,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3677,
+      "precision": 498,
+      "f1": 498
+     }
+    },
+    {
+     "condition": "pericardial_effusion",
+     "TP": 0,
+     "FN": 0,
+     "TN": 99,
+     "FP": 1,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 0.99,
+      "wilson95": [
+       0.945514,
+       0.998233
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.793451
+      ],
+      "n": 1
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 3598,
+      "f1": 3598
+     }
+    },
+    {
+     "condition": "bronchiectasis",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "pulmonary_vessel_enlargement",
+     "TP": 1,
+     "FN": 0,
+     "TN": 98,
+     "FP": 1,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 0.989899,
+      "wilson95": [
+       0.944985,
+       0.998215
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 0.5,
+      "wilson95": [
+       0.094531,
+       0.905469
+      ],
+      "n": 2
+     },
+     "f1": 0.666667,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3677,
+      "precision": 1364,
+      "f1": 1364
+     }
+    },
+    {
+     "condition": "left_sided_cardiomegaly",
+     "TP": 14,
+     "FN": 1,
+     "TN": 83,
+     "FP": 2,
+     "ref_pos": 15,
+     "ref_neg": 85,
+     "pred_pos": 16,
+     "sensitivity": {
+      "point": 0.933333,
+      "wilson95": [
+       0.701835,
+       0.988133
+      ],
+      "n": 15
+     },
+     "specificity": {
+      "point": 0.976471,
+      "wilson95": [
+       0.918213,
+       0.993523
+      ],
+      "n": 85
+     },
+     "precision": {
+      "point": 0.875,
+      "wilson95": [
+       0.639772,
+       0.965023
+      ],
+      "n": 16
+     },
+     "f1": 0.903226,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "thoracic_lymphadenopathy",
+     "TP": 2,
+     "FN": 0,
+     "TN": 96,
+     "FP": 2,
+     "ref_pos": 2,
+     "ref_neg": 98,
+     "pred_pos": 4,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "specificity": {
+      "point": 0.979592,
+      "wilson95": [
+       0.928618,
+       0.994385
+      ],
+      "n": 98
+     },
+     "precision": {
+      "point": 0.5,
+      "wilson95": [
+       0.150039,
+       0.849961
+      ],
+      "n": 4
+     },
+     "f1": 0.666667,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 1305,
+      "precision": 159,
+      "f1": 159
+     }
+    },
+    {
+     "condition": "esophagitis",
+     "TP": 0,
+     "FN": 0,
+     "TN": 98,
+     "FP": 2,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 0.98,
+      "wilson95": [
+       0.929988,
+       0.994498
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.65762
+      ],
+      "n": 2
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 1344,
+      "f1": 1344
+     }
+    }
+   ]
+  },
+  "EVAL-05": {
+   "label": "CT Week 5 OpenAI M1",
+   "dataset": "CT",
+   "matrix": "M1",
+   "run": "RUN-03",
+   "counts": {
+    "TP": 126,
+    "FN": 923,
+    "TN": 916,
+    "FP": 35
+   },
+   "micro": {
+    "accuracy": {
+     "point": 0.521,
+     "ci95": [
+      0.472,
+      0.5715
+     ],
+     "undefined_replicates": 0
+    },
+    "sensitivity": {
+     "point": 0.120114,
+     "ci95": [
+      0.092823,
+      0.146712
+     ],
+     "undefined_replicates": 0
+    },
+    "specificity": {
+     "point": 0.963197,
+     "ci95": [
+      0.944803,
+      0.978788
+     ],
+     "undefined_replicates": 0
+    },
+    "precision": {
+     "point": 0.782609,
+     "ci95": [
+      0.684491,
+      0.871508
+     ],
+     "undefined_replicates": 0
+    },
+    "f1": {
+     "point": 0.208264,
+     "ci95": [
+      0.164602,
+      0.24885
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "macro": {
+    "sensitivity": {
+     "point": 0.127188,
+     "included": 20,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.097955,
+      0.156054
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 20,
+      "median": 20.0,
+      "max": 20
+     }
+    },
+    "specificity": {
+     "point": 0.960588,
+     "included": 20,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.942179,
+      0.976757
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 20,
+      "median": 20.0,
+      "max": 20
+     }
+    },
+    "precision": {
+     "point": 0.808723,
+     "included": 17,
+     "excluded_undefined": 3,
+     "ci95": [
+      0.692905,
+      0.902823
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 10,
+      "median": 16.0,
+      "max": 17
+     }
+    },
+    "f1": {
+     "point": 0.188783,
+     "included": 20,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.149821,
+      0.222043
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 20,
+      "median": 20.0,
+      "max": 20
+     }
+    }
+   },
+   "conditions": [
+    {
+     "condition": "perihilar_infiltrate",
+     "TP": 1,
+     "FN": 56,
+     "TN": 42,
+     "FP": 1,
+     "ref_pos": 57,
+     "ref_neg": 43,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 0.017544,
+      "wilson95": [
+       0.003104,
+       0.092907
+      ],
+      "n": 57
+     },
+     "specificity": {
+      "point": 0.976744,
+      "wilson95": [
+       0.87941,
+       0.995883
+      ],
+      "n": 43
+     },
+     "precision": {
+      "point": 0.5,
+      "wilson95": [
+       0.094531,
+       0.905469
+      ],
+      "n": 2
+     },
+     "f1": 0.033898,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1343,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pneumonia",
+     "TP": 7,
+     "FN": 40,
+     "TN": 52,
+     "FP": 1,
+     "ref_pos": 47,
+     "ref_neg": 53,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 0.148936,
+      "wilson95": [
+       0.074067,
+       0.276856
+      ],
+      "n": 47
+     },
+     "specificity": {
+      "point": 0.981132,
+      "wilson95": [
+       0.900571,
+       0.996662
+      ],
+      "n": 53
+     },
+     "precision": {
+      "point": 0.875,
+      "wilson95": [
+       0.529112,
+       0.977583
+      ],
+      "n": 8
+     },
+     "f1": 0.254545,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 3,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "bronchitis",
+     "TP": 15,
+     "FN": 48,
+     "TN": 33,
+     "FP": 4,
+     "ref_pos": 63,
+     "ref_neg": 37,
+     "pred_pos": 19,
+     "sensitivity": {
+      "point": 0.238095,
+      "wilson95": [
+       0.149938,
+       0.356357
+      ],
+      "n": 63
+     },
+     "specificity": {
+      "point": 0.891892,
+      "wilson95": [
+       0.752915,
+       0.957148
+      ],
+      "n": 37
+     },
+     "precision": {
+      "point": 0.789474,
+      "wilson95": [
+       0.566657,
+       0.914923
+      ],
+      "n": 19
+     },
+     "f1": 0.365854,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "interstitial",
+     "TP": 19,
+     "FN": 40,
+     "TN": 32,
+     "FP": 9,
+     "ref_pos": 59,
+     "ref_neg": 41,
+     "pred_pos": 28,
+     "sensitivity": {
+      "point": 0.322034,
+      "wilson95": [
+       0.216876,
+       0.44895
+      ],
+      "n": 59
+     },
+     "specificity": {
+      "point": 0.780488,
+      "wilson95": [
+       0.63295,
+       0.879968
+      ],
+      "n": 41
+     },
+     "precision": {
+      "point": 0.678571,
+      "wilson95": [
+       0.493388,
+       0.820668
+      ],
+      "n": 28
+     },
+     "f1": 0.436782,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "diseased_lungs",
+     "TP": 28,
+     "FN": 35,
+     "TN": 31,
+     "FP": 6,
+     "ref_pos": 63,
+     "ref_neg": 37,
+     "pred_pos": 34,
+     "sensitivity": {
+      "point": 0.444444,
+      "wilson95": [
+       0.328471,
+       0.566804
+      ],
+      "n": 63
+     },
+     "specificity": {
+      "point": 0.837838,
+      "wilson95": [
+       0.688635,
+       0.923488
+      ],
+      "n": 37
+     },
+     "precision": {
+      "point": 0.823529,
+      "wilson95": [
+       0.664863,
+       0.91651
+      ],
+      "n": 34
+     },
+     "f1": 0.57732,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "hypo_plastic_trachea",
+     "TP": 0,
+     "FN": 35,
+     "TN": 65,
+     "FP": 0,
+     "ref_pos": 35,
+     "ref_neg": 65,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.098901
+      ],
+      "n": 35
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.944198,
+       1.0
+      ],
+      "n": 65
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "cardiomegaly",
+     "TP": 12,
+     "FN": 17,
+     "TN": 67,
+     "FP": 4,
+     "ref_pos": 29,
+     "ref_neg": 71,
+     "pred_pos": 16,
+     "sensitivity": {
+      "point": 0.413793,
+      "wilson95": [
+       0.255132,
+       0.592622
+      ],
+      "n": 29
+     },
+     "specificity": {
+      "point": 0.943662,
+      "wilson95": [
+       0.863904,
+       0.977875
+      ],
+      "n": 71
+     },
+     "precision": {
+      "point": 0.75,
+      "wilson95": [
+       0.505017,
+       0.898179
+      ],
+      "n": 16
+     },
+     "f1": 0.533333,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pulmonary_nodules",
+     "TP": 7,
+     "FN": 55,
+     "TN": 37,
+     "FP": 1,
+     "ref_pos": 62,
+     "ref_neg": 38,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 0.112903,
+      "wilson95": [
+       0.055779,
+       0.215197
+      ],
+      "n": 62
+     },
+     "specificity": {
+      "point": 0.973684,
+      "wilson95": [
+       0.865051,
+       0.995339
+      ],
+      "n": 38
+     },
+     "precision": {
+      "point": 0.875,
+      "wilson95": [
+       0.529112,
+       0.977583
+      ],
+      "n": 8
+     },
+     "f1": 0.2,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pleural_effusion",
+     "TP": 1,
+     "FN": 59,
+     "TN": 40,
+     "FP": 0,
+     "ref_pos": 60,
+     "ref_neg": 40,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 0.016667,
+      "wilson95": [
+       0.002948,
+       0.088551
+      ],
+      "n": 60
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.912378,
+       1.0
+      ],
+      "n": 40
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 0.032787,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 3675,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "rtm",
+     "TP": 4,
+     "FN": 51,
+     "TN": 43,
+     "FP": 2,
+     "ref_pos": 55,
+     "ref_neg": 45,
+     "pred_pos": 6,
+     "sensitivity": {
+      "point": 0.072727,
+      "wilson95": [
+       0.028644,
+       0.172599
+      ],
+      "n": 55
+     },
+     "specificity": {
+      "point": 0.955556,
+      "wilson95": [
+       0.851725,
+       0.987726
+      ],
+      "n": 45
+     },
+     "precision": {
+      "point": 0.666667,
+      "wilson95": [
+       0.299993,
+       0.903229
+      ],
+      "n": 6
+     },
+     "f1": 0.131148,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 22,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "focal_caudodorsal_lung",
+     "TP": 3,
+     "FN": 44,
+     "TN": 53,
+     "FP": 0,
+     "ref_pos": 47,
+     "ref_neg": 53,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 0.06383,
+      "wilson95": [
+       0.021945,
+       0.171626
+      ],
+      "n": 47
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.932418,
+       1.0
+      ],
+      "n": 53
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.438503,
+       1.0
+      ],
+      "n": 3
+     },
+     "f1": 0.12,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 457,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "focal_perihilar",
+     "TP": 0,
+     "FN": 58,
+     "TN": 42,
+     "FP": 0,
+     "ref_pos": 58,
+     "ref_neg": 42,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.062118
+      ],
+      "n": 58
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.916201,
+       1.0
+      ],
+      "n": 42
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pulmonary_hypoinflation",
+     "TP": 10,
+     "FN": 62,
+     "TN": 27,
+     "FP": 1,
+     "ref_pos": 72,
+     "ref_neg": 28,
+     "pred_pos": 11,
+     "sensitivity": {
+      "point": 0.138889,
+      "wilson95": [
+       0.077227,
+       0.237132
+      ],
+      "n": 72
+     },
+     "specificity": {
+      "point": 0.964286,
+      "wilson95": [
+       0.822878,
+       0.993667
+      ],
+      "n": 28
+     },
+     "precision": {
+      "point": 0.909091,
+      "wilson95": [
+       0.622642,
+       0.983768
+      ],
+      "n": 11
+     },
+     "f1": 0.240964,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "right_sided_cardiomegaly",
+     "TP": 2,
+     "FN": 30,
+     "TN": 67,
+     "FP": 1,
+     "ref_pos": 32,
+     "ref_neg": 68,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 0.0625,
+      "wilson95": [
+       0.017311,
+       0.201471
+      ],
+      "n": 32
+     },
+     "specificity": {
+      "point": 0.985294,
+      "wilson95": [
+       0.92129,
+       0.997399
+      ],
+      "n": 68
+     },
+     "precision": {
+      "point": 0.666667,
+      "wilson95": [
+       0.20766,
+       0.938508
+      ],
+      "n": 3
+     },
+     "f1": 0.114286,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 498,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pericardial_effusion",
+     "TP": 1,
+     "FN": 23,
+     "TN": 76,
+     "FP": 0,
+     "ref_pos": 24,
+     "ref_neg": 76,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 0.041667,
+      "wilson95": [
+       0.007393,
+       0.202418
+      ],
+      "n": 24
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.951886,
+       1.0
+      ],
+      "n": 76
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 0.08,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 3598,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "bronchiectasis",
+     "TP": 0,
+     "FN": 67,
+     "TN": 33,
+     "FP": 0,
+     "ref_pos": 67,
+     "ref_neg": 33,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.054226
+      ],
+      "n": 67
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.89573,
+       1.0
+      ],
+      "n": 33
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pulmonary_vessel_enlargement",
+     "TP": 2,
+     "FN": 50,
+     "TN": 48,
+     "FP": 0,
+     "ref_pos": 52,
+     "ref_neg": 48,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 0.038462,
+      "wilson95": [
+       0.010612,
+       0.129812
+      ],
+      "n": 52
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.9259,
+       1.0
+      ],
+      "n": 48
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "f1": 0.074074,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1364,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "left_sided_cardiomegaly",
+     "TP": 10,
+     "FN": 18,
+     "TN": 68,
+     "FP": 4,
+     "ref_pos": 28,
+     "ref_neg": 72,
+     "pred_pos": 14,
+     "sensitivity": {
+      "point": 0.357143,
+      "wilson95": [
+       0.207058,
+       0.541697
+      ],
+      "n": 28
+     },
+     "specificity": {
+      "point": 0.944444,
+      "wilson95": [
+       0.86568,
+       0.978186
+      ],
+      "n": 72
+     },
+     "precision": {
+      "point": 0.714286,
+      "wilson95": [
+       0.453509,
+       0.882786
+      ],
+      "n": 14
+     },
+     "f1": 0.47619,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "thoracic_lymphadenopathy",
+     "TP": 3,
+     "FN": 79,
+     "TN": 18,
+     "FP": 0,
+     "ref_pos": 82,
+     "ref_neg": 18,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 0.036585,
+      "wilson95": [
+       0.01252,
+       0.102127
+      ],
+      "n": 82
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.824121,
+       1.0
+      ],
+      "n": 18
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.438503,
+       1.0
+      ],
+      "n": 3
+     },
+     "f1": 0.070588,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 453,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "esophagitis",
+     "TP": 1,
+     "FN": 56,
+     "TN": 42,
+     "FP": 1,
+     "ref_pos": 57,
+     "ref_neg": 43,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 0.017544,
+      "wilson95": [
+       0.003104,
+       0.092907
+      ],
+      "n": 57
+     },
+     "specificity": {
+      "point": 0.976744,
+      "wilson95": [
+       0.87941,
+       0.995883
+      ],
+      "n": 43
+     },
+     "precision": {
+      "point": 0.5,
+      "wilson95": [
+       0.094531,
+       0.905469
+      ],
+      "n": 2
+     },
+     "f1": 0.033898,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1344,
+      "f1": 0
+     }
+    }
+   ]
+  },
+  "EVAL-06": {
+   "label": "CT Week 5 OpenAI M2",
+   "dataset": "CT",
+   "matrix": "M2",
+   "run": "RUN-04",
+   "counts": {
+    "TP": 126,
+    "FN": 32,
+    "TN": 1806,
+    "FP": 36
+   },
+   "micro": {
+    "accuracy": {
+     "point": 0.966,
+     "ci95": [
+      0.9565,
+      0.975
+     ],
+     "undefined_replicates": 0
+    },
+    "sensitivity": {
+     "point": 0.797468,
+     "ci95": [
+      0.725275,
+      0.861446
+     ],
+     "undefined_replicates": 0
+    },
+    "specificity": {
+     "point": 0.980456,
+     "ci95": [
+      0.9729,
+      0.987282
+     ],
+     "undefined_replicates": 0
+    },
+    "precision": {
+     "point": 0.777778,
+     "ci95": [
+      0.713415,
+      0.838889
+     ],
+     "undefined_replicates": 0
+    },
+    "f1": {
+     "point": 0.7875,
+     "ci95": [
+      0.731518,
+      0.834691
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "macro": {
+    "sensitivity": {
+     "point": 0.826521,
+     "included": 16,
+     "excluded_undefined": 4,
+     "ci95": [
+      0.732163,
+      0.913081
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 9,
+      "median": 14.0,
+      "max": 16
+     }
+    },
+    "specificity": {
+     "point": 0.980168,
+     "included": 20,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.972612,
+      0.987144
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 20,
+      "median": 20.0,
+      "max": 20
+     }
+    },
+    "precision": {
+     "point": 0.583913,
+     "included": 17,
+     "excluded_undefined": 3,
+     "ci95": [
+      0.502059,
+      0.701856
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 10,
+      "median": 16.0,
+      "max": 17
+     }
+    },
+    "f1": {
+     "point": 0.603004,
+     "included": 18,
+     "excluded_undefined": 2,
+     "ci95": [
+      0.500602,
+      0.690031
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 10,
+      "median": 17.0,
+      "max": 18
+     }
+    }
+   },
+   "conditions": [
+    {
+     "condition": "perihilar_infiltrate",
+     "TP": 1,
+     "FN": 1,
+     "TN": 96,
+     "FP": 2,
+     "ref_pos": 2,
+     "ref_neg": 98,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 0.5,
+      "wilson95": [
+       0.094531,
+       0.905469
+      ],
+      "n": 2
+     },
+     "specificity": {
+      "point": 0.979592,
+      "wilson95": [
+       0.928618,
+       0.994385
+      ],
+      "n": 98
+     },
+     "precision": {
+      "point": 0.333333,
+      "wilson95": [
+       0.061492,
+       0.79234
+      ],
+      "n": 3
+     },
+     "f1": 0.4,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 1328,
+      "precision": 512,
+      "f1": 182
+     }
+    },
+    {
+     "condition": "pneumonia",
+     "TP": 6,
+     "FN": 0,
+     "TN": 92,
+     "FP": 2,
+     "ref_pos": 6,
+     "ref_neg": 94,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.609666,
+       1.0
+      ],
+      "n": 6
+     },
+     "specificity": {
+      "point": 0.978723,
+      "wilson95": [
+       0.92571,
+       0.994146
+      ],
+      "n": 94
+     },
+     "precision": {
+      "point": 0.75,
+      "wilson95": [
+       0.409275,
+       0.928521
+      ],
+      "n": 8
+     },
+     "f1": 0.857143,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 16,
+      "precision": 3,
+      "f1": 3
+     }
+    },
+    {
+     "condition": "bronchitis",
+     "TP": 9,
+     "FN": 6,
+     "TN": 76,
+     "FP": 9,
+     "ref_pos": 15,
+     "ref_neg": 85,
+     "pred_pos": 18,
+     "sensitivity": {
+      "point": 0.6,
+      "wilson95": [
+       0.357468,
+       0.801755
+      ],
+      "n": 15
+     },
+     "specificity": {
+      "point": 0.894118,
+      "wilson95": [
+       0.810865,
+       0.943288
+      ],
+      "n": 85
+     },
+     "precision": {
+      "point": 0.5,
+      "wilson95": [
+       0.29031,
+       0.70969
+      ],
+      "n": 18
+     },
+     "f1": 0.545455,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "interstitial",
+     "TP": 28,
+     "FN": 0,
+     "TN": 70,
+     "FP": 2,
+     "ref_pos": 28,
+     "ref_neg": 72,
+     "pred_pos": 30,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.879357,
+       1.0
+      ],
+      "n": 28
+     },
+     "specificity": {
+      "point": 0.972222,
+      "wilson95": [
+       0.904258,
+       0.992349
+      ],
+      "n": 72
+     },
+     "precision": {
+      "point": 0.933333,
+      "wilson95": [
+       0.786765,
+       0.981523
+      ],
+      "n": 30
+     },
+     "f1": 0.965517,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "diseased_lungs",
+     "TP": 33,
+     "FN": 15,
+     "TN": 52,
+     "FP": 0,
+     "ref_pos": 48,
+     "ref_neg": 52,
+     "pred_pos": 33,
+     "sensitivity": {
+      "point": 0.6875,
+      "wilson95": [
+       0.546669,
+       0.800543
+      ],
+      "n": 48
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.931208,
+       1.0
+      ],
+      "n": 52
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.89573,
+       1.0
+      ],
+      "n": 33
+     },
+     "f1": 0.814815,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "hypo_plastic_trachea",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "cardiomegaly",
+     "TP": 14,
+     "FN": 5,
+     "TN": 80,
+     "FP": 1,
+     "ref_pos": 19,
+     "ref_neg": 81,
+     "pred_pos": 15,
+     "sensitivity": {
+      "point": 0.736842,
+      "wilson95": [
+       0.512084,
+       0.881936
+      ],
+      "n": 19
+     },
+     "specificity": {
+      "point": 0.987654,
+      "wilson95": [
+       0.933331,
+       0.997817
+      ],
+      "n": 81
+     },
+     "precision": {
+      "point": 0.933333,
+      "wilson95": [
+       0.701835,
+       0.988133
+      ],
+      "n": 15
+     },
+     "f1": 0.823529,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pulmonary_nodules",
+     "TP": 5,
+     "FN": 1,
+     "TN": 91,
+     "FP": 3,
+     "ref_pos": 6,
+     "ref_neg": 94,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 0.833333,
+      "wilson95": [
+       0.436497,
+       0.969947
+      ],
+      "n": 6
+     },
+     "specificity": {
+      "point": 0.968085,
+      "wilson95": [
+       0.910327,
+       0.989087
+      ],
+      "n": 94
+     },
+     "precision": {
+      "point": 0.625,
+      "wilson95": [
+       0.305742,
+       0.863156
+      ],
+      "n": 8
+     },
+     "f1": 0.714286,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 24,
+      "precision": 1,
+      "f1": 1
+     }
+    },
+    {
+     "condition": "pleural_effusion",
+     "TP": 1,
+     "FN": 0,
+     "TN": 99,
+     "FP": 0,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.962647,
+       1.0
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 1.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3675,
+      "precision": 3675,
+      "f1": 3675
+     }
+    },
+    {
+     "condition": "rtm",
+     "TP": 2,
+     "FN": 0,
+     "TN": 94,
+     "FP": 4,
+     "ref_pos": 2,
+     "ref_neg": 98,
+     "pred_pos": 6,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "specificity": {
+      "point": 0.959184,
+      "wilson95": [
+       0.899712,
+       0.984015
+      ],
+      "n": 98
+     },
+     "precision": {
+      "point": 0.333333,
+      "wilson95": [
+       0.096771,
+       0.700007
+      ],
+      "n": 6
+     },
+     "f1": 0.5,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 1286,
+      "precision": 22,
+      "f1": 22
+     }
+    },
+    {
+     "condition": "focal_caudodorsal_lung",
+     "TP": 1,
+     "FN": 0,
+     "TN": 97,
+     "FP": 2,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 0.979798,
+      "wilson95": [
+       0.92931,
+       0.994442
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 0.333333,
+      "wilson95": [
+       0.061492,
+       0.79234
+      ],
+      "n": 3
+     },
+     "f1": 0.5,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3681,
+      "precision": 522,
+      "f1": 522
+     }
+    },
+    {
+     "condition": "focal_perihilar",
+     "TP": 0,
+     "FN": 2,
+     "TN": 98,
+     "FP": 0,
+     "ref_pos": 2,
+     "ref_neg": 98,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.65762
+      ],
+      "n": 2
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.96228,
+       1.0
+      ],
+      "n": 98
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 1328,
+      "precision": 10000,
+      "f1": 1328
+     }
+    },
+    {
+     "condition": "pulmonary_hypoinflation",
+     "TP": 9,
+     "FN": 0,
+     "TN": 89,
+     "FP": 2,
+     "ref_pos": 9,
+     "ref_neg": 91,
+     "pred_pos": 11,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.700855,
+       1.0
+      ],
+      "n": 9
+     },
+     "specificity": {
+      "point": 0.978022,
+      "wilson95": [
+       0.923368,
+       0.993952
+      ],
+      "n": 91
+     },
+     "precision": {
+      "point": 0.818182,
+      "wilson95": [
+       0.523019,
+       0.948632
+      ],
+      "n": 11
+     },
+     "f1": 0.9,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "right_sided_cardiomegaly",
+     "TP": 1,
+     "FN": 0,
+     "TN": 97,
+     "FP": 2,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 0.979798,
+      "wilson95": [
+       0.92931,
+       0.994442
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 0.333333,
+      "wilson95": [
+       0.061492,
+       0.79234
+      ],
+      "n": 3
+     },
+     "f1": 0.5,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3677,
+      "precision": 498,
+      "f1": 498
+     }
+    },
+    {
+     "condition": "pericardial_effusion",
+     "TP": 0,
+     "FN": 0,
+     "TN": 99,
+     "FP": 1,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 0.99,
+      "wilson95": [
+       0.945514,
+       0.998233
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.793451
+      ],
+      "n": 1
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 3598,
+      "f1": 3598
+     }
+    },
+    {
+     "condition": "bronchiectasis",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "pulmonary_vessel_enlargement",
+     "TP": 1,
+     "FN": 0,
+     "TN": 98,
+     "FP": 1,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 0.989899,
+      "wilson95": [
+       0.944985,
+       0.998215
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 0.5,
+      "wilson95": [
+       0.094531,
+       0.905469
+      ],
+      "n": 2
+     },
+     "f1": 0.666667,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3677,
+      "precision": 1364,
+      "f1": 1364
+     }
+    },
+    {
+     "condition": "left_sided_cardiomegaly",
+     "TP": 13,
+     "FN": 2,
+     "TN": 83,
+     "FP": 2,
+     "ref_pos": 15,
+     "ref_neg": 85,
+     "pred_pos": 15,
+     "sensitivity": {
+      "point": 0.866667,
+      "wilson95": [
+       0.62118,
+       0.962639
+      ],
+      "n": 15
+     },
+     "specificity": {
+      "point": 0.976471,
+      "wilson95": [
+       0.918213,
+       0.993523
+      ],
+      "n": 85
+     },
+     "precision": {
+      "point": 0.866667,
+      "wilson95": [
+       0.62118,
+       0.962639
+      ],
+      "n": 15
+     },
+     "f1": 0.866667,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "thoracic_lymphadenopathy",
+     "TP": 2,
+     "FN": 0,
+     "TN": 97,
+     "FP": 1,
+     "ref_pos": 2,
+     "ref_neg": 98,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "specificity": {
+      "point": 0.989796,
+      "wilson95": [
+       0.944445,
+       0.998196
+      ],
+      "n": 98
+     },
+     "precision": {
+      "point": 0.666667,
+      "wilson95": [
+       0.20766,
+       0.938508
+      ],
+      "n": 3
+     },
+     "f1": 0.8,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 1305,
+      "precision": 453,
+      "f1": 453
+     }
+    },
+    {
+     "condition": "esophagitis",
+     "TP": 0,
+     "FN": 0,
+     "TN": 98,
+     "FP": 2,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 0.98,
+      "wilson95": [
+       0.929988,
+       0.994498
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.65762
+      ],
+      "n": 2
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 1344,
+      "f1": 1344
+     }
+    }
+   ]
+  },
+  "EVAL-07": {
+   "label": "CT Week 7 Gemini M1",
+   "dataset": "CT",
+   "matrix": "M1",
+   "run": "RUN-05",
+   "counts": {
+    "TP": 96,
+    "FN": 953,
+    "TN": 924,
+    "FP": 27
+   },
+   "micro": {
+    "accuracy": {
+     "point": 0.51,
+     "ci95": [
+      0.459,
+      0.563
+     ],
+     "undefined_replicates": 0
+    },
+    "sensitivity": {
+     "point": 0.091516,
+     "ci95": [
+      0.070555,
+      0.112979
+     ],
+     "undefined_replicates": 0
+    },
+    "specificity": {
+     "point": 0.971609,
+     "ci95": [
+      0.956109,
+      0.984733
+     ],
+     "undefined_replicates": 0
+    },
+    "precision": {
+     "point": 0.780488,
+     "ci95": [
+      0.672897,
+      0.87619
+     ],
+     "undefined_replicates": 0
+    },
+    "f1": {
+     "point": 0.163823,
+     "ci95": [
+      0.128595,
+      0.198548
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "macro": {
+    "sensitivity": {
+     "point": 0.098888,
+     "included": 20,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.076403,
+      0.12202
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 20,
+      "median": 20.0,
+      "max": 20
+     }
+    },
+    "specificity": {
+     "point": 0.970951,
+     "included": 20,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.955901,
+      0.984201
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 20,
+      "median": 20.0,
+      "max": 20
+     }
+    },
+    "precision": {
+     "point": 0.850623,
+     "included": 16,
+     "excluded_undefined": 4,
+     "ci95": [
+      0.729729,
+      0.921447
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 9,
+      "median": 15.0,
+      "max": 16
+     }
+    },
+    "f1": {
+     "point": 0.15244,
+     "included": 20,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.119532,
+      0.181819
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 20,
+      "median": 20.0,
+      "max": 20
+     }
+    }
+   },
+   "conditions": [
+    {
+     "condition": "perihilar_infiltrate",
+     "TP": 1,
+     "FN": 56,
+     "TN": 43,
+     "FP": 0,
+     "ref_pos": 57,
+     "ref_neg": 43,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 0.017544,
+      "wilson95": [
+       0.003104,
+       0.092907
+      ],
+      "n": 57
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.91799,
+       1.0
+      ],
+      "n": 43
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 0.034483,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 3645,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pneumonia",
+     "TP": 5,
+     "FN": 42,
+     "TN": 52,
+     "FP": 1,
+     "ref_pos": 47,
+     "ref_neg": 53,
+     "pred_pos": 6,
+     "sensitivity": {
+      "point": 0.106383,
+      "wilson95": [
+       0.046305,
+       0.225943
+      ],
+      "n": 47
+     },
+     "specificity": {
+      "point": 0.981132,
+      "wilson95": [
+       0.900571,
+       0.996662
+      ],
+      "n": 53
+     },
+     "precision": {
+      "point": 0.833333,
+      "wilson95": [
+       0.436497,
+       0.969947
+      ],
+      "n": 6
+     },
+     "f1": 0.188679,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 16,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "bronchitis",
+     "TP": 3,
+     "FN": 60,
+     "TN": 35,
+     "FP": 2,
+     "ref_pos": 63,
+     "ref_neg": 37,
+     "pred_pos": 5,
+     "sensitivity": {
+      "point": 0.047619,
+      "wilson95": [
+       0.016326,
+       0.13091
+      ],
+      "n": 63
+     },
+     "specificity": {
+      "point": 0.945946,
+      "wilson95": [
+       0.822953,
+       0.985049
+      ],
+      "n": 37
+     },
+     "precision": {
+      "point": 0.6,
+      "wilson95": [
+       0.230724,
+       0.882379
+      ],
+      "n": 5
+     },
+     "f1": 0.088235,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 54,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "interstitial",
+     "TP": 18,
+     "FN": 41,
+     "TN": 31,
+     "FP": 10,
+     "ref_pos": 59,
+     "ref_neg": 41,
+     "pred_pos": 28,
+     "sensitivity": {
+      "point": 0.305085,
+      "wilson95": [
+       0.202536,
+       0.431463
+      ],
+      "n": 59
+     },
+     "specificity": {
+      "point": 0.756098,
+      "wilson95": [
+       0.606567,
+       0.86175
+      ],
+      "n": 41
+     },
+     "precision": {
+      "point": 0.642857,
+      "wilson95": [
+       0.458303,
+       0.792942
+      ],
+      "n": 28
+     },
+     "f1": 0.413793,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "diseased_lungs",
+     "TP": 20,
+     "FN": 43,
+     "TN": 34,
+     "FP": 3,
+     "ref_pos": 63,
+     "ref_neg": 37,
+     "pred_pos": 23,
+     "sensitivity": {
+      "point": 0.31746,
+      "wilson95": [
+       0.215867,
+       0.440035
+      ],
+      "n": 63
+     },
+     "specificity": {
+      "point": 0.918919,
+      "wilson95": [
+       0.786993,
+       0.972039
+      ],
+      "n": 37
+     },
+     "precision": {
+      "point": 0.869565,
+      "wilson95": [
+       0.678725,
+       0.954623
+      ],
+      "n": 23
+     },
+     "f1": 0.465116,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "hypo_plastic_trachea",
+     "TP": 0,
+     "FN": 35,
+     "TN": 65,
+     "FP": 0,
+     "ref_pos": 35,
+     "ref_neg": 65,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.098901
+      ],
+      "n": 35
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.944198,
+       1.0
+      ],
+      "n": 65
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "cardiomegaly",
+     "TP": 6,
+     "FN": 23,
+     "TN": 69,
+     "FP": 2,
+     "ref_pos": 29,
+     "ref_neg": 71,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 0.206897,
+      "wilson95": [
+       0.098461,
+       0.383901
+      ],
+      "n": 29
+     },
+     "specificity": {
+      "point": 0.971831,
+      "wilson95": [
+       0.902985,
+       0.992241
+      ],
+      "n": 71
+     },
+     "precision": {
+      "point": 0.75,
+      "wilson95": [
+       0.409275,
+       0.928521
+      ],
+      "n": 8
+     },
+     "f1": 0.324324,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 2,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pulmonary_nodules",
+     "TP": 7,
+     "FN": 55,
+     "TN": 37,
+     "FP": 1,
+     "ref_pos": 62,
+     "ref_neg": 38,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 0.112903,
+      "wilson95": [
+       0.055779,
+       0.215197
+      ],
+      "n": 62
+     },
+     "specificity": {
+      "point": 0.973684,
+      "wilson95": [
+       0.865051,
+       0.995339
+      ],
+      "n": 38
+     },
+     "precision": {
+      "point": 0.875,
+      "wilson95": [
+       0.529112,
+       0.977583
+      ],
+      "n": 8
+     },
+     "f1": 0.2,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pleural_effusion",
+     "TP": 2,
+     "FN": 58,
+     "TN": 40,
+     "FP": 0,
+     "ref_pos": 60,
+     "ref_neg": 40,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 0.033333,
+      "wilson95": [
+       0.009189,
+       0.113638
+      ],
+      "n": 60
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.912378,
+       1.0
+      ],
+      "n": 40
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "f1": 0.064516,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1344,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "rtm",
+     "TP": 4,
+     "FN": 51,
+     "TN": 43,
+     "FP": 2,
+     "ref_pos": 55,
+     "ref_neg": 45,
+     "pred_pos": 6,
+     "sensitivity": {
+      "point": 0.072727,
+      "wilson95": [
+       0.028644,
+       0.172599
+      ],
+      "n": 55
+     },
+     "specificity": {
+      "point": 0.955556,
+      "wilson95": [
+       0.851725,
+       0.987726
+      ],
+      "n": 45
+     },
+     "precision": {
+      "point": 0.666667,
+      "wilson95": [
+       0.299993,
+       0.903229
+      ],
+      "n": 6
+     },
+     "f1": 0.131148,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 22,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "focal_caudodorsal_lung",
+     "TP": 2,
+     "FN": 45,
+     "TN": 53,
+     "FP": 0,
+     "ref_pos": 47,
+     "ref_neg": 53,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 0.042553,
+      "wilson95": [
+       0.011748,
+       0.142485
+      ],
+      "n": 47
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.932418,
+       1.0
+      ],
+      "n": 53
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "f1": 0.081633,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1325,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "focal_perihilar",
+     "TP": 0,
+     "FN": 58,
+     "TN": 42,
+     "FP": 0,
+     "ref_pos": 58,
+     "ref_neg": 42,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.062118
+      ],
+      "n": 58
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.916201,
+       1.0
+      ],
+      "n": 42
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pulmonary_hypoinflation",
+     "TP": 10,
+     "FN": 62,
+     "TN": 28,
+     "FP": 0,
+     "ref_pos": 72,
+     "ref_neg": 28,
+     "pred_pos": 10,
+     "sensitivity": {
+      "point": 0.138889,
+      "wilson95": [
+       0.077227,
+       0.237132
+      ],
+      "n": 72
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.879357,
+       1.0
+      ],
+      "n": 28
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.722467,
+       1.0
+      ],
+      "n": 10
+     },
+     "f1": 0.243902,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "right_sided_cardiomegaly",
+     "TP": 2,
+     "FN": 30,
+     "TN": 67,
+     "FP": 1,
+     "ref_pos": 32,
+     "ref_neg": 68,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 0.0625,
+      "wilson95": [
+       0.017311,
+       0.201471
+      ],
+      "n": 32
+     },
+     "specificity": {
+      "point": 0.985294,
+      "wilson95": [
+       0.92129,
+       0.997399
+      ],
+      "n": 68
+     },
+     "precision": {
+      "point": 0.666667,
+      "wilson95": [
+       0.20766,
+       0.938508
+      ],
+      "n": 3
+     },
+     "f1": 0.114286,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 498,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pericardial_effusion",
+     "TP": 1,
+     "FN": 23,
+     "TN": 76,
+     "FP": 0,
+     "ref_pos": 24,
+     "ref_neg": 76,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 0.041667,
+      "wilson95": [
+       0.007393,
+       0.202418
+      ],
+      "n": 24
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.951886,
+       1.0
+      ],
+      "n": 76
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 0.08,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 3598,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "bronchiectasis",
+     "TP": 0,
+     "FN": 67,
+     "TN": 33,
+     "FP": 0,
+     "ref_pos": 67,
+     "ref_neg": 33,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.054226
+      ],
+      "n": 67
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.89573,
+       1.0
+      ],
+      "n": 33
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pulmonary_vessel_enlargement",
+     "TP": 1,
+     "FN": 51,
+     "TN": 48,
+     "FP": 0,
+     "ref_pos": 52,
+     "ref_neg": 48,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 0.019231,
+      "wilson95": [
+       0.003403,
+       0.101205
+      ],
+      "n": 52
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.9259,
+       1.0
+      ],
+      "n": 48
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 0.037736,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 3677,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "left_sided_cardiomegaly",
+     "TP": 12,
+     "FN": 16,
+     "TN": 67,
+     "FP": 5,
+     "ref_pos": 28,
+     "ref_neg": 72,
+     "pred_pos": 17,
+     "sensitivity": {
+      "point": 0.428571,
+      "wilson95": [
+       0.265085,
+       0.609292
+      ],
+      "n": 28
+     },
+     "specificity": {
+      "point": 0.930556,
+      "wilson95": [
+       0.84752,
+       0.969975
+      ],
+      "n": 72
+     },
+     "precision": {
+      "point": 0.705882,
+      "wilson95": [
+       0.468669,
+       0.8672
+      ],
+      "n": 17
+     },
+     "f1": 0.533333,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "thoracic_lymphadenopathy",
+     "TP": 2,
+     "FN": 80,
+     "TN": 18,
+     "FP": 0,
+     "ref_pos": 82,
+     "ref_neg": 18,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 0.02439,
+      "wilson95": [
+       0.006714,
+       0.084634
+      ],
+      "n": 82
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.824121,
+       1.0
+      ],
+      "n": 18
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "f1": 0.047619,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1305,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "esophagitis",
+     "TP": 0,
+     "FN": 57,
+     "TN": 43,
+     "FP": 0,
+     "ref_pos": 57,
+     "ref_neg": 43,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.063139
+      ],
+      "n": 57
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.91799,
+       1.0
+      ],
+      "n": 43
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    }
+   ]
+  },
+  "EVAL-08": {
+   "label": "CT Week 7 Gemini M2",
+   "dataset": "CT",
+   "matrix": "M2",
+   "run": "RUN-06",
+   "counts": {
+    "TP": 102,
+    "FN": 56,
+    "TN": 1822,
+    "FP": 20
+   },
+   "micro": {
+    "accuracy": {
+     "point": 0.962,
+     "ci95": [
+      0.9515,
+      0.972
+     ],
+     "undefined_replicates": 0
+    },
+    "sensitivity": {
+     "point": 0.64557,
+     "ci95": [
+      0.567251,
+      0.724359
+     ],
+     "undefined_replicates": 0
+    },
+    "specificity": {
+     "point": 0.989142,
+     "ci95": [
+      0.984265,
+      0.993521
+     ],
+     "undefined_replicates": 0
+    },
+    "precision": {
+     "point": 0.836066,
+     "ci95": [
+      0.768593,
+      0.895652
+     ],
+     "undefined_replicates": 0
+    },
+    "f1": {
+     "point": 0.728571,
+     "ci95": [
+      0.66192,
+      0.789062
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "macro": {
+    "sensitivity": {
+     "point": 0.736426,
+     "included": 16,
+     "excluded_undefined": 4,
+     "ci95": [
+      0.612704,
+      0.827491
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 9,
+      "median": 14.0,
+      "max": 16
+     }
+    },
+    "specificity": {
+     "point": 0.988973,
+     "included": 20,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.984028,
+      0.993429
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 20,
+      "median": 20.0,
+      "max": 20
+     }
+    },
+    "precision": {
+     "point": 0.713704,
+     "included": 16,
+     "excluded_undefined": 4,
+     "ci95": [
+      0.610314,
+      0.835648
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 9,
+      "median": 15.0,
+      "max": 16
+     }
+    },
+    "f1": {
+     "point": 0.633719,
+     "included": 17,
+     "excluded_undefined": 3,
+     "ci95": [
+      0.495984,
+      0.7419
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 9,
+      "median": 16.0,
+      "max": 17
+     }
+    }
+   },
+   "conditions": [
+    {
+     "condition": "perihilar_infiltrate",
+     "TP": 1,
+     "FN": 1,
+     "TN": 98,
+     "FP": 0,
+     "ref_pos": 2,
+     "ref_neg": 98,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 0.5,
+      "wilson95": [
+       0.094531,
+       0.905469
+      ],
+      "n": 2
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.96228,
+       1.0
+      ],
+      "n": 98
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 0.666667,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 1328,
+      "precision": 3645,
+      "f1": 1328
+     }
+    },
+    {
+     "condition": "pneumonia",
+     "TP": 6,
+     "FN": 0,
+     "TN": 94,
+     "FP": 0,
+     "ref_pos": 6,
+     "ref_neg": 94,
+     "pred_pos": 6,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.609666,
+       1.0
+      ],
+      "n": 6
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.960738,
+       1.0
+      ],
+      "n": 94
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.609666,
+       1.0
+      ],
+      "n": 6
+     },
+     "f1": 1.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 16,
+      "precision": 16,
+      "f1": 16
+     }
+    },
+    {
+     "condition": "bronchitis",
+     "TP": 3,
+     "FN": 12,
+     "TN": 84,
+     "FP": 1,
+     "ref_pos": 15,
+     "ref_neg": 85,
+     "pred_pos": 4,
+     "sensitivity": {
+      "point": 0.2,
+      "wilson95": [
+       0.070475,
+       0.451854
+      ],
+      "n": 15
+     },
+     "specificity": {
+      "point": 0.988235,
+      "wilson95": [
+       0.936328,
+       0.99792
+      ],
+      "n": 85
+     },
+     "precision": {
+      "point": 0.75,
+      "wilson95": [
+       0.300642,
+       0.954413
+      ],
+      "n": 4
+     },
+     "f1": 0.315789,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 181,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "interstitial",
+     "TP": 26,
+     "FN": 2,
+     "TN": 70,
+     "FP": 2,
+     "ref_pos": 28,
+     "ref_neg": 72,
+     "pred_pos": 28,
+     "sensitivity": {
+      "point": 0.928571,
+      "wilson95": [
+       0.773546,
+       0.980188
+      ],
+      "n": 28
+     },
+     "specificity": {
+      "point": 0.972222,
+      "wilson95": [
+       0.904258,
+       0.992349
+      ],
+      "n": 72
+     },
+     "precision": {
+      "point": 0.928571,
+      "wilson95": [
+       0.773546,
+       0.980188
+      ],
+      "n": 28
+     },
+     "f1": 0.928571,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "diseased_lungs",
+     "TP": 22,
+     "FN": 26,
+     "TN": 52,
+     "FP": 0,
+     "ref_pos": 48,
+     "ref_neg": 52,
+     "pred_pos": 22,
+     "sensitivity": {
+      "point": 0.458333,
+      "wilson95": [
+       0.325752,
+       0.597089
+      ],
+      "n": 48
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.931208,
+       1.0
+      ],
+      "n": 52
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.851345,
+       1.0
+      ],
+      "n": 22
+     },
+     "f1": 0.628571,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "hypo_plastic_trachea",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "cardiomegaly",
+     "TP": 9,
+     "FN": 10,
+     "TN": 80,
+     "FP": 1,
+     "ref_pos": 19,
+     "ref_neg": 81,
+     "pred_pos": 10,
+     "sensitivity": {
+      "point": 0.473684,
+      "wilson95": [
+       0.273298,
+       0.682922
+      ],
+      "n": 19
+     },
+     "specificity": {
+      "point": 0.987654,
+      "wilson95": [
+       0.933331,
+       0.997817
+      ],
+      "n": 81
+     },
+     "precision": {
+      "point": 0.9,
+      "wilson95": [
+       0.59585,
+       0.982124
+      ],
+      "n": 10
+     },
+     "f1": 0.62069,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pulmonary_nodules",
+     "TP": 5,
+     "FN": 1,
+     "TN": 91,
+     "FP": 3,
+     "ref_pos": 6,
+     "ref_neg": 94,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 0.833333,
+      "wilson95": [
+       0.436497,
+       0.969947
+      ],
+      "n": 6
+     },
+     "specificity": {
+      "point": 0.968085,
+      "wilson95": [
+       0.910327,
+       0.989087
+      ],
+      "n": 94
+     },
+     "precision": {
+      "point": 0.625,
+      "wilson95": [
+       0.305742,
+       0.863156
+      ],
+      "n": 8
+     },
+     "f1": 0.714286,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 24,
+      "precision": 1,
+      "f1": 1
+     }
+    },
+    {
+     "condition": "pleural_effusion",
+     "TP": 1,
+     "FN": 0,
+     "TN": 98,
+     "FP": 1,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 0.989899,
+      "wilson95": [
+       0.944985,
+       0.998215
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 0.5,
+      "wilson95": [
+       0.094531,
+       0.905469
+      ],
+      "n": 2
+     },
+     "f1": 0.666667,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3675,
+      "precision": 1344,
+      "f1": 1344
+     }
+    },
+    {
+     "condition": "rtm",
+     "TP": 1,
+     "FN": 1,
+     "TN": 94,
+     "FP": 4,
+     "ref_pos": 2,
+     "ref_neg": 98,
+     "pred_pos": 5,
+     "sensitivity": {
+      "point": 0.5,
+      "wilson95": [
+       0.094531,
+       0.905469
+      ],
+      "n": 2
+     },
+     "specificity": {
+      "point": 0.959184,
+      "wilson95": [
+       0.899712,
+       0.984015
+      ],
+      "n": 98
+     },
+     "precision": {
+      "point": 0.2,
+      "wilson95": [
+       0.036224,
+       0.624465
+      ],
+      "n": 5
+     },
+     "f1": 0.285714,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 1286,
+      "precision": 62,
+      "f1": 22
+     }
+    },
+    {
+     "condition": "focal_caudodorsal_lung",
+     "TP": 1,
+     "FN": 0,
+     "TN": 98,
+     "FP": 1,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 0.989899,
+      "wilson95": [
+       0.944985,
+       0.998215
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 0.5,
+      "wilson95": [
+       0.094531,
+       0.905469
+      ],
+      "n": 2
+     },
+     "f1": 0.666667,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3681,
+      "precision": 1325,
+      "f1": 1325
+     }
+    },
+    {
+     "condition": "focal_perihilar",
+     "TP": 0,
+     "FN": 2,
+     "TN": 98,
+     "FP": 0,
+     "ref_pos": 2,
+     "ref_neg": 98,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.65762
+      ],
+      "n": 2
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.96228,
+       1.0
+      ],
+      "n": 98
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 1328,
+      "precision": 10000,
+      "f1": 1328
+     }
+    },
+    {
+     "condition": "pulmonary_hypoinflation",
+     "TP": 8,
+     "FN": 1,
+     "TN": 89,
+     "FP": 2,
+     "ref_pos": 9,
+     "ref_neg": 91,
+     "pred_pos": 10,
+     "sensitivity": {
+      "point": 0.888889,
+      "wilson95": [
+       0.565,
+       0.980109
+      ],
+      "n": 9
+     },
+     "specificity": {
+      "point": 0.978022,
+      "wilson95": [
+       0.923368,
+       0.993952
+      ],
+      "n": 91
+     },
+     "precision": {
+      "point": 0.8,
+      "wilson95": [
+       0.490162,
+       0.943318
+      ],
+      "n": 10
+     },
+     "f1": 0.842105,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "right_sided_cardiomegaly",
+     "TP": 1,
+     "FN": 0,
+     "TN": 97,
+     "FP": 2,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 0.979798,
+      "wilson95": [
+       0.92931,
+       0.994442
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 0.333333,
+      "wilson95": [
+       0.061492,
+       0.79234
+      ],
+      "n": 3
+     },
+     "f1": 0.5,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3677,
+      "precision": 498,
+      "f1": 498
+     }
+    },
+    {
+     "condition": "pericardial_effusion",
+     "TP": 0,
+     "FN": 0,
+     "TN": 99,
+     "FP": 1,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 0.99,
+      "wilson95": [
+       0.945514,
+       0.998233
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.793451
+      ],
+      "n": 1
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 3598,
+      "f1": 3598
+     }
+    },
+    {
+     "condition": "bronchiectasis",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "pulmonary_vessel_enlargement",
+     "TP": 1,
+     "FN": 0,
+     "TN": 99,
+     "FP": 0,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.962647,
+       1.0
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 1.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3677,
+      "precision": 3677,
+      "f1": 3677
+     }
+    },
+    {
+     "condition": "left_sided_cardiomegaly",
+     "TP": 15,
+     "FN": 0,
+     "TN": 83,
+     "FP": 2,
+     "ref_pos": 15,
+     "ref_neg": 85,
+     "pred_pos": 17,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.796117,
+       1.0
+      ],
+      "n": 15
+     },
+     "specificity": {
+      "point": 0.976471,
+      "wilson95": [
+       0.918213,
+       0.993523
+      ],
+      "n": 85
+     },
+     "precision": {
+      "point": 0.882353,
+      "wilson95": [
+       0.656636,
+       0.96712
+      ],
+      "n": 17
+     },
+     "f1": 0.9375,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "thoracic_lymphadenopathy",
+     "TP": 2,
+     "FN": 0,
+     "TN": 98,
+     "FP": 0,
+     "ref_pos": 2,
+     "ref_neg": 98,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.96228,
+       1.0
+      ],
+      "n": 98
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "f1": 1.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 1305,
+      "precision": 1305,
+      "f1": 1305
+     }
+    },
+    {
+     "condition": "esophagitis",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    }
+   ]
+  },
+  "EVAL-11": {
+   "label": "FT Week 7 OpenAI M1",
+   "dataset": "FT",
+   "matrix": "M1",
+   "run": "RUN-07",
+   "counts": {
+    "TP": 29,
+    "FN": 505,
+    "TN": 1529,
+    "FP": 37
+   },
+   "micro": {
+    "accuracy": {
+     "point": 0.741905,
+     "ci95": [
+      0.704762,
+      0.777143
+     ],
+     "undefined_replicates": 0
+    },
+    "sensitivity": {
+     "point": 0.054307,
+     "ci95": [
+      0.028507,
+      0.079855
+     ],
+     "undefined_replicates": 0
+    },
+    "specificity": {
+     "point": 0.976373,
+     "ci95": [
+      0.966854,
+      0.984944
+     ],
+     "undefined_replicates": 0
+    },
+    "precision": {
+     "point": 0.439394,
+     "ci95": [
+      0.253968,
+      0.608696
+     ],
+     "undefined_replicates": 0
+    },
+    "f1": {
+     "point": 0.096667,
+     "ci95": [
+      0.051458,
+      0.139607
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "macro": {
+    "sensitivity": {
+     "point": 0.108043,
+     "included": 21,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.065328,
+      0.140961
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 16,
+      "median": 21.0,
+      "max": 21
+     }
+    },
+    "specificity": {
+     "point": 0.978326,
+     "included": 21,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.969414,
+      0.986324
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 21,
+      "median": 21.0,
+      "max": 21
+     }
+    },
+    "precision": {
+     "point": 0.532971,
+     "included": 11,
+     "excluded_undefined": 10,
+     "ci95": [
+      0.328814,
+      0.68502
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 6,
+      "median": 10.0,
+      "max": 11
+     }
+    },
+    "f1": {
+     "point": 0.11337,
+     "included": 21,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.058171,
+      0.152192
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 17,
+      "median": 21.0,
+      "max": 21
+     }
+    }
+   },
+   "conditions": [
+    {
+     "condition": "pulmonary_nodules",
+     "TP": 1,
+     "FN": 5,
+     "TN": 90,
+     "FP": 4,
+     "ref_pos": 6,
+     "ref_neg": 94,
+     "pred_pos": 5,
+     "sensitivity": {
+      "point": 0.166667,
+      "wilson95": [
+       0.030053,
+       0.563503
+      ],
+      "n": 6
+     },
+     "specificity": {
+      "point": 0.957447,
+      "wilson95": [
+       0.895644,
+       0.983329
+      ],
+      "n": 94
+     },
+     "precision": {
+      "point": 0.2,
+      "wilson95": [
+       0.036224,
+       0.624465
+      ],
+      "n": 5
+     },
+     "f1": 0.181818,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 17,
+      "precision": 61,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "esophagitis",
+     "TP": 0,
+     "FN": 59,
+     "TN": 41,
+     "FP": 0,
+     "ref_pos": 59,
+     "ref_neg": 41,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.061129
+      ],
+      "n": 59
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.914332,
+       1.0
+      ],
+      "n": 41
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pneumonia",
+     "TP": 0,
+     "FN": 51,
+     "TN": 49,
+     "FP": 0,
+     "ref_pos": 51,
+     "ref_neg": 49,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.070047
+      ],
+      "n": 51
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.927302,
+       1.0
+      ],
+      "n": 49
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "bronchitis",
+     "TP": 4,
+     "FN": 10,
+     "TN": 79,
+     "FP": 7,
+     "ref_pos": 14,
+     "ref_neg": 86,
+     "pred_pos": 11,
+     "sensitivity": {
+      "point": 0.285714,
+      "wilson95": [
+       0.117214,
+       0.546491
+      ],
+      "n": 14
+     },
+     "specificity": {
+      "point": 0.918605,
+      "wilson95": [
+       0.841398,
+       0.960014
+      ],
+      "n": 86
+     },
+     "precision": {
+      "point": 0.363636,
+      "wilson95": [
+       0.151665,
+       0.646199
+      ],
+      "n": 11
+     },
+     "f1": 0.32,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "interstitial",
+     "TP": 3,
+     "FN": 16,
+     "TN": 75,
+     "FP": 6,
+     "ref_pos": 19,
+     "ref_neg": 81,
+     "pred_pos": 9,
+     "sensitivity": {
+      "point": 0.157895,
+      "wilson95": [
+       0.055205,
+       0.375655
+      ],
+      "n": 19
+     },
+     "specificity": {
+      "point": 0.925926,
+      "wilson95": [
+       0.847671,
+       0.96561
+      ],
+      "n": 81
+     },
+     "precision": {
+      "point": 0.333333,
+      "wilson95": [
+       0.120584,
+       0.645798
+      ],
+      "n": 9
+     },
+     "f1": 0.214286,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "diseased_lungs",
+     "TP": 10,
+     "FN": 23,
+     "TN": 58,
+     "FP": 9,
+     "ref_pos": 33,
+     "ref_neg": 67,
+     "pred_pos": 19,
+     "sensitivity": {
+      "point": 0.30303,
+      "wilson95": [
+       0.173755,
+       0.473381
+      ],
+      "n": 33
+     },
+     "specificity": {
+      "point": 0.865672,
+      "wilson95": [
+       0.763996,
+       0.927689
+      ],
+      "n": 67
+     },
+     "precision": {
+      "point": 0.526316,
+      "wilson95": [
+       0.317078,
+       0.726702
+      ],
+      "n": 19
+     },
+     "f1": 0.384615,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "hypo_plastic_trachea",
+     "TP": 0,
+     "FN": 12,
+     "TN": 88,
+     "FP": 0,
+     "ref_pos": 12,
+     "ref_neg": 88,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.242494
+      ],
+      "n": 12
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.958173,
+       1.0
+      ],
+      "n": 88
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "cardiomegaly",
+     "TP": 3,
+     "FN": 1,
+     "TN": 88,
+     "FP": 8,
+     "ref_pos": 4,
+     "ref_neg": 96,
+     "pred_pos": 11,
+     "sensitivity": {
+      "point": 0.75,
+      "wilson95": [
+       0.300642,
+       0.954413
+      ],
+      "n": 4
+     },
+     "specificity": {
+      "point": 0.916667,
+      "wilson95": [
+       0.844101,
+       0.957169
+      ],
+      "n": 96
+     },
+     "precision": {
+      "point": 0.272727,
+      "wilson95": [
+       0.097461,
+       0.565645
+      ],
+      "n": 11
+     },
+     "f1": 0.4,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 160,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pleural_effusion",
+     "TP": 3,
+     "FN": 25,
+     "TN": 72,
+     "FP": 0,
+     "ref_pos": 28,
+     "ref_neg": 72,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 0.107143,
+      "wilson95": [
+       0.037118,
+       0.271959
+      ],
+      "n": 28
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.949349,
+       1.0
+      ],
+      "n": 72
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.438503,
+       1.0
+      ],
+      "n": 3
+     },
+     "f1": 0.193548,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 493,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "perihilar_infiltrate",
+     "TP": 0,
+     "FN": 54,
+     "TN": 46,
+     "FP": 0,
+     "ref_pos": 54,
+     "ref_neg": 46,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.066414
+      ],
+      "n": 54
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.922926,
+       1.0
+      ],
+      "n": 46
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "rtm",
+     "TP": 0,
+     "FN": 21,
+     "TN": 79,
+     "FP": 0,
+     "ref_pos": 21,
+     "ref_neg": 79,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.154639
+      ],
+      "n": 21
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.953629,
+       1.0
+      ],
+      "n": 79
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "focal_caudodorsal_lung",
+     "TP": 0,
+     "FN": 38,
+     "TN": 61,
+     "FP": 1,
+     "ref_pos": 38,
+     "ref_neg": 62,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.09181
+      ],
+      "n": 38
+     },
+     "specificity": {
+      "point": 0.983871,
+      "wilson95": [
+       0.914133,
+       0.997147
+      ],
+      "n": 62
+     },
+     "precision": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.793451
+      ],
+      "n": 1
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 3586,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "right_sided_cardiomegaly",
+     "TP": 0,
+     "FN": 5,
+     "TN": 95,
+     "FP": 0,
+     "ref_pos": 5,
+     "ref_neg": 95,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.434482
+      ],
+      "n": 5
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.961135,
+       1.0
+      ],
+      "n": 95
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 61,
+      "precision": 10000,
+      "f1": 61
+     }
+    },
+    {
+     "condition": "focal_perihilar",
+     "TP": 0,
+     "FN": 52,
+     "TN": 48,
+     "FP": 0,
+     "ref_pos": 52,
+     "ref_neg": 48,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.068792
+      ],
+      "n": 52
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.9259,
+       1.0
+      ],
+      "n": 48
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "left_sided_cardiomegaly",
+     "TP": 0,
+     "FN": 5,
+     "TN": 95,
+     "FP": 0,
+     "ref_pos": 5,
+     "ref_neg": 95,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.434482
+      ],
+      "n": 5
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.961135,
+       1.0
+      ],
+      "n": 95
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 53,
+      "precision": 10000,
+      "f1": 53
+     }
+    },
+    {
+     "condition": "bronchiectasis",
+     "TP": 0,
+     "FN": 26,
+     "TN": 74,
+     "FP": 0,
+     "ref_pos": 26,
+     "ref_neg": 74,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.128729
+      ],
+      "n": 26
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.95065,
+       1.0
+      ],
+      "n": 74
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 10000,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pulmonary_vessel_enlargement",
+     "TP": 2,
+     "FN": 3,
+     "TN": 94,
+     "FP": 1,
+     "ref_pos": 5,
+     "ref_neg": 95,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 0.4,
+      "wilson95": [
+       0.117621,
+       0.769276
+      ],
+      "n": 5
+     },
+     "specificity": {
+      "point": 0.989474,
+      "wilson95": [
+       0.942761,
+       0.998139
+      ],
+      "n": 95
+     },
+     "precision": {
+      "point": 0.666667,
+      "wilson95": [
+       0.20766,
+       0.938508
+      ],
+      "n": 3
+     },
+     "f1": 0.5,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 53,
+      "precision": 494,
+      "f1": 24
+     }
+    },
+    {
+     "condition": "thoracic_lymphadenopathy",
+     "TP": 1,
+     "FN": 45,
+     "TN": 54,
+     "FP": 0,
+     "ref_pos": 46,
+     "ref_neg": 54,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 0.021739,
+      "wilson95": [
+       0.003848,
+       0.113353
+      ],
+      "n": 46
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.933586,
+       1.0
+      ],
+      "n": 54
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 0.042553,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 3577,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pulmonary_hypoinflation",
+     "TP": 1,
+     "FN": 31,
+     "TN": 68,
+     "FP": 0,
+     "ref_pos": 32,
+     "ref_neg": 68,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 0.03125,
+      "wilson95": [
+       0.005538,
+       0.157443
+      ],
+      "n": 32
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.946529,
+       1.0
+      ],
+      "n": 68
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 0.060606,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 3566,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pericardial_effusion",
+     "TP": 0,
+     "FN": 2,
+     "TN": 98,
+     "FP": 0,
+     "ref_pos": 2,
+     "ref_neg": 98,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.65762
+      ],
+      "n": 2
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.96228,
+       1.0
+      ],
+      "n": 98
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 1340,
+      "precision": 10000,
+      "f1": 1340
+     }
+    },
+    {
+     "condition": "Fe_Alveolar",
+     "TP": 1,
+     "FN": 21,
+     "TN": 77,
+     "FP": 1,
+     "ref_pos": 22,
+     "ref_neg": 78,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 0.045455,
+      "wilson95": [
+       0.008069,
+       0.21798
+      ],
+      "n": 22
+     },
+     "specificity": {
+      "point": 0.987179,
+      "wilson95": [
+       0.930891,
+       0.997733
+      ],
+      "n": 78
+     },
+     "precision": {
+      "point": 0.5,
+      "wilson95": [
+       0.094531,
+       0.905469
+      ],
+      "n": 2
+     },
+     "f1": 0.083333,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1332,
+      "f1": 0
+     }
+    }
+   ]
+  },
+  "EVAL-12": {
+   "label": "FT Week 7 OpenAI M2",
+   "dataset": "FT",
+   "matrix": "M2",
+   "run": "RUN-07",
+   "counts": {
+    "TP": 58,
+    "FN": 59,
+    "TN": 1975,
+    "FP": 8
+   },
+   "micro": {
+    "accuracy": {
+     "point": 0.968095,
+     "ci95": [
+      0.959524,
+      0.97619
+     ],
+     "undefined_replicates": 0
+    },
+    "sensitivity": {
+     "point": 0.495726,
+     "ci95": [
+      0.372723,
+      0.61157
+     ],
+     "undefined_replicates": 0
+    },
+    "specificity": {
+     "point": 0.995966,
+     "ci95": [
+      0.992872,
+      0.998495
+     ],
+     "undefined_replicates": 0
+    },
+    "precision": {
+     "point": 0.878788,
+     "ci95": [
+      0.786643,
+      0.955882
+     ],
+     "undefined_replicates": 0
+    },
+    "f1": {
+     "point": 0.63388,
+     "ci95": [
+      0.516556,
+      0.726316
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "macro": {
+    "sensitivity": {
+     "point": 0.731586,
+     "included": 11,
+     "excluded_undefined": 10,
+     "ci95": [
+      0.614009,
+      0.853358
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 5,
+      "median": 10.0,
+      "max": 11
+     }
+    },
+    "specificity": {
+     "point": 0.995558,
+     "included": 21,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.991611,
+      0.998512
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 21,
+      "median": 21.0,
+      "max": 21
+     }
+    },
+    "precision": {
+     "point": 0.839292,
+     "included": 11,
+     "excluded_undefined": 10,
+     "ci95": [
+      0.75,
+      0.963312
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 6,
+      "median": 10.0,
+      "max": 11
+     }
+    },
+    "f1": {
+     "point": 0.750906,
+     "included": 11,
+     "excluded_undefined": 10,
+     "ci95": [
+      0.60656,
+      0.835087
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 6,
+      "median": 10.0,
+      "max": 11
+     }
+    }
+   },
+   "conditions": [
+    {
+     "condition": "pulmonary_nodules",
+     "TP": 4,
+     "FN": 1,
+     "TN": 94,
+     "FP": 1,
+     "ref_pos": 5,
+     "ref_neg": 95,
+     "pred_pos": 5,
+     "sensitivity": {
+      "point": 0.8,
+      "wilson95": [
+       0.375535,
+       0.963776
+      ],
+      "n": 5
+     },
+     "specificity": {
+      "point": 0.989474,
+      "wilson95": [
+       0.942761,
+       0.998139
+      ],
+      "n": 95
+     },
+     "precision": {
+      "point": 0.8,
+      "wilson95": [
+       0.375535,
+       0.963776
+      ],
+      "n": 5
+     },
+     "f1": 0.8,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 56,
+      "precision": 61,
+      "f1": 18
+     }
+    },
+    {
+     "condition": "esophagitis",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "pneumonia",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "bronchitis",
+     "TP": 11,
+     "FN": 27,
+     "TN": 62,
+     "FP": 0,
+     "ref_pos": 38,
+     "ref_neg": 62,
+     "pred_pos": 11,
+     "sensitivity": {
+      "point": 0.289474,
+      "wilson95": [
+       0.170033,
+       0.447571
+      ],
+      "n": 38
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.941656,
+       1.0
+      ],
+      "n": 62
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.741167,
+       1.0
+      ],
+      "n": 11
+     },
+     "f1": 0.44898,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "interstitial",
+     "TP": 6,
+     "FN": 0,
+     "TN": 91,
+     "FP": 3,
+     "ref_pos": 6,
+     "ref_neg": 94,
+     "pred_pos": 9,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.609666,
+       1.0
+      ],
+      "n": 6
+     },
+     "specificity": {
+      "point": 0.968085,
+      "wilson95": [
+       0.910327,
+       0.989087
+      ],
+      "n": 94
+     },
+     "precision": {
+      "point": 0.666667,
+      "wilson95": [
+       0.354202,
+       0.879416
+      ],
+      "n": 9
+     },
+     "f1": 0.8,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 18,
+      "precision": 1,
+      "f1": 1
+     }
+    },
+    {
+     "condition": "diseased_lungs",
+     "TP": 18,
+     "FN": 28,
+     "TN": 53,
+     "FP": 1,
+     "ref_pos": 46,
+     "ref_neg": 54,
+     "pred_pos": 19,
+     "sensitivity": {
+      "point": 0.391304,
+      "wilson95": [
+       0.263932,
+       0.535432
+      ],
+      "n": 46
+     },
+     "specificity": {
+      "point": 0.981481,
+      "wilson95": [
+       0.902286,
+       0.996724
+      ],
+      "n": 54
+     },
+     "precision": {
+      "point": 0.947368,
+      "wilson95": [
+       0.753613,
+       0.990648
+      ],
+      "n": 19
+     },
+     "f1": 0.553846,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "hypo_plastic_trachea",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "cardiomegaly",
+     "TP": 9,
+     "FN": 1,
+     "TN": 88,
+     "FP": 2,
+     "ref_pos": 10,
+     "ref_neg": 90,
+     "pred_pos": 11,
+     "sensitivity": {
+      "point": 0.9,
+      "wilson95": [
+       0.59585,
+       0.982124
+      ],
+      "n": 10
+     },
+     "specificity": {
+      "point": 0.977778,
+      "wilson95": [
+       0.922555,
+       0.993885
+      ],
+      "n": 90
+     },
+     "precision": {
+      "point": 0.818182,
+      "wilson95": [
+       0.523019,
+       0.948632
+      ],
+      "n": 11
+     },
+     "f1": 0.857143,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pleural_effusion",
+     "TP": 3,
+     "FN": 0,
+     "TN": 97,
+     "FP": 0,
+     "ref_pos": 3,
+     "ref_neg": 97,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.438503,
+       1.0
+      ],
+      "n": 3
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.961906,
+       1.0
+      ],
+      "n": 97
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.438503,
+       1.0
+      ],
+      "n": 3
+     },
+     "f1": 1.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 493,
+      "precision": 493,
+      "f1": 493
+     }
+    },
+    {
+     "condition": "perihilar_infiltrate",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "rtm",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "focal_caudodorsal_lung",
+     "TP": 0,
+     "FN": 1,
+     "TN": 98,
+     "FP": 1,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.793451
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 0.989899,
+      "wilson95": [
+       0.944985,
+       0.998215
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 0.0,
+      "wilson95": [
+       0.0,
+       0.793451
+      ],
+      "n": 1
+     },
+     "f1": 0.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3672,
+      "precision": 3586,
+      "f1": 1285
+     }
+    },
+    {
+     "condition": "right_sided_cardiomegaly",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "focal_perihilar",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "left_sided_cardiomegaly",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "bronchiectasis",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "pulmonary_vessel_enlargement",
+     "TP": 3,
+     "FN": 0,
+     "TN": 97,
+     "FP": 0,
+     "ref_pos": 3,
+     "ref_neg": 97,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.438503,
+       1.0
+      ],
+      "n": 3
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.961906,
+       1.0
+      ],
+      "n": 97
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.438503,
+       1.0
+      ],
+      "n": 3
+     },
+     "f1": 1.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 494,
+      "precision": 494,
+      "f1": 494
+     }
+    },
+    {
+     "condition": "thoracic_lymphadenopathy",
+     "TP": 1,
+     "FN": 0,
+     "TN": 99,
+     "FP": 0,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.962647,
+       1.0
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 1.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3577,
+      "precision": 3577,
+      "f1": 3577
+     }
+    },
+    {
+     "condition": "pulmonary_hypoinflation",
+     "TP": 1,
+     "FN": 0,
+     "TN": 99,
+     "FP": 0,
+     "ref_pos": 1,
+     "ref_neg": 99,
+     "pred_pos": 1,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.962647,
+       1.0
+      ],
+      "n": 99
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.206549,
+       1.0
+      ],
+      "n": 1
+     },
+     "f1": 1.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 3566,
+      "precision": 3566,
+      "f1": 3566
+     }
+    },
+    {
+     "condition": "pericardial_effusion",
+     "TP": 0,
+     "FN": 0,
+     "TN": 100,
+     "FP": 0,
+     "ref_pos": 0,
+     "ref_neg": 100,
+     "pred_pos": 0,
+     "sensitivity": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.963007,
+       1.0
+      ],
+      "n": 100
+     },
+     "precision": {
+      "point": null,
+      "wilson95": null,
+      "n": 0
+     },
+     "f1": null,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 10000,
+      "precision": 10000,
+      "f1": 10000
+     }
+    },
+    {
+     "condition": "Fe_Alveolar",
+     "TP": 2,
+     "FN": 1,
+     "TN": 97,
+     "FP": 0,
+     "ref_pos": 3,
+     "ref_neg": 97,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 0.666667,
+      "wilson95": [
+       0.20766,
+       0.938508
+      ],
+      "n": 3
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.961906,
+       1.0
+      ],
+      "n": 97
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "f1": 0.8,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 458,
+      "precision": 1332,
+      "f1": 458
+     }
+    }
+   ]
+  },
+  "EVAL-13": {
+   "label": "CA Week 7 OpenAI M1",
+   "dataset": "CA",
+   "matrix": "M1",
+   "run": "RUN-08",
+   "counts": {
+    "TP": 34,
+    "FN": 246,
+    "TN": 697,
+    "FP": 23
+   },
+   "micro": {
+    "accuracy": {
+     "point": 0.731,
+     "ci95": [
+      0.696,
+      0.764
+     ],
+     "undefined_replicates": 0
+    },
+    "sensitivity": {
+     "point": 0.121429,
+     "ci95": [
+      0.084141,
+      0.160536
+     ],
+     "undefined_replicates": 0
+    },
+    "specificity": {
+     "point": 0.968056,
+     "ci95": [
+      0.952829,
+      0.981458
+     ],
+     "undefined_replicates": 0
+    },
+    "precision": {
+     "point": 0.596491,
+     "ci95": [
+      0.457627,
+      0.733333
+     ],
+     "undefined_replicates": 0
+    },
+    "f1": {
+     "point": 0.20178,
+     "ci95": [
+      0.144578,
+      0.257703
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "macro": {
+    "sensitivity": {
+     "point": 0.126944,
+     "included": 10,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.085737,
+      0.170201
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 10,
+      "median": 10.0,
+      "max": 10
+     }
+    },
+    "specificity": {
+     "point": 0.968088,
+     "included": 10,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.952161,
+      0.981905
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 10,
+      "median": 10.0,
+      "max": 10
+     }
+    },
+    "precision": {
+     "point": 0.579167,
+     "included": 10,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.41991,
+      0.7254
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 7,
+      "median": 10.0,
+      "max": 10
+     }
+    },
+    "f1": {
+     "point": 0.201775,
+     "included": 10,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.136855,
+      0.253333
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 10,
+      "median": 10.0,
+      "max": 10
+     }
+    }
+   },
+   "conditions": [
+    {
+     "condition": "gastritis",
+     "TP": 6,
+     "FN": 23,
+     "TN": 68,
+     "FP": 3,
+     "ref_pos": 29,
+     "ref_neg": 71,
+     "pred_pos": 9,
+     "sensitivity": {
+      "point": 0.206897,
+      "wilson95": [
+       0.098461,
+       0.383901
+      ],
+      "n": 29
+     },
+     "specificity": {
+      "point": 0.957746,
+      "wilson95": [
+       0.882976,
+       0.985527
+      ],
+      "n": 71
+     },
+     "precision": {
+      "point": 0.666667,
+      "wilson95": [
+       0.354202,
+       0.879416
+      ],
+      "n": 9
+     },
+     "f1": 0.315789,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "ascites",
+     "TP": 3,
+     "FN": 16,
+     "TN": 80,
+     "FP": 1,
+     "ref_pos": 19,
+     "ref_neg": 81,
+     "pred_pos": 4,
+     "sensitivity": {
+      "point": 0.157895,
+      "wilson95": [
+       0.055205,
+       0.375655
+      ],
+      "n": 19
+     },
+     "specificity": {
+      "point": 0.987654,
+      "wilson95": [
+       0.933331,
+       0.997817
+      ],
+      "n": 81
+     },
+     "precision": {
+      "point": 0.75,
+      "wilson95": [
+       0.300642,
+       0.954413
+      ],
+      "n": 4
+     },
+     "f1": 0.26087,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 175,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "colitis",
+     "TP": 3,
+     "FN": 22,
+     "TN": 70,
+     "FP": 5,
+     "ref_pos": 25,
+     "ref_neg": 75,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 0.12,
+      "wilson95": [
+       0.041668,
+       0.299558
+      ],
+      "n": 25
+     },
+     "specificity": {
+      "point": 0.933333,
+      "wilson95": [
+       0.853249,
+       0.97119
+      ],
+      "n": 75
+     },
+     "precision": {
+      "point": 0.375,
+      "wilson95": [
+       0.136844,
+       0.694258
+      ],
+      "n": 8
+     },
+     "f1": 0.181818,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 2,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "liver_mass",
+     "TP": 2,
+     "FN": 11,
+     "TN": 87,
+     "FP": 0,
+     "ref_pos": 13,
+     "ref_neg": 87,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 0.153846,
+      "wilson95": [
+       0.043258,
+       0.422346
+      ],
+      "n": 13
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.957712,
+       1.0
+      ],
+      "n": 87
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "f1": 0.266667,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1319,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "pancreatitis",
+     "TP": 2,
+     "FN": 73,
+     "TN": 24,
+     "FP": 1,
+     "ref_pos": 75,
+     "ref_neg": 25,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 0.026667,
+      "wilson95": [
+       0.007344,
+       0.092115
+      ],
+      "n": 75
+     },
+     "specificity": {
+      "point": 0.96,
+      "wilson95": [
+       0.804559,
+       0.992904
+      ],
+      "n": 25
+     },
+     "precision": {
+      "point": 0.666667,
+      "wilson95": [
+       0.20766,
+       0.938508
+      ],
+      "n": 3
+     },
+     "f1": 0.051282,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 472,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "microhepatia",
+     "TP": 1,
+     "FN": 13,
+     "TN": 81,
+     "FP": 5,
+     "ref_pos": 14,
+     "ref_neg": 86,
+     "pred_pos": 6,
+     "sensitivity": {
+      "point": 0.071429,
+      "wilson95": [
+       0.012722,
+       0.314687
+      ],
+      "n": 14
+     },
+     "specificity": {
+      "point": 0.94186,
+      "wilson95": [
+       0.871022,
+       0.974913
+      ],
+      "n": 86
+     },
+     "precision": {
+      "point": 0.166667,
+      "wilson95": [
+       0.030053,
+       0.563503
+      ],
+      "n": 6
+     },
+     "f1": 0.1,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 24,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "small_intestinal_obstruction",
+     "TP": 4,
+     "FN": 17,
+     "TN": 75,
+     "FP": 4,
+     "ref_pos": 21,
+     "ref_neg": 79,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 0.190476,
+      "wilson95": [
+       0.076676,
+       0.400006
+      ],
+      "n": 21
+     },
+     "specificity": {
+      "point": 0.949367,
+      "wilson95": [
+       0.876923,
+       0.980136
+      ],
+      "n": 79
+     },
+     "precision": {
+      "point": 0.5,
+      "wilson95": [
+       0.215216,
+       0.784784
+      ],
+      "n": 8
+     },
+     "f1": 0.275862,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 1,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "splenic_mass",
+     "TP": 1,
+     "FN": 17,
+     "TN": 80,
+     "FP": 2,
+     "ref_pos": 18,
+     "ref_neg": 82,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 0.055556,
+      "wilson95": [
+       0.009875,
+       0.257573
+      ],
+      "n": 18
+     },
+     "specificity": {
+      "point": 0.97561,
+      "wilson95": [
+       0.915366,
+       0.993286
+      ],
+      "n": 82
+     },
+     "precision": {
+      "point": 0.333333,
+      "wilson95": [
+       0.061492,
+       0.79234
+      ],
+      "n": 3
+     },
+     "f1": 0.095238,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 466,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "splenomegaly",
+     "TP": 1,
+     "FN": 18,
+     "TN": 79,
+     "FP": 2,
+     "ref_pos": 19,
+     "ref_neg": 81,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 0.052632,
+      "wilson95": [
+       0.009352,
+       0.246387
+      ],
+      "n": 19
+     },
+     "specificity": {
+      "point": 0.975309,
+      "wilson95": [
+       0.914373,
+       0.993202
+      ],
+      "n": 81
+     },
+     "precision": {
+      "point": 0.333333,
+      "wilson95": [
+       0.061492,
+       0.79234
+      ],
+      "n": 3
+     },
+     "f1": 0.090909,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 467,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "hepatomegaly",
+     "TP": 11,
+     "FN": 36,
+     "TN": 53,
+     "FP": 0,
+     "ref_pos": 47,
+     "ref_neg": 53,
+     "pred_pos": 11,
+     "sensitivity": {
+      "point": 0.234043,
+      "wilson95": [
+       0.136033,
+       0.372243
+      ],
+      "n": 47
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.932418,
+       1.0
+      ],
+      "n": 53
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.741167,
+       1.0
+      ],
+      "n": 11
+     },
+     "f1": 0.37931,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    }
+   ]
+  },
+  "EVAL-14": {
+   "label": "CA Week 7 OpenAI M2",
+   "dataset": "CA",
+   "matrix": "M2",
+   "run": "RUN-08",
+   "counts": {
+    "TP": 53,
+    "FN": 28,
+    "TN": 915,
+    "FP": 4
+   },
+   "micro": {
+    "accuracy": {
+     "point": 0.968,
+     "ci95": [
+      0.957,
+      0.979
+     ],
+     "undefined_replicates": 0
+    },
+    "sensitivity": {
+     "point": 0.654321,
+     "ci95": [
+      0.545455,
+      0.756098
+     ],
+     "undefined_replicates": 0
+    },
+    "specificity": {
+     "point": 0.995647,
+     "ci95": [
+      0.991218,
+      0.998926
+     ],
+     "undefined_replicates": 0
+    },
+    "precision": {
+     "point": 0.929825,
+     "ci95": [
+      0.864853,
+      0.983051
+     ],
+     "undefined_replicates": 0
+    },
+    "f1": {
+     "point": 0.768116,
+     "ci95": [
+      0.684211,
+      0.839291
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "macro": {
+    "sensitivity": {
+     "point": 0.794583,
+     "included": 10,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.70491,
+      0.8675
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 7,
+      "median": 10.0,
+      "max": 10
+     }
+    },
+    "specificity": {
+     "point": 0.995673,
+     "included": 10,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.991241,
+      0.998969
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 10,
+      "median": 10.0,
+      "max": 10
+     }
+    },
+    "precision": {
+     "point": 0.932576,
+     "included": 10,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.859648,
+      0.990741
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 7,
+      "median": 10.0,
+      "max": 10
+     }
+    },
+    "f1": {
+     "point": 0.83827,
+     "included": 10,
+     "excluded_undefined": 0,
+     "ci95": [
+      0.746824,
+      0.883059
+     ],
+     "undefined_replicates": 0,
+     "contributing_conditions_in_replicates": {
+      "min": 7,
+      "median": 10.0,
+      "max": 10
+     }
+    }
+   },
+   "conditions": [
+    {
+     "condition": "gastritis",
+     "TP": 9,
+     "FN": 7,
+     "TN": 84,
+     "FP": 0,
+     "ref_pos": 16,
+     "ref_neg": 84,
+     "pred_pos": 9,
+     "sensitivity": {
+      "point": 0.5625,
+      "wilson95": [
+       0.331786,
+       0.769013
+      ],
+      "n": 16
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.956268,
+       1.0
+      ],
+      "n": 84
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.700855,
+       1.0
+      ],
+      "n": 9
+     },
+     "f1": 0.72,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "ascites",
+     "TP": 4,
+     "FN": 1,
+     "TN": 95,
+     "FP": 0,
+     "ref_pos": 5,
+     "ref_neg": 95,
+     "pred_pos": 4,
+     "sensitivity": {
+      "point": 0.8,
+      "wilson95": [
+       0.375535,
+       0.963776
+      ],
+      "n": 5
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.961135,
+       1.0
+      ],
+      "n": 95
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.510109,
+       1.0
+      ],
+      "n": 4
+     },
+     "f1": 0.888889,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 51,
+      "precision": 175,
+      "f1": 51
+     }
+    },
+    {
+     "condition": "colitis",
+     "TP": 8,
+     "FN": 16,
+     "TN": 76,
+     "FP": 0,
+     "ref_pos": 24,
+     "ref_neg": 76,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 0.333333,
+      "wilson95": [
+       0.179722,
+       0.532937
+      ],
+      "n": 24
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.951886,
+       1.0
+      ],
+      "n": 76
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.675592,
+       1.0
+      ],
+      "n": 8
+     },
+     "f1": 0.5,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 2,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "liver_mass",
+     "TP": 2,
+     "FN": 0,
+     "TN": 98,
+     "FP": 0,
+     "ref_pos": 2,
+     "ref_neg": 98,
+     "pred_pos": 2,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.96228,
+       1.0
+      ],
+      "n": 98
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.34238,
+       1.0
+      ],
+      "n": 2
+     },
+     "f1": 1.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 1319,
+      "precision": 1319,
+      "f1": 1319
+     }
+    },
+    {
+     "condition": "pancreatitis",
+     "TP": 2,
+     "FN": 2,
+     "TN": 95,
+     "FP": 1,
+     "ref_pos": 4,
+     "ref_neg": 96,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 0.5,
+      "wilson95": [
+       0.150039,
+       0.849961
+      ],
+      "n": 4
+     },
+     "specificity": {
+      "point": 0.989583,
+      "wilson95": [
+       0.943334,
+       0.998159
+      ],
+      "n": 96
+     },
+     "precision": {
+      "point": 0.666667,
+      "wilson95": [
+       0.20766,
+       0.938508
+      ],
+      "n": 3
+     },
+     "f1": 0.571429,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 166,
+      "precision": 472,
+      "f1": 58
+     }
+    },
+    {
+     "condition": "microhepatia",
+     "TP": 6,
+     "FN": 0,
+     "TN": 94,
+     "FP": 0,
+     "ref_pos": 6,
+     "ref_neg": 94,
+     "pred_pos": 6,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.609666,
+       1.0
+      ],
+      "n": 6
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.960738,
+       1.0
+      ],
+      "n": 94
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.609666,
+       1.0
+      ],
+      "n": 6
+     },
+     "f1": 1.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 24,
+      "precision": 24,
+      "f1": 24
+     }
+    },
+    {
+     "condition": "small_intestinal_obstruction",
+     "TP": 6,
+     "FN": 2,
+     "TN": 90,
+     "FP": 2,
+     "ref_pos": 8,
+     "ref_neg": 92,
+     "pred_pos": 8,
+     "sensitivity": {
+      "point": 0.75,
+      "wilson95": [
+       0.409275,
+       0.928521
+      ],
+      "n": 8
+     },
+     "specificity": {
+      "point": 0.978261,
+      "wilson95": [
+       0.924165,
+       0.994018
+      ],
+      "n": 92
+     },
+     "precision": {
+      "point": 0.75,
+      "wilson95": [
+       0.409275,
+       0.928521
+      ],
+      "n": 8
+     },
+     "f1": 0.75,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 6,
+      "precision": 1,
+      "f1": 0
+     }
+    },
+    {
+     "condition": "splenic_mass",
+     "TP": 3,
+     "FN": 0,
+     "TN": 97,
+     "FP": 0,
+     "ref_pos": 3,
+     "ref_neg": 97,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.438503,
+       1.0
+      ],
+      "n": 3
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.961906,
+       1.0
+      ],
+      "n": 97
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.438503,
+       1.0
+      ],
+      "n": 3
+     },
+     "f1": 1.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 466,
+      "precision": 466,
+      "f1": 466
+     }
+    },
+    {
+     "condition": "splenomegaly",
+     "TP": 3,
+     "FN": 0,
+     "TN": 97,
+     "FP": 0,
+     "ref_pos": 3,
+     "ref_neg": 97,
+     "pred_pos": 3,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.438503,
+       1.0
+      ],
+      "n": 3
+     },
+     "specificity": {
+      "point": 1.0,
+      "wilson95": [
+       0.961906,
+       1.0
+      ],
+      "n": 97
+     },
+     "precision": {
+      "point": 1.0,
+      "wilson95": [
+       0.438503,
+       1.0
+      ],
+      "n": 3
+     },
+     "f1": 1.0,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 467,
+      "precision": 467,
+      "f1": 467
+     }
+    },
+    {
+     "condition": "hepatomegaly",
+     "TP": 10,
+     "FN": 0,
+     "TN": 89,
+     "FP": 1,
+     "ref_pos": 10,
+     "ref_neg": 90,
+     "pred_pos": 11,
+     "sensitivity": {
+      "point": 1.0,
+      "wilson95": [
+       0.722467,
+       1.0
+      ],
+      "n": 10
+     },
+     "specificity": {
+      "point": 0.988889,
+      "wilson95": [
+       0.939716,
+       0.998036
+      ],
+      "n": 90
+     },
+     "precision": {
+      "point": 0.909091,
+      "wilson95": [
+       0.622642,
+       0.983768
+      ],
+      "n": 11
+     },
+     "f1": 0.952381,
+     "bootstrap_undefined_replicates": {
+      "sensitivity": 0,
+      "precision": 0,
+      "f1": 0
+     }
+    }
+   ]
+  }
+ },
+ "paired_reference_contrasts": {
+  "FT: M2 (EVAL-12) minus M1 (EVAL-11), identical predictions RUN-07": {
+   "accuracy": {
+    "point": 0.22619,
+    "ci95": [
+     0.189524,
+     0.26381
+    ],
+    "undefined_replicates": 0
+   },
+   "sensitivity": {
+    "point": 0.441419,
+    "ci95": [
+     0.334473,
+     0.543785
+    ],
+    "undefined_replicates": 0
+   },
+   "specificity": {
+    "point": 0.019593,
+    "ci95": [
+     0.011476,
+     0.028578
+    ],
+    "undefined_replicates": 0
+   },
+   "precision": {
+    "point": 0.439394,
+    "ci95": [
+     0.261538,
+     0.631579
+    ],
+    "undefined_replicates": 0
+   },
+   "f1": {
+    "point": 0.537213,
+    "ci95": [
+     0.444072,
+     0.615937
+    ],
+    "undefined_replicates": 0
+   }
+  },
+  "CA: M2 (EVAL-14) minus M1 (EVAL-13), identical predictions RUN-08": {
+   "accuracy": {
+    "point": 0.237,
+    "ci95": [
+     0.202,
+     0.273
+    ],
+    "undefined_replicates": 0
+   },
+   "sensitivity": {
+    "point": 0.532892,
+    "ci95": [
+     0.438216,
+     0.627646
+    ],
+    "undefined_replicates": 0
+   },
+   "specificity": {
+    "point": 0.027592,
+    "ci95": [
+     0.014273,
+     0.042684
+    ],
+    "undefined_replicates": 0
+   },
+   "precision": {
+    "point": 0.333333,
+    "ci95": [
+     0.177419,
+     0.490196
+    ],
+    "undefined_replicates": 0
+   },
+   "f1": {
+    "point": 0.566336,
+    "ci95": [
+     0.485678,
+     0.647969
+    ],
+    "undefined_replicates": 0
+   }
+  }
+ },
+ "reference_label_agreement": {
+  "CT": {
+   "pairs": 2000,
+   "agreement": 0.5155,
+   "kappa": 0.069395,
+   "kappa_ci95_cluster_bootstrap_2000": [
+    0.040998,
+    0.097136
+   ],
+   "m1_pos_m2_neg": 930,
+   "m1_neg_m2_pos": 39,
+   "per_condition": [
+    {
+     "condition": "perihilar_infiltrate",
+     "agreement": 0.45,
+     "kappa": 0.030324,
+     "m1_pos": 57,
+     "m2_pos": 2,
+     "m1_pos_m2_neg": 55,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "pneumonia",
+     "agreement": 0.57,
+     "kappa": 0.092061,
+     "m1_pos": 47,
+     "m2_pos": 6,
+     "m1_pos_m2_neg": 42,
+     "m1_neg_m2_pos": 1
+    },
+    {
+     "condition": "bronchitis",
+     "agreement": 0.42,
+     "kappa": 0.018613,
+     "m1_pos": 63,
+     "m2_pos": 15,
+     "m1_pos_m2_neg": 53,
+     "m1_neg_m2_pos": 5
+    },
+    {
+     "condition": "interstitial",
+     "agreement": 0.51,
+     "kappa": 0.09192,
+     "m1_pos": 59,
+     "m2_pos": 28,
+     "m1_pos_m2_neg": 40,
+     "m1_neg_m2_pos": 9
+    },
+    {
+     "condition": "diseased_lungs",
+     "agreement": 0.59,
+     "kappa": 0.18844,
+     "m1_pos": 63,
+     "m2_pos": 48,
+     "m1_pos_m2_neg": 28,
+     "m1_neg_m2_pos": 13
+    },
+    {
+     "condition": "hypo_plastic_trachea",
+     "agreement": 0.65,
+     "kappa": 0.0,
+     "m1_pos": 35,
+     "m2_pos": 0,
+     "m1_pos_m2_neg": 35,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "cardiomegaly",
+     "agreement": 0.82,
+     "kappa": 0.51325,
+     "m1_pos": 29,
+     "m2_pos": 19,
+     "m1_pos_m2_neg": 14,
+     "m1_neg_m2_pos": 4
+    },
+    {
+     "condition": "pulmonary_nodules",
+     "agreement": 0.42,
+     "kappa": 0.042272,
+     "m1_pos": 62,
+     "m2_pos": 6,
+     "m1_pos_m2_neg": 57,
+     "m1_neg_m2_pos": 1
+    },
+    {
+     "condition": "pleural_effusion",
+     "agreement": 0.41,
+     "kappa": 0.013378,
+     "m1_pos": 60,
+     "m2_pos": 1,
+     "m1_pos_m2_neg": 59,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "rtm",
+     "agreement": 0.45,
+     "kappa": -0.00365,
+     "m1_pos": 55,
+     "m2_pos": 2,
+     "m1_pos_m2_neg": 54,
+     "m1_neg_m2_pos": 1
+    },
+    {
+     "condition": "focal_caudodorsal_lung",
+     "agreement": 0.54,
+     "kappa": 0.022524,
+     "m1_pos": 47,
+     "m2_pos": 1,
+     "m1_pos_m2_neg": 46,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "focal_perihilar",
+     "agreement": 0.44,
+     "kappa": 0.029126,
+     "m1_pos": 58,
+     "m2_pos": 2,
+     "m1_pos_m2_neg": 56,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "pulmonary_hypoinflation",
+     "agreement": 0.37,
+     "kappa": 0.074074,
+     "m1_pos": 72,
+     "m2_pos": 9,
+     "m1_pos_m2_neg": 63,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "right_sided_cardiomegaly",
+     "agreement": 0.67,
+     "kappa": -0.019778,
+     "m1_pos": 32,
+     "m2_pos": 1,
+     "m1_pos_m2_neg": 32,
+     "m1_neg_m2_pos": 1
+    },
+    {
+     "condition": "pericardial_effusion",
+     "agreement": 0.76,
+     "kappa": 0.0,
+     "m1_pos": 24,
+     "m2_pos": 0,
+     "m1_pos_m2_neg": 24,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "bronchiectasis",
+     "agreement": 0.33,
+     "kappa": 0.0,
+     "m1_pos": 67,
+     "m2_pos": 0,
+     "m1_pos_m2_neg": 67,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "pulmonary_vessel_enlargement",
+     "agreement": 0.49,
+     "kappa": 0.018476,
+     "m1_pos": 52,
+     "m2_pos": 1,
+     "m1_pos_m2_neg": 51,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "left_sided_cardiomegaly",
+     "agreement": 0.79,
+     "kappa": 0.393064,
+     "m1_pos": 28,
+     "m2_pos": 15,
+     "m1_pos_m2_neg": 17,
+     "m1_neg_m2_pos": 4
+    },
+    {
+     "condition": "thoracic_lymphadenopathy",
+     "agreement": 0.2,
+     "kappa": 0.00892,
+     "m1_pos": 82,
+     "m2_pos": 2,
+     "m1_pos_m2_neg": 80,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "esophagitis",
+     "agreement": 0.43,
+     "kappa": -0.0,
+     "m1_pos": 57,
+     "m2_pos": 0,
+     "m1_pos_m2_neg": 57,
+     "m1_neg_m2_pos": 0
+    }
+   ]
+  },
+  "FT": {
+   "pairs": 2100,
+   "agreement": 0.727143,
+   "kappa": 0.031272,
+   "kappa_ci95_cluster_bootstrap_2000": [
+    -0.007955,
+    0.067355
+   ],
+   "m1_pos_m2_neg": 495,
+   "m1_neg_m2_pos": 78,
+   "per_condition": [
+    {
+     "condition": "pulmonary_nodules",
+     "agreement": 0.91,
+     "kappa": 0.134615,
+     "m1_pos": 6,
+     "m2_pos": 5,
+     "m1_pos_m2_neg": 5,
+     "m1_neg_m2_pos": 4
+    },
+    {
+     "condition": "esophagitis",
+     "agreement": 0.41,
+     "kappa": -0.0,
+     "m1_pos": 59,
+     "m2_pos": 0,
+     "m1_pos_m2_neg": 59,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "pneumonia",
+     "agreement": 0.49,
+     "kappa": 0.0,
+     "m1_pos": 51,
+     "m2_pos": 0,
+     "m1_pos_m2_neg": 51,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "bronchitis",
+     "agreement": 0.64,
+     "kappa": 0.129594,
+     "m1_pos": 14,
+     "m2_pos": 38,
+     "m1_pos_m2_neg": 6,
+     "m1_neg_m2_pos": 30
+    },
+    {
+     "condition": "interstitial",
+     "agreement": 0.79,
+     "kappa": 0.075704,
+     "m1_pos": 19,
+     "m2_pos": 6,
+     "m1_pos_m2_neg": 17,
+     "m1_neg_m2_pos": 4
+    },
+    {
+     "condition": "diseased_lungs",
+     "agreement": 0.55,
+     "kappa": 0.074836,
+     "m1_pos": 33,
+     "m2_pos": 46,
+     "m1_pos_m2_neg": 16,
+     "m1_neg_m2_pos": 29
+    },
+    {
+     "condition": "hypo_plastic_trachea",
+     "agreement": 0.88,
+     "kappa": 0.0,
+     "m1_pos": 12,
+     "m2_pos": 0,
+     "m1_pos_m2_neg": 12,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "cardiomegaly",
+     "agreement": 0.9,
+     "kappa": 0.242424,
+     "m1_pos": 4,
+     "m2_pos": 10,
+     "m1_pos_m2_neg": 2,
+     "m1_neg_m2_pos": 8
+    },
+    {
+     "condition": "pleural_effusion",
+     "agreement": 0.75,
+     "kappa": 0.14734,
+     "m1_pos": 28,
+     "m2_pos": 3,
+     "m1_pos_m2_neg": 25,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "perihilar_infiltrate",
+     "agreement": 0.46,
+     "kappa": 0.0,
+     "m1_pos": 54,
+     "m2_pos": 0,
+     "m1_pos_m2_neg": 54,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "rtm",
+     "agreement": 0.79,
+     "kappa": 0.0,
+     "m1_pos": 21,
+     "m2_pos": 0,
+     "m1_pos_m2_neg": 21,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "focal_caudodorsal_lung",
+     "agreement": 0.63,
+     "kappa": 0.032427,
+     "m1_pos": 38,
+     "m2_pos": 1,
+     "m1_pos_m2_neg": 37,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "right_sided_cardiomegaly",
+     "agreement": 0.95,
+     "kappa": 0.0,
+     "m1_pos": 5,
+     "m2_pos": 0,
+     "m1_pos_m2_neg": 5,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "focal_perihilar",
+     "agreement": 0.48,
+     "kappa": 0.0,
+     "m1_pos": 52,
+     "m2_pos": 0,
+     "m1_pos_m2_neg": 52,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "left_sided_cardiomegaly",
+     "agreement": 0.95,
+     "kappa": 0.0,
+     "m1_pos": 5,
+     "m2_pos": 0,
+     "m1_pos_m2_neg": 5,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "bronchiectasis",
+     "agreement": 0.74,
+     "kappa": 0.0,
+     "m1_pos": 26,
+     "m2_pos": 0,
+     "m1_pos_m2_neg": 26,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "pulmonary_vessel_enlargement",
+     "agreement": 0.96,
+     "kappa": 0.480519,
+     "m1_pos": 5,
+     "m2_pos": 3,
+     "m1_pos_m2_neg": 3,
+     "m1_neg_m2_pos": 1
+    },
+    {
+     "condition": "thoracic_lymphadenopathy",
+     "agreement": 0.55,
+     "kappa": 0.023437,
+     "m1_pos": 46,
+     "m2_pos": 1,
+     "m1_pos_m2_neg": 45,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "pulmonary_hypoinflation",
+     "agreement": 0.69,
+     "kappa": 0.042027,
+     "m1_pos": 32,
+     "m2_pos": 1,
+     "m1_pos_m2_neg": 31,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "pericardial_effusion",
+     "agreement": 0.98,
+     "kappa": 0.0,
+     "m1_pos": 2,
+     "m2_pos": 0,
+     "m1_pos_m2_neg": 2,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "Fe_Alveolar",
+     "agreement": 0.77,
+     "kappa": 0.028716,
+     "m1_pos": 22,
+     "m2_pos": 3,
+     "m1_pos_m2_neg": 21,
+     "m1_neg_m2_pos": 2
+    }
+   ]
+  },
+  "CA": {
+   "pairs": 1000,
+   "agreement": 0.725,
+   "kappa": 0.128754,
+   "kappa_ci95_cluster_bootstrap_2000": [
+    0.07725,
+    0.18302
+   ],
+   "m1_pos_m2_neg": 237,
+   "m1_neg_m2_pos": 38,
+   "per_condition": [
+    {
+     "condition": "gastritis",
+     "agreement": 0.69,
+     "kappa": 0.132139,
+     "m1_pos": 29,
+     "m2_pos": 16,
+     "m1_pos_m2_neg": 22,
+     "m1_neg_m2_pos": 9
+    },
+    {
+     "condition": "ascites",
+     "agreement": 0.84,
+     "kappa": 0.276018,
+     "m1_pos": 19,
+     "m2_pos": 5,
+     "m1_pos_m2_neg": 15,
+     "m1_neg_m2_pos": 1
+    },
+    {
+     "condition": "colitis",
+     "agreement": 0.67,
+     "kappa": 0.108108,
+     "m1_pos": 25,
+     "m2_pos": 24,
+     "m1_pos_m2_neg": 17,
+     "m1_neg_m2_pos": 16
+    },
+    {
+     "condition": "liver_mass",
+     "agreement": 0.89,
+     "kappa": 0.240331,
+     "m1_pos": 13,
+     "m2_pos": 2,
+     "m1_pos_m2_neg": 11,
+     "m1_neg_m2_pos": 0
+    },
+    {
+     "condition": "pancreatitis",
+     "agreement": 0.27,
+     "kappa": 0.0,
+     "m1_pos": 75,
+     "m2_pos": 4,
+     "m1_pos_m2_neg": 72,
+     "m1_neg_m2_pos": 1
+    },
+    {
+     "condition": "microhepatia",
+     "agreement": 0.82,
+     "kappa": 0.017467,
+     "m1_pos": 14,
+     "m2_pos": 6,
+     "m1_pos_m2_neg": 13,
+     "m1_neg_m2_pos": 5
+    },
+    {
+     "condition": "small_intestinal_obstruction",
+     "agreement": 0.83,
+     "kappa": 0.336973,
+     "m1_pos": 21,
+     "m2_pos": 8,
+     "m1_pos_m2_neg": 15,
+     "m1_neg_m2_pos": 2
+    },
+    {
+     "condition": "splenic_mass",
+     "agreement": 0.81,
+     "kappa": 0.046185,
+     "m1_pos": 18,
+     "m2_pos": 3,
+     "m1_pos_m2_neg": 17,
+     "m1_neg_m2_pos": 2
+    },
+    {
+     "condition": "splenomegaly",
+     "agreement": 0.8,
+     "kappa": 0.041227,
+     "m1_pos": 19,
+     "m2_pos": 3,
+     "m1_pos_m2_neg": 18,
+     "m1_neg_m2_pos": 2
+    },
+    {
+     "condition": "hepatomegaly",
+     "agreement": 0.63,
+     "kappa": 0.222689,
+     "m1_pos": 47,
+     "m2_pos": 10,
+     "m1_pos_m2_neg": 37,
+     "m1_neg_m2_pos": 0
+    }
+   ]
+  }
+ },
+ "ct_model_comparison": {
+  "M1": {
+   "openai": "EVAL-05",
+   "gemini": "EVAL-07",
+   "agreement_pairs": 1940,
+   "pairs": 2000,
+   "kappa": 0.772897,
+   "kappa_ci95_cluster_bootstrap_2000": [
+    0.715552,
+    0.822328
+   ],
+   "testable_conditions": 13,
+   "per_condition": [
+    {
+     "condition": "perihilar_infiltrate",
+     "openai_only_correct": 1,
+     "gemini_only_correct": 2,
+     "mcnemar_exact_p": 1.0,
+     "agreement": 0.97,
+     "kappa": -0.013514,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "pneumonia",
+     "openai_only_correct": 2,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": 0.5,
+     "agreement": 0.98,
+     "kappa": 0.846626,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "bronchitis",
+     "openai_only_correct": 12,
+     "gemini_only_correct": 2,
+     "mcnemar_exact_p": 0.012939,
+     "agreement": 0.86,
+     "kappa": 0.366516,
+     "holm_p": 0.168213
+    },
+    {
+     "condition": "interstitial",
+     "openai_only_correct": 3,
+     "gemini_only_correct": 1,
+     "mcnemar_exact_p": 0.625,
+     "agreement": 0.96,
+     "kappa": 0.900794,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "diseased_lungs",
+     "openai_only_correct": 11,
+     "gemini_only_correct": 6,
+     "mcnemar_exact_p": 0.332306,
+     "agreement": 0.83,
+     "kappa": 0.588975,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "hypo_plastic_trachea",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": null,
+     "agreement": 1.0,
+     "kappa": null,
+     "holm_p": null
+    },
+    {
+     "condition": "cardiomegaly",
+     "openai_only_correct": 6,
+     "gemini_only_correct": 2,
+     "mcnemar_exact_p": 0.289062,
+     "agreement": 0.92,
+     "kappa": 0.626866,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "pulmonary_nodules",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": null,
+     "agreement": 1.0,
+     "kappa": 1.0,
+     "holm_p": null
+    },
+    {
+     "condition": "pleural_effusion",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 1,
+     "mcnemar_exact_p": 1.0,
+     "agreement": 0.99,
+     "kappa": 0.662162,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "rtm",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": null,
+     "agreement": 1.0,
+     "kappa": 1.0,
+     "holm_p": null
+    },
+    {
+     "condition": "focal_caudodorsal_lung",
+     "openai_only_correct": 1,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": 1.0,
+     "agreement": 0.99,
+     "kappa": 0.795082,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "focal_perihilar",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": null,
+     "agreement": 1.0,
+     "kappa": null,
+     "holm_p": null
+    },
+    {
+     "condition": "pulmonary_hypoinflation",
+     "openai_only_correct": 1,
+     "gemini_only_correct": 2,
+     "mcnemar_exact_p": 1.0,
+     "agreement": 0.97,
+     "kappa": 0.840426,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "right_sided_cardiomegaly",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": null,
+     "agreement": 1.0,
+     "kappa": 1.0,
+     "holm_p": null
+    },
+    {
+     "condition": "pericardial_effusion",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": null,
+     "agreement": 1.0,
+     "kappa": 1.0,
+     "holm_p": null
+    },
+    {
+     "condition": "bronchiectasis",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": null,
+     "agreement": 1.0,
+     "kappa": null,
+     "holm_p": null
+    },
+    {
+     "condition": "pulmonary_vessel_enlargement",
+     "openai_only_correct": 1,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": 1.0,
+     "agreement": 0.99,
+     "kappa": 0.662162,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "left_sided_cardiomegaly",
+     "openai_only_correct": 1,
+     "gemini_only_correct": 2,
+     "mcnemar_exact_p": 1.0,
+     "agreement": 0.97,
+     "kappa": 0.885671,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "thoracic_lymphadenopathy",
+     "openai_only_correct": 1,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": 1.0,
+     "agreement": 0.99,
+     "kappa": 0.795082,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "esophagitis",
+     "openai_only_correct": 1,
+     "gemini_only_correct": 1,
+     "mcnemar_exact_p": 1.0,
+     "agreement": 0.98,
+     "kappa": 0.0,
+     "holm_p": 1.0
+    }
+   ],
+   "paired_difference_gemini_minus_openai": {
+    "accuracy": {
+     "point": -0.011,
+     "ci95": [
+      -0.0205,
+      -0.002
+     ],
+     "undefined_replicates": 0
+    },
+    "sensitivity": {
+     "point": -0.028599,
+     "ci95": [
+      -0.042242,
+      -0.015518
+     ],
+     "undefined_replicates": 0
+    },
+    "specificity": {
+     "point": 0.008412,
+     "ci95": [
+      -0.001297,
+      0.019628
+     ],
+     "undefined_replicates": 0
+    },
+    "precision": {
+     "point": -0.002121,
+     "ci95": [
+      -0.059526,
+      0.05866
+     ],
+     "undefined_replicates": 0
+    },
+    "f1": {
+     "point": -0.044442,
+     "ci95": [
+      -0.06534,
+      -0.023817
+     ],
+     "undefined_replicates": 0
+    }
+   }
+  },
+  "M2": {
+   "openai": "EVAL-06",
+   "gemini": "EVAL-08",
+   "agreement_pairs": 1944,
+   "pairs": 2000,
+   "kappa": 0.788068,
+   "kappa_ci95_cluster_bootstrap_2000": [
+    0.73456,
+    0.838995
+   ],
+   "testable_conditions": 14,
+   "per_condition": [
+    {
+     "condition": "perihilar_infiltrate",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 2,
+     "mcnemar_exact_p": 0.5,
+     "agreement": 0.98,
+     "kappa": 0.492386,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "pneumonia",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 2,
+     "mcnemar_exact_p": 0.5,
+     "agreement": 0.98,
+     "kappa": 0.846626,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "bronchitis",
+     "openai_only_correct": 6,
+     "gemini_only_correct": 8,
+     "mcnemar_exact_p": 0.790527,
+     "agreement": 0.86,
+     "kappa": 0.319066,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "interstitial",
+     "openai_only_correct": 2,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": 0.5,
+     "agreement": 0.98,
+     "kappa": 0.951456,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "diseased_lungs",
+     "openai_only_correct": 14,
+     "gemini_only_correct": 3,
+     "mcnemar_exact_p": 0.012726,
+     "agreement": 0.83,
+     "kappa": 0.58004,
+     "holm_p": 0.178162
+    },
+    {
+     "condition": "hypo_plastic_trachea",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": null,
+     "agreement": 1.0,
+     "kappa": null,
+     "holm_p": null
+    },
+    {
+     "condition": "cardiomegaly",
+     "openai_only_correct": 6,
+     "gemini_only_correct": 1,
+     "mcnemar_exact_p": 0.125,
+     "agreement": 0.93,
+     "kappa": 0.681818,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "pulmonary_nodules",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": null,
+     "agreement": 1.0,
+     "kappa": 1.0,
+     "holm_p": null
+    },
+    {
+     "condition": "pleural_effusion",
+     "openai_only_correct": 1,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": 1.0,
+     "agreement": 0.99,
+     "kappa": 0.662162,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "rtm",
+     "openai_only_correct": 1,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": 1.0,
+     "agreement": 0.99,
+     "kappa": 0.903846,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "focal_caudodorsal_lung",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 1,
+     "mcnemar_exact_p": 1.0,
+     "agreement": 0.99,
+     "kappa": 0.795082,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "focal_perihilar",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": null,
+     "agreement": 1.0,
+     "kappa": null,
+     "holm_p": null
+    },
+    {
+     "condition": "pulmonary_hypoinflation",
+     "openai_only_correct": 2,
+     "gemini_only_correct": 1,
+     "mcnemar_exact_p": 1.0,
+     "agreement": 0.97,
+     "kappa": 0.840426,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "right_sided_cardiomegaly",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": null,
+     "agreement": 1.0,
+     "kappa": 1.0,
+     "holm_p": null
+    },
+    {
+     "condition": "pericardial_effusion",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": null,
+     "agreement": 1.0,
+     "kappa": 1.0,
+     "holm_p": null
+    },
+    {
+     "condition": "bronchiectasis",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 0,
+     "mcnemar_exact_p": null,
+     "agreement": 1.0,
+     "kappa": null,
+     "holm_p": null
+    },
+    {
+     "condition": "pulmonary_vessel_enlargement",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 1,
+     "mcnemar_exact_p": 1.0,
+     "agreement": 0.99,
+     "kappa": 0.662162,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "left_sided_cardiomegaly",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 2,
+     "mcnemar_exact_p": 0.5,
+     "agreement": 0.98,
+     "kappa": 0.925651,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "thoracic_lymphadenopathy",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 1,
+     "mcnemar_exact_p": 1.0,
+     "agreement": 0.99,
+     "kappa": 0.795082,
+     "holm_p": 1.0
+    },
+    {
+     "condition": "esophagitis",
+     "openai_only_correct": 0,
+     "gemini_only_correct": 2,
+     "mcnemar_exact_p": 0.5,
+     "agreement": 0.98,
+     "kappa": 0.0,
+     "holm_p": 1.0
+    }
+   ],
+   "paired_difference_gemini_minus_openai": {
+    "accuracy": {
+     "point": -0.004,
+     "ci95": [
+      -0.012,
+      0.0035
+     ],
+     "undefined_replicates": 0
+    },
+    "sensitivity": {
+     "point": -0.151899,
+     "ci95": [
+      -0.231707,
+      -0.071429
+     ],
+     "undefined_replicates": 0
+    },
+    "specificity": {
+     "point": 0.008686,
+     "ci95": [
+      0.003772,
+      0.014077
+     ],
+     "undefined_replicates": 0
+    },
+    "precision": {
+     "point": 0.058288,
+     "ci95": [
+      0.008505,
+      0.105181
+     ],
+     "undefined_replicates": 0
+    },
+    "f1": {
+     "point": -0.058929,
+     "ci95": [
+      -0.117871,
+      -0.001971
+     ],
+     "undefined_replicates": 0
+    }
+   }
+  }
+ },
+ "ct_run_to_run": {
+  "Week 4: RUN-02 (M1 batch) vs RUN-01 (M2 batch)": {
+   "differing_pairs": 8,
+   "pairs": 2000,
+   "cases_affected": 6,
+   "pos_to_neg": 4,
+   "neg_to_pos": 4,
+   "kappa": 0.973723,
+   "conditions_affected": {
+    "bronchitis": 2,
+    "interstitial": 1,
+    "diseased_lungs": 3,
+    "focal_caudodorsal_lung": 1,
+    "left_sided_cardiomegaly": 1
+   }
+  },
+  "Week 5: RUN-03 (M1 batch) vs RUN-04 (M2 batch)": {
+   "differing_pairs": 11,
+   "pairs": 2000,
+   "cases_affected": 8,
+   "pos_to_neg": 5,
+   "neg_to_pos": 6,
+   "kappa": 0.962953,
+   "conditions_affected": {
+    "perihilar_infiltrate": 1,
+    "bronchitis": 1,
+    "interstitial": 2,
+    "diseased_lungs": 3,
+    "cardiomegaly": 1,
+    "focal_caudodorsal_lung": 2,
+    "left_sided_cardiomegaly": 1
+   }
+  },
+  "Week 7 Gemini: RUN-05 vs RUN-06": {
+   "differing_pairs": 13,
+   "pairs": 2000,
+   "cases_affected": 11,
+   "pos_to_neg": 7,
+   "neg_to_pos": 6,
+   "kappa": 0.943477,
+   "conditions_affected": {
+    "bronchitis": 1,
+    "interstitial": 2,
+    "diseased_lungs": 7,
+    "cardiomegaly": 2,
+    "rtm": 1
+   }
+  },
+  "Week 4 vs Week 5, M1 workflow: RUN-02 vs RUN-03": {
+   "differing_pairs": 13,
+   "pairs": 2000,
+   "cases_affected": 10,
+   "pos_to_neg": 9,
+   "neg_to_pos": 4,
+   "kappa": 0.956706,
+   "conditions_affected": {
+    "bronchitis": 2,
+    "interstitial": 2,
+    "diseased_lungs": 5,
+    "focal_caudodorsal_lung": 2,
+    "left_sided_cardiomegaly": 1,
+    "thoracic_lymphadenopathy": 1
+   }
+  },
+  "Week 4 vs Week 5, M2 workflow: RUN-01 vs RUN-04": {
+   "differing_pairs": 8,
+   "pairs": 2000,
+   "cases_affected": 6,
+   "pos_to_neg": 6,
+   "neg_to_pos": 2,
+   "kappa": 0.973431,
+   "conditions_affected": {
+    "perihilar_infiltrate": 1,
+    "bronchitis": 1,
+    "interstitial": 1,
+    "diseased_lungs": 1,
+    "cardiomegaly": 1,
+    "focal_caudodorsal_lung": 1,
+    "left_sided_cardiomegaly": 1,
+    "thoracic_lymphadenopathy": 1
+   }
+  }
+ },
+ "d_a_compatibility": {
+  "caseids_identical_and_same_order": true,
+  "report_text_identical_all_three_fields": true,
+  "condition_keys_identical_and_same_order": true,
+  "run03_predictions": {
+   "records": 100,
+   "keys": 20
+  },
+  "run04_predictions": {
+   "records": 100,
+   "keys": 20
+  },
+  "compatible": true,
+  "exploratory_rescoring_both_week5_batches": {
+   "RUN-03 predictions scored against M2 (Gold Standard)": {
+    "TP": 125,
+    "FN": 33,
+    "TN": 1806,
+    "FP": 36,
+    "accuracy": 0.9655,
+    "sensitivity": 0.791139,
+    "specificity": 0.980456,
+    "precision": 0.776398,
+    "f1": 0.783699
+   },
+   "RUN-04 predictions scored against M1 (Vetology)": {
+    "TP": 124,
+    "FN": 925,
+    "TN": 913,
+    "FP": 38,
+    "accuracy": 0.5185,
+    "sensitivity": 0.118208,
+    "specificity": 0.960042,
+    "precision": 0.765432,
+    "f1": 0.204789
+   }
+  },
+  "paired_reference_contrast_RUN-03": {
+   "accuracy": {
+    "point": 0.4445,
+    "ci95": [
+     0.3945,
+     0.493512
+    ]
+   },
+   "sensitivity": {
+    "point": 0.671025,
+    "ci95": [
+     0.606226,
+     0.732959
+    ]
+   },
+   "specificity": {
+    "point": 0.017259,
+    "ci95": [
+     0.00138,
+     0.034812
+    ]
+   },
+   "precision": {
+    "point": -0.006211,
+    "ci95": [
+     -0.122449,
+     0.115157
+    ]
+   },
+   "f1": {
+    "point": 0.575435,
+    "ci95": [
+     0.518362,
+     0.630655
+    ]
+   }
+  }
+ }
+}

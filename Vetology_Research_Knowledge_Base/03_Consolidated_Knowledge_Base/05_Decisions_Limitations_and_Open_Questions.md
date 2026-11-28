@@ -112,3 +112,16 @@ Notable rejected or deferred engineering options:
 | OQ-14 | Which two Week 7 local-artifact tests were skipped, and why? | User |
 | OQ-15 | What are the exact model snapshot identifiers? | User |
 | OQ-16 | Should the paper's scope be Canine Thorax only (KB_03 outline) or all three datasets (programme requirement)? | User |
+
+
+## 4. Week 8 additions: provenance, overlap, analyses
+
+| ID | Item | Status | Source |
+|---|---|---|---|
+| L-W8-1 | **Prompt-development / evaluation overlap.** Selected cases from the evaluation datasets were reviewed during prompt development (CT/FT cases 3, 4, 5, 7, 8; CA 13–17), using report text and model predictions. The developer reports that reference labels were not inspected in the manual review | Developer clarification (2026-11-28). The evaluation is **not held out** | KB_06 §11; owner |
+| L-W8-2 | **CA hedged-language analysis.** The developer recalls using report wording and model predictions, and does not remember whether any script inspected the reference-label columns. KB_07 §8.5 records a keyword heuristic that tabulated reference labels; its provenance could not be independently established | **Unresolved**: possible reference-label exposure | KB_07 §8.5; owner |
+| L-W8-3 | **Prompt domain provenance.** For CT V1.3: ten textbooks queried with NotebookLM, consolidated with ChatGPT, guidance from Dr. Parin Candy. Editions, source-to-rule mapping, intermediate notes and the scope of expert input are undocumented. **No evidence that this process informed FT or CA** | Partially documented | KB_03 §5.2; `09_…` §8 |
+| L-W8-4 | **D-A.** CT common-batch compatibility verified. Exploratory rescoring of both Week 5 batches done; batch selection open | Open (owner) | `04_…/07_…Results.md` §7 |
+| L-W8-5 | **Statistical settings** (B, seed, interval rule) executed without prior owner approval | Disclosed; approval pending | `08_…` §13 |
+| L-W8-6 | **Reference-label agreement** between Matrix 1 and Matrix 2 is low (κ CT 0.069, FT 0.031, CA 0.129); reason unresolved | New finding; interpretation open | `07_…Results.md` §4 |
+| L-W8-7 | **FLAIR Appendix S1** not retrieved (publisher access challenge) | Open | `11_…` |

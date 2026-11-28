@@ -310,3 +310,17 @@ Owner-approved corrections (D-065, D-066). The supplied originals are kept byte-
 - **Digests:** file SHA-256 `9336be3fa463be14bdfd71d93e2709b4bad70c626d0533d8e4f887809b2a254c`; text SHA-256 `d6c50d5d2e9e8dde080e7c77879cfd9c4c2ccc7fbcad96753a090803497dee91`; 17,996 characters (18,133 bytes).
 - **Tests:** Week 7 504 run (499 passed, 5 skipped); Week 5 338 run (329 passed, 9 skipped); parity and flake8 clean.
 - **Not executed:** live OpenAI runs.
+
+
+## Week 8 — Research paper development (2026-11-28)
+
+### Added
+- `Vetology_Research_Knowledge_Base/`: source extractions; consolidated knowledge base (00–11); evidence registers (00–07).
+- `analysis/week08_statistics.py`: deterministic statistics over the confidential case-level files, which are supplied at run time and not committed. It computes report-level cluster-bootstrap and Wilson intervals, paired reference contrasts, reference-label κ, the CT model comparison (κ, exact McNemar with Holm), run-to-run consistency and the D-A compatibility check. Outputs are aggregate only (`04_Evidence_and_Artifacts/07_*`).
+- `paper/Research_Paper_Draft_v0.1.md` and `paper/README.md`: first full manuscript draft with an evidence map.
+
+### Verified
+- All ten reference-based evaluation counts were reproduced from the prediction files and reference workbooks. They equal the evaluation workbooks.
+
+### Corrected
+- The README status for Feline Thorax and Canine Abdomen now records the completed live runs and local evaluations of 2026-11-21. Earlier entries in this file that said "Not executed" describe the state at the time they were written.

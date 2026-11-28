@@ -92,3 +92,19 @@ Nothing here was silently resolved. "Week 8 note" gives evidence gathered in thi
 | Source disagreements and their provenance | §3 above |
 | Demonstrated capability vs product potential | 06 §2–§3 |
 | Provisional novelty | 06 §1 |
+
+
+## 5. Manuscript evidence map (draft v0.1)
+
+| Manuscript element | Evidence | Status |
+|---|---|---|
+| Table 1 (datasets, prevalence) | `04_Evidence_and_Artifacts/03_…Register.md`; `06_Per_Condition_Results.md` | Verified against workbooks |
+| Table 2 (runs, configurations) | `02_Experimental_Run_Register.md`; `04_Prompts_and_Configurations_Index.md` | Verified (manifests for Week 7) |
+| Table 3 (counts, micro metrics, CIs) | `03_…Register.md`; `07_Statistical_Analysis_Results.md` §1 | Counts verified; CIs computed by `analysis/week08_statistics.py` |
+| Table 4 (paired M2 − M1; reference κ) | `07_…Results.md` §3, §4, §7 | Computed (FT, CA paired; CT exploratory rescoring) |
+| Table 5 (condition-level) | `07_…Results.md` §8 | Computed |
+| Table 6 (CT model comparison) | `07_…Results.md` §5; AGR-01/02 | Computed; exploratory tests |
+| Table 7 (run-to-run) | `07_…Results.md` §6 | Computed |
+| Prompt-development overlap and CA heuristic | `05_…` §4 L-W8-1, L-W8-2 | Developer clarification; heuristic provenance unresolved |
+| Literature citations | `09_Literature_Evidence_Matrix.md` §2 (L01–L11) | Verification level per item; L07 and L11 metadata only |
+| C-26 *(new)* | KB_07 §8.5 records a reference-label keyword heuristic; the developer does not recall reference-label use | **Conflicting / unresolved** |

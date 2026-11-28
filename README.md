@@ -6,15 +6,24 @@ Python project for the Vetology training assignments. The project processes vete
 
 ## Current status
 
-### Week 7 extension — Feline Thorax and Canine Abdomen (implemented; approved prompts registered; live runs to be executed locally)
+### Week 8 — research paper development (in progress)
+
+Branch `week-08/research-paper-development` adds:
+- the research knowledge base (`Vetology_Research_Knowledge_Base/`);
+- the statistical analysis script `analysis/week08_statistics.py`, whose aggregate outputs are in `Vetology_Research_Knowledge_Base/04_Evidence_and_Artifacts/07_*`;
+- the first manuscript draft, `paper/Research_Paper_Draft_v0.1.md`.
+
+No application code, prompts or historical outputs were changed.
+
+### Week 7 extension — Feline Thorax and Canine Abdomen (implemented; live runs executed and evaluated locally on 2026-11-21)
 
 Week 7 (branch `week-07/feline-thorax-and-canine-abdomen`) now runs three applications on one shared engine, chosen with `--application`. Canine Thorax is still the default.
 
 | Application | Provider / model | Conditions | Prompt | Status |
 |---|---|---:|---|---|
 | `canine_thorax` | Google Gemini `gemini-3.8-flash` | 20 | Canine Thorax Master Prompt V1.3 (SHA-256 pinned) | Unchanged, existing results kept |
-| `feline_thorax` | OpenAI `gpt-4.1-mini` | 21 | Feline Thorax Master Prompt V1.2 (SHA-256 pinned; supersedes V1.1) | Ready; live run not yet executed |
-| `canine_abdomen` | OpenAI `gpt-4.1-mini` | 10 | Canine Abdomen Master Prompt V1.4 (SHA-256 pinned; supersedes V1.2, V1.3) | Ready; live run not yet executed |
+| `feline_thorax` | OpenAI `gpt-4.1-mini` | 21 | Feline Thorax Master Prompt V1.2 (SHA-256 pinned; supersedes V1.1) | Live batch 100/100 (2026-11-21, manifest committed); Matrix 1/2 evaluated locally (workbooks confidential) |
+| `canine_abdomen` | OpenAI `gpt-4.1-mini` | 10 | Canine Abdomen Master Prompt V1.4 (SHA-256 pinned; supersedes V1.2, V1.3) | Live batch 100/100 (2026-11-21, manifest committed); Matrix 1/2 evaluated locally (workbooks confidential) |
 
 - **Predictions:** each new application generates its predictions **once**, from the Matrix 1 workbook, and reuses them for **both** evaluations. Matrix 1 uses the Vetology reference labels, Matrix 2 the Gold Standard labels, and the two reference tracks stay separate.
 - **Workbook check:** before the shared predictions serve Matrix 2, the Matrix 2 workbook must hold the same 100 unique CaseIDs, in the same order, with identical report text.

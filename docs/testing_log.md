@@ -382,3 +382,15 @@ New tests:
 - **Execution path:** `canine_abdomen` loads V1.4 and records V1.4 with its digests in the run manifest.
 
 Live OpenAI runs were not executed.
+
+
+## Week 8 — verification record (2026-11-28)
+
+| Check | Result | Notes |
+|---|---|---|
+| Week 7 suite (`src/week_07/tests`, scratch export of HEAD, Linux, Python 3.13) | 504 run, OK, 6 skipped | Dependencies installed from `requirements.txt` in a scratch virtual environment |
+| Week 5 suite (`src/week_05/tests`, full export) | 338 run, OK, 9 skipped | Artifact-dependent tests skip without the gitignored baselines |
+| `analysis/week08_statistics.py` | Reproduced all 10 registered micro confusion counts; aborts on mismatch; two runs gave identical JSON (except the timestamp) | Inputs: owner-supplied bundle (not committed) |
+| flake8 on `analysis/week08_statistics.py` | Clean except E501 (line length > 100) | Analysis script; not part of the application packages |
+
+Status correction: the Feline Thorax and Canine Abdomen live OpenAI runs **were executed** on 2026-11-21 (committed manifests, `ceb3f42`) and evaluated locally. The statements above that they were "not executed" describe the state at the time.

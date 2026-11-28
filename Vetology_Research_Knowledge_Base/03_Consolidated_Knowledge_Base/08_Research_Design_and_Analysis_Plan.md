@@ -583,3 +583,22 @@ These items are not supported by the knowledge base and are **not** filled in he
 - Ethics, approval, funding and conflict-of-interest statements.
 - Literature-based novelty.
 - Any inferential statistic: no κ, CI or p-value has been computed yet.
+
+---
+
+## 13. Execution record and deviations (added after approval; the plan above is unchanged)
+
+Analyses executed 2026-11-28 with `analysis/week08_statistics.py`. Outputs: `04_Evidence_and_Artifacts/07_Statistical_Analysis_Results.md` and `07_statistical_results.json` (aggregate only).
+
+| Plan element | Executed as | Deviation or note |
+|---|---|---|
+| §6.2 metrics | All ten evaluations recomputed from case-level files; counts equal the registered values | F1 uses the plan definition. Macro F1 therefore differs from the workbook values, which remain the historical record |
+| §6.3 condition-level | Wilson 95% intervals for sensitivity, specificity and precision; support counts; undefined flagged | D-C thresholds not applied as formal flags. The manuscript uses ≥ 10 reference positives as a descriptive cut-off only |
+| §6.4 bootstrap (D-I) | Report-level cluster bootstrap; B = 10,000; seed 20261128; percentile intervals over defined replicates; undefined-replicate counts and contributing-condition ranges reported | Settings chosen by the analyst after testing on the case-level data; **owner approval pending**. κ intervals use the first 2,000 replicates (deviation, for speed) |
+| §6.5 model comparison (D-D) | CT only: agreement, κ (overall and per condition), exact McNemar per condition with Holm, paired bootstrap Δ | Exploratory. No condition significant after Holm |
+| §6.6 run-to-run | Five CT comparisons, including the Week 4 vs Week 5 quasi-repeat | — |
+| §6.7 dependence | Pooled pairs never treated as independent; per-condition tests only | Mixed-effects model (D-E) **not** fitted |
+| RQ2 reference agreement | Raw agreement and κ between Matrix 1 and Matrix 2 labels per dataset | — |
+| D-A | Compatibility verified (CaseIDs, order, report text, keys, prediction format). Both Week 5 batches rescored against the other reference (exploratory) | **No batch selected.** The owner must record the selected batch (RUN-03 or RUN-04) and the reason |
+| D-B balanced accuracy | Not reported | Unresolved |
+| §6.9 pre-specification | Settings fixed in the script before final results were written | Settings were not owner-approved before execution; disclosed |

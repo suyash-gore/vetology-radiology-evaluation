@@ -176,3 +176,20 @@ The Week 4 application and optional JSON prompt-configuration task are implement
 - **The live OpenAI runs have not been executed yet**; they are to be run locally.
 - **No Feline Thorax or Canine Abdomen model results exist yet.** The offline end-to-end run used a fake classifier and is not an evaluation result.
 - The live runs need `OPENAI_API_KEY` in the local `.env`.
+
+
+## Week 8 — Research paper development (2026-11-28)
+
+### Completed
+- Consolidated the research knowledge base and evidence inventory (`ea92818`).
+- Reconciled all evaluation results against the actual workbooks (`6843bab`).
+- Wrote the research design and statistical analysis plan (`fb30842`).
+- Wrote the literature evidence matrix, the gap assessment and a provisional FLAIR crosswalk.
+- Completed the feasible statistical analyses (`analysis/week08_statistics.py`).
+- Wrote the first full manuscript draft (`paper/Research_Paper_Draft_v0.1.md`).
+
+### Status correction
+- The Week 7 Feline Thorax and Canine Abdomen live runs were executed and evaluated on 2026-11-21. The earlier Week 7 lines saying they had not been executed describe the state before those runs.
+
+### Open
+- Owner confirmations on the Gold Standard process, ethics, model snapshots, D-A batch selection and FLAIR Appendix S1 (see `paper/README.md`).

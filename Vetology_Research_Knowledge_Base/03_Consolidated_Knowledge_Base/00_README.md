@@ -92,3 +92,16 @@ Original vocabulary:
 5. Contradictions are kept and attributed, never silently resolved.
 6. No report text, case-level label records, credentials or `.env` contents are copied here. CaseIDs appear only where a source used them as encoded pilot indices; they are not reproduced in this folder.
 7. Candidate novelty claims stay provisional until a literature review and verified evidence support them.
+
+
+## 5. Current state (Week 8, after the manuscript draft)
+
+| Area | Status | Files |
+|---|---|---|
+| Evidence reconciliation | Complete: all 10 evaluations verified and reproduced | `../04_Evidence_and_Artifacts/03_…`, `06_…` |
+| Research design | Approved (`fb30842`); execution record added as §13 | `08_Research_Design_and_Analysis_Plan.md` |
+| Statistics | Feasible analyses complete (intervals, paired contrasts, κ, McNemar, run-to-run, D-A check) | `../04_Evidence_and_Artifacts/07_*`; `../../analysis/week08_statistics.py` |
+| Literature | Targeted preliminary review of 11 seed sources (not systematic); verification status per item | `09_…`, `10_…` |
+| FLAIR | Provisional: 15 of 32 items mapped from owner-described topics; Appendix S1 not retrieved | `11_…` |
+| Manuscript | First full draft v0.1 | `../../paper/Research_Paper_Draft_v0.1.md`, `../../paper/README.md` |
+| Open owner confirmations | Gold Standard process; Matrix 1 label origin; ethics and data permission; model snapshots; D-A selection; prompt provenance (P-1–P-6); Appendix S1 | `05_…` §4; `../../paper/README.md` |
